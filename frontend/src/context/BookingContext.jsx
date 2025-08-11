@@ -106,13 +106,7 @@ export const BookingProvider = ({ children }) => {
   const getUserBookings = async (page = 0, size = 10, sort = 'bookingDate,desc') => {
     setLoading(true);
     try {
-      const response = await api.get('/bookings', {
-        params: {
-          page,
-          size,
-          sort,
-        },
-      });
+      const response = await api.get('/bookings');
 
       const result = response.data;
       console.log(result)

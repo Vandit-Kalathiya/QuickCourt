@@ -64,6 +64,7 @@ export const AuthProvider = ({ children }) => {
         email: data.email,
         name: data.name,
         role: data.role,
+        id: data.id,
       };
     } catch (err) {
       throw new Error("Failed to fetch user profile");
