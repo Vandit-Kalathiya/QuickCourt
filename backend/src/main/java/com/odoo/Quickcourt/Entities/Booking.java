@@ -53,8 +53,7 @@ public class Booking extends BaseEntity {
     @Builder.Default
     private BookingStatus status = BookingStatus.CONFIRMED;
 
-    @OneToOne(mappedBy = "bookingId", cascade = CascadeType.ALL)
-    private Payment payment;
+    private UUID payment;
 
     public enum BookingStatus {
         CONFIRMED, CANCELLED, COMPLETED

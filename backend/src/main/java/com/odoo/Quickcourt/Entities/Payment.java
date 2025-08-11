@@ -19,8 +19,6 @@ import java.util.UUID;
 @Builder
 public class Payment extends BaseEntity {
 
-    @NotNull
-    @Column(nullable = false)
     private UUID bookingId;
 
     @NotNull
