@@ -18,6 +18,7 @@ import AdminPlatformManagement from "./pages/admin-platform-management";
 import AuthPage from "pages/auth/AuthPage";
 import Homepage from "pages/landingPage/HomePage";
 import { useAuth } from "context/AuthContext";
+import Header from "components/ui/Header";
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center min-h-screen">
@@ -27,16 +28,13 @@ const LoadingSpinner = () => (
 
 // Protected route component
 const ProtectedRoute = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, userProfile } = useAuth();
 
   if (loading) {
     return <LoadingSpinner />;
   }
 
-  // Check if user is authenticated
-  const isAuthenticated = user;
-
-  if (!isAuthenticated) {
+  if (!user || !userProfile) {
     return <Navigate to="/auth" replace />;
   }
 
@@ -58,12 +56,9 @@ const PublicRoute = () => {
     return <LoadingSpinner />;
   }
 
-  // Check if user is authenticated
-  const isAuthenticated = user;
-
-  // If user is already authenticated, redirect to dashboard
-  if (isAuthenticated) {
-    return <Navigate to="/user-dashboard" replace />;
+  // If user is authenticated, redirect to dashboard
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <Outlet />;
@@ -74,50 +69,68 @@ const PublicLayout = () => {
   return <Outlet />;
 };
 
+// Single dashboard component that renders based on role
+const Dashboard = () => {
+  const { user, loading, userProfile } = useAuth();
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!user || !userProfile) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  // Render appropriate dashboard based on user role
+  switch (userProfile.role) {
+    case "USER":
+      return <UserDashboardBookingManagement />;
+    case "ADMIN":
+      return <AdminPlatformManagement />;
+    case "OWNER":
+      return <FacilityOwnerDashboard />;
+    default:
+      return <UserDashboardBookingManagement />; // Default fallback
+  }
+};
+
 const Routes = () => {
   return (
     <BrowserRouter>
       <ErrorBoundary>
         <ScrollToTop />
         <RouterRoutes>
+          {/* Public routes */}
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Homepage />} />
-          </Route>
-
-          <Route element={<PublicRoute />}>
-            <Route path="/auth" element={<AuthPage />} />
-          </Route>
-
-          {/* <Route element={<ProtectedRoute />}> */}
-            <Route
-              path="/admin-dashboard"
-              element={<AdminPlatformManagement />}
-            />
-            <Route
-              path="/user-dashboard"
-              element={<UserDashboardBookingManagement />}
-            />
             <Route
               path="/venue-search-listings"
               element={<VenueSearchListings />}
             />
             <Route
-              path="/facility-owner-dashboard"
-              element={<FacilityOwnerDashboard />}
+              path="/venue-details-booking"
+              element={<VenueDetailsBooking />}
             />
+          </Route>
+
+          {/* Auth routes (redirect to dashboard if already logged in) */}
+          <Route element={<PublicRoute />}>
+            <Route path="/auth" element={<AuthPage />} />
+          </Route>
+
+          {/* Protected routes */}
+          <Route element={<ProtectedRoute />}>
+            {/* Single dashboard route that renders based on user role */}
+            <Route path="/dashboard" element={<Dashboard />} />
+
+            {/* Other protected routes */}
             <Route
               path="/facility-court-management"
               element={<FacilityCourtManagement />}
             />
-            <Route
-              path="/venue-details-booking"
-              element={<VenueDetailsBooking />}
-            />
-            <Route
-              path="/admin-platform-management"
-              element={<AdminPlatformManagement />}
-            />
-          {/* </Route> */}
+          </Route>
+
+          {/* Fallback route */}
           <Route path="*" element={<NotFound />} />
         </RouterRoutes>
       </ErrorBoundary>
