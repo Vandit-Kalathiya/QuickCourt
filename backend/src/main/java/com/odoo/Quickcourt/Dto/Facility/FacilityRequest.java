@@ -10,16 +10,17 @@ import java.util.List;
 
 @Data
 public class FacilityRequest {
-    @NotBlank
+
     private String name;
 
     private String description;
 
-    @NotBlank
+
     private String address;
 
-    @NotNull
-    private List<Facility.Sport> sports;
+
+    private List<String> sports;
 
     private List<String> amenities;
+    private boolean active;
 }

@@ -24,6 +24,7 @@ public class Facility extends BaseEntity {
     @Column(nullable = false)
     private UUID ownerId;
 
+
     @NotBlank
     @Column(nullable = false)
     private String name;
@@ -31,13 +32,16 @@ public class Facility extends BaseEntity {
     @Column(length = 1000)
     private String description;
 
+    private String phone;
+    private String email;
+
     @NotBlank
     @Column(nullable = false)
     private String address;
 
     @ElementCollection
     @Enumerated(EnumType.STRING)
-    private List<Sport> sports;
+    private List<String> sports;
 
     @ElementCollection
     private List<String> amenities;
@@ -56,6 +60,9 @@ public class Facility extends BaseEntity {
 
     @OneToMany(mappedBy = "facilityId", cascade = CascadeType.ALL)
     private List<Review> reviews;
+
+    @Builder.Default
+    private Boolean active = true;
 
     public enum Sport {
         FOOTBALL, BASKETBALL, TENNIS, BADMINTON, VOLLEYBALL, CRICKET, SWIMMING
