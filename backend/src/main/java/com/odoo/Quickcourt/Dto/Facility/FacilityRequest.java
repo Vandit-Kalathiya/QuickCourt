@@ -16,6 +16,8 @@ public class FacilityRequest {
 
     private String description;
 
+    private String ownerEmail;
+    private String ownerPhone;
 
     private String address;
 

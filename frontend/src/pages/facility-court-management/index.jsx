@@ -83,20 +83,21 @@ const FacilityCourtManagement = () => {
     { id: "pricing", label: "Pricing Rules", icon: "DollarSign" },
   ];
 
-  const handleFacilityCreate = async (createdFacility) => {
+  const handleFacilityCreate = async (newFacilityData) => {
     try {
+      console.log(newFacilityData);
+      const createdFacility = await createFacility(newFacilityData);
+
       // Add the new facility to the list
       setFacilities((prev) => [...prev, createdFacility]);
 
       // Select the newly created facility
       setSelectedFacilityIndex(facilities.length);
 
-      // Close the modal
       setShowCreateForm(false);
-      
       console.log("New facility created:", createdFacility);
     } catch (error) {
-      console.error("Error handling facility creation:", error);
+      console.error("Error creating facility:", error);
     }
   };
 

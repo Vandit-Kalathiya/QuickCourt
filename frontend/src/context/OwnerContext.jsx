@@ -266,6 +266,17 @@ export const OwnerProvider = ({ children }) => {
     }
   };
 
+  const getApprovedFacilities = async () => {
+    const res = await axios.get(`http://localhost:7000/owner/approved-facilities`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+      },
+    });
+
+    console.log(res.data);
+    return res.data;
+  }
+
   // Clear error
   const clearError = () => {
     dispatch({ type: 'CLEAR_ERROR' });
@@ -281,6 +292,7 @@ export const OwnerProvider = ({ children }) => {
     getFacilityCourts,
     blockTimeSlot,
     unblockTimeSlot,
+    getApprovedFacilities,
     getOwnerDashboard,
     clearError
   };

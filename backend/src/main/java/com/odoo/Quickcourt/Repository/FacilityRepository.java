@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,4 +35,6 @@ public interface FacilityRepository extends JpaRepository<Facility, UUID> {
     @Query("SELECT f.sports as sport, COUNT(f) as count FROM Facility f " +
             "JOIN f.sports s GROUP BY s ORDER BY COUNT(f) DESC")
     List<Object[]> findTopSports();
+
+    List<Facility> findAllByOwnerIdAndStatus(UUID id, Facility.FacilityStatus facilityStatus);
 }

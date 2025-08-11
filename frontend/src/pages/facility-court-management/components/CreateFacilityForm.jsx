@@ -14,8 +14,8 @@ const CreateFacilityForm = ({
     name: '',
     description: '',
     address: '',
-    email: '', // Added email field
-    phoneNumber: '', // Added phone number field
+    ownerEmail: '', // Added ownerEmail field
+    ownerPhone: '', // Added phone number field
     sports: [],
     amenities: [],
     active: true
@@ -105,14 +105,14 @@ const CreateFacilityForm = ({
     setSelectedPhoto(null);
   };
 
-  // Email validation function
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+  // ownerEmail validation function
+  const validateownerEmail = (ownerEmail) => {
+    const ownerEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return ownerEmailRegex.test(ownerEmail);
   };
 
   // Phone number validation function
-  const validatePhoneNumber = (phone) => {
+  const validateownerPhone = (phone) => {
     // Allow various phone number formats: +1234567890, (123) 456-7890, 123-456-7890, etc.
     const phoneRegex = /^[\+]?[1-9][\d]{0,15}$|^[\+]?[\d\s\-\(\)]{10,}$/;
     return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
@@ -133,18 +133,18 @@ const CreateFacilityForm = ({
       newErrors.address = 'Address is required';
     }
 
-    // Email validation
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+    // ownerEmail validation
+    if (!formData.ownerEmail.trim()) {
+      newErrors.ownerEmail = 'ownerEmail is required';
+    } else if (!validateownerEmail(formData.ownerEmail)) {
+      newErrors.ownerEmail = 'Please enter a valid ownerEmail address';
     }
 
     // Phone number validation
-    if (!formData.phoneNumber.trim()) {
-      newErrors.phoneNumber = 'Phone number is required';
-    } else if (!validatePhoneNumber(formData.phoneNumber)) {
-      newErrors.phoneNumber = 'Please enter a valid phone number';
+    if (!formData.ownerPhone.trim()) {
+      newErrors.ownerPhone = 'Phone number is required';
+    } else if (!validateownerPhone(formData.ownerPhone)) {
+      newErrors.ownerPhone = 'Please enter a valid phone number';
     }
 
     if (formData.sports.length === 0) {
@@ -161,8 +161,8 @@ const CreateFacilityForm = ({
       name: '',
       description: '',
       address: '',
-      email: '', // Clear email
-      phoneNumber: '', // Clear phone number
+      ownerEmail: '', // Clear ownerEmail
+      ownerPhone: '', // Clear phone number
       sports: [],
       amenities: [],
       active: true
@@ -186,8 +186,8 @@ const CreateFacilityForm = ({
       formDataToSend.append('name', formData.name);
       formDataToSend.append('description', formData.description);
       formDataToSend.append('address', formData.address);
-      formDataToSend.append('email', formData.email); // Add email to form data
-      formDataToSend.append('phoneNumber', formData.phoneNumber); // Add phone number to form data
+      formDataToSend.append('ownerEmail', formData.ownerEmail); // Add ownerEmail to form data
+      formDataToSend.append('ownerPhone', formData.ownerPhone); // Add phone number to form data
       formDataToSend.append('active', formData.active);
       
       formData.sports.forEach(sport => {
@@ -323,20 +323,20 @@ const CreateFacilityForm = ({
                   {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                 </div>
 
-                {/* Email */}
+                {/* ownerEmail */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Email Address *
+                    ownerEmail Address *
                   </label>
                   <div className="relative">
                     <input
-                      type="email"
+                      type="ownerEmail"
                       className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all ${
-                        errors.email ? 'border-red-500' : 'border-border'
+                        errors.ownerEmail ? 'border-red-500' : 'border-border'
                       }`}
-                      placeholder="Enter email address"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      placeholder="Enter ownerEmail address"
+                      value={formData.ownerEmail}
+                      onChange={(e) => handleInputChange('ownerEmail', e.target.value)}
                       disabled={isSubmitting}
                     />
                     <Icon 
@@ -345,7 +345,7 @@ const CreateFacilityForm = ({
                       className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary"
                     />
                   </div>
-                  {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                  {errors.ownerEmail && <p className="text-red-500 text-sm mt-1">{errors.ownerEmail}</p>}
                 </div>
 
                 {/* Phone Number */}
@@ -357,11 +357,11 @@ const CreateFacilityForm = ({
                     <input
                       type="tel"
                       className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all ${
-                        errors.phoneNumber ? 'border-red-500' : 'border-border'
+                        errors.ownerPhone ? 'border-red-500' : 'border-border'
                       }`}
                       placeholder="Enter phone number"
-                      value={formData.phoneNumber}
-                      onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                      value={formData.ownerPhone}
+                      onChange={(e) => handleInputChange('ownerPhone', e.target.value)}
                       disabled={isSubmitting}
                     />
                     <Icon 
@@ -370,7 +370,7 @@ const CreateFacilityForm = ({
                       className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary"
                     />
                   </div>
-                  {errors.phoneNumber && <p className="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>}
+                  {errors.ownerPhone && <p className="text-red-500 text-sm mt-1">{errors.ownerPhone}</p>}
                 </div>
 
                 {/* Description - Full Width */}
