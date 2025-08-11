@@ -242,7 +242,7 @@ const FacilityCourtManagement = () => {
         <div className="bg-card border-b border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <nav className="flex items-center space-x-2 text-sm">
-              <a href="/dashboard" className="text-text-secondary hover:text-primary transition-colors">
+              <a href="/facility-owner-dashboard" className="text-text-secondary hover:text-primary transition-colors">
                 Dashboard
               </a>
               <Icon name="ChevronRight" size={16} className="text-text-secondary" />
@@ -320,7 +320,7 @@ const FacilityCourtManagement = () => {
       <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <nav className="flex items-center space-x-2 text-sm">
-            <a href="/dashboard" className="text-text-secondary hover:text-primary transition-colors">
+            <a href="/facility-owner-dashboard" className="text-text-secondary hover:text-primary transition-colors">
               Dashboard
             </a>
             <Icon name="ChevronRight" size={16} className="text-text-secondary" />

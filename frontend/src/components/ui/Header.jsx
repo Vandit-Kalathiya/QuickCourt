@@ -57,12 +57,12 @@ const Header = () => {
       navigation: [
         {
           label: "Find Venues",
-          path: "/venue-search-listings",
+          path: "/listings",
           icon: "Search",
         },
         {
           label: "My Bookings",
-          path: "/dashboard",
+          path: "/my-bookings",
           icon: "Calendar",
           badge: "3",
         },
