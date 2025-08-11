@@ -70,7 +70,7 @@ const PublicLayout = () => {
   return (
     <>
       <Header />
-      <div className="pt-16">
+      <div className="pt-[4.6rem]">
         <Outlet />
       </div>
     </>

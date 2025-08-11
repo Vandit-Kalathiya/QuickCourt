@@ -77,7 +77,8 @@ const AuthPage = () => {
 
       if (!formData.confirmPassword) {
         newErrors.confirmPassword = "Please confirm your password";
-      } else if (formData.password !== formData.confirmPassword) {
+      }
+       if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = "Passwords do not match";
       }
     }
