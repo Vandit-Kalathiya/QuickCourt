@@ -1,21 +1,29 @@
 package com.odoo.Quickcourt.Auth.Controllers;
 // controller/AuthController.java
 
+import com.odoo.Quickcourt.Auth.Entities.User;
 import com.odoo.Quickcourt.Auth.Payload.auth.*;
+import com.odoo.Quickcourt.Auth.Repository.UserRepository;
 import com.odoo.Quickcourt.Auth.Services.AuthService;
 import com.odoo.Quickcourt.Auth.Services.OtpService;
+import com.odoo.Quickcourt.Auth.Utills.JwtTokenProvider;
+import com.odoo.Quickcourt.Auth.Utills.JwtUtils;
 import com.odoo.Quickcourt.Services.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -27,6 +35,8 @@ public class AuthController {
     private final AuthService authService;
     private final EmailService emailService;
     private final OtpService otpService;
+    private final JwtTokenProvider jwtHelper;
+    private final UserRepository userRepository;
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest,
@@ -77,6 +87,29 @@ public class AuthController {
                         .message("OTP verified successfully.")
                         .build()
         );
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(HttpServletRequest request) {
+        // Extract token from the Authorization header
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing or invalid Authorization header");
+        }
+
+        String token = authHeader.substring(7); // Remove "Bearer "
+
+        // Extract username from token
+        String username = jwtHelper.getUserIdFromToken(token);
+        if (username == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
+
+        // Fetch user from DB
+        User user = userRepository.findById(UUID.fromString(username))
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        return ResponseEntity.ok(user);
     }
 
 }

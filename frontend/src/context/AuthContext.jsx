@@ -48,7 +48,8 @@ export const AuthProvider = ({ children }) => {
   // Get current user profile from token
   const getCurrentUser = async (token) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/current`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+        method: "GET",
         headers: getHeaders(),
       });
 
@@ -56,6 +57,8 @@ export const AuthProvider = ({ children }) => {
 
       // Since /current returns user profile data, we'll parse it
       const data = await response.json();
+
+      console.log("Current User : ", data);
 
       return {
         mobileNumber: data.mobileNumber,
@@ -114,24 +117,26 @@ export const AuthProvider = ({ children }) => {
 
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify({ identifier, password }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: identifier, password }),
       });
 
       await handleApiError(response);
 
       const data = await response.json();
 
-      console.log(data);
+      console.log("Logged in user:", data);
 
       // Expecting JwtResponse with token field
-      if (!data.jwtToken) {
+      if (!data.token) {
         throw new Error("No token received from server");
       }
 
-      localStorage.setItem("jwtToken", data.jwtToken);
+      localStorage.setItem("jwtToken", data.token);
 
-      const userData = await getCurrentUser(data.jwtToken);
+      const userData = await getCurrentUser(data.token);
 
       setUser(userData ? true : false);
       setUserProfile(userData);
@@ -152,9 +157,11 @@ export const AuthProvider = ({ children }) => {
 
       console.log(signUpData);
 
-      const response = await fetch(`${API_BASE_URL}/api/auth/s/register`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
         method: "POST",
-        headers: getHeaders(),
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(signUpData),
       });
 

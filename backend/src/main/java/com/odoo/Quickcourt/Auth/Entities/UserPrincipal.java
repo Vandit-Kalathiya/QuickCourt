@@ -28,7 +28,7 @@ public class UserPrincipal implements UserDetails {
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
-                user.getPasswordHash(),
+                user.getPassword(),
                 user.getRole(),
 //                user.getVerified(),
                 user.getBanned()
