@@ -1,16 +1,18 @@
 package com.odoo.Quickcourt.Auth.Payload.auth;
-// dto/auth/LoginRequest.java
+// dto/auth/OtpVerificationRequest.java
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class LoginRequest {
+public class OtpVerificationRequest {
     @Email
     @NotBlank
     private String email;
 
     @NotBlank
-    private String password;
+    @Size(min = 6, max = 6)
+    private String otp;
 }
