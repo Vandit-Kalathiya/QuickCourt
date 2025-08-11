@@ -37,11 +37,10 @@ public class OwnerController {
 
     // Facility Management
     @PostMapping("/facilities")
-    @Operation(summary = "Create a new facility")
     public ResponseEntity<FacilityResponse> createFacility(
-            @Valid @RequestPart FacilityRequest request,
-            @RequestPart(required = false) List<MultipartFile> photos) {
-        FacilityResponse facility = facilityService.createFacility(request, photos);
+             @RequestPart FacilityRequest request,
+            @RequestPart(required = false) MultipartFile photo) {
+        FacilityResponse facility = facilityService.createFacility(request, photo);
         return ResponseEntity.ok(facility);
     }
 
@@ -50,8 +49,8 @@ public class OwnerController {
     public ResponseEntity<FacilityResponse> updateFacility(
             @PathVariable UUID id,
             @Valid @RequestPart FacilityRequest request,
-            @RequestPart(required = false) List<MultipartFile> photos) {
-        FacilityResponse facility = facilityService.updateFacility(id, request, photos);
+            @RequestPart(required = false) MultipartFile photo) {
+        FacilityResponse facility = facilityService.updateFacility(id, request, photo);
         return ResponseEntity.ok(facility);
     }
 
