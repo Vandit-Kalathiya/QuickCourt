@@ -25,6 +25,8 @@ const VenueInfo = ({ venue }) => {
     'Gym': 'Dumbbell'
   };
 
+  console.log(venue);
+
   return (
     <div className="space-y-8">
       {/* Basic Info */}
@@ -52,11 +54,11 @@ const VenueInfo = ({ venue }) => {
         <div className="flex items-center space-x-4 text-sm text-text-secondary">
           <div className="flex items-center space-x-1">
             <Icon name="MapPin" size={16} />
-            <span>{venue?.location?.address}</span>
+            <span>{venue?.address}</span>
           </div>
           <div className="flex items-center space-x-1">
             <Icon name="Clock" size={16} />
-            <span>{venue?.operatingHours}</span>
+            <span>{venue?.operatingHours || "8 AM - 10 PM"}</span>
           </div>
         </div>
       </div>

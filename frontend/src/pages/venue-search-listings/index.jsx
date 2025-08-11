@@ -9,17 +9,25 @@ import SearchHeader from "./components/SearchHeader";
 import SortDropdown from "./components/SortDropdown";
 import MapView from "./components/MapView";
 import LoadingSkeleton from "./components/LoadingSkeleton";
+import { useVenue } from "context/VenueContext";
 
 const VenueSearchListings = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams?.get("q") || "");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [viewMode, setViewMode] = useState("list"); // 'list' or 'map'
+  const [viewMode, setViewMode] = useState("list");
   const [sortBy, setSortBy] = useState("relevance");
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedVenue, setSelectedVenue] = useState(null);
-  const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(1);
+
+  const {
+    venues,
+    loading,
+    error,
+    pagination,
+    getFacilities,
+    loadMoreVenues,
+    searchVenues,
+  } = useVenue();
 
   const [filters, setFilters] = useState({
     sports: [],
@@ -30,159 +38,98 @@ const VenueSearchListings = () => {
     amenities: [],
   });
 
-  // Mock venue data
-  const mockVenues = [
-    {
-      id: 1,
-      name: "Elite Tennis Club",
-      image:
-        "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=400&h=300&fit=crop",
-      sports: ["Tennis", "Squash"],
-      rating: 4.8,
-      reviewCount: 124,
-      startingPrice: 45,
-      distance: "0.8 mi",
-      availability: "available",
-      isVerified: true,
-      isPopular: true,
-      isFavorited: false,
-      openingHours: { start: "6:00 AM", end: "10:00 PM" },
-      amenities: [
-        { id: 1, name: "Parking", icon: "Car" },
-        { id: 2, name: "Locker", icon: "Lock" },
-        { id: 3, name: "Shower", icon: "Droplets" },
-        { id: 4, name: "WiFi", icon: "Wifi" },
-      ],
-    },
-    {
-      id: 2,
-      name: "Downtown Basketball Arena",
-      image:
-        "https://images.pexels.com/photos/1752757/pexels-photo-1752757.jpeg?w=400&h=300&fit=crop",
-      sports: ["Basketball", "Volleyball"],
-      rating: 4.6,
-      reviewCount: 89,
-      startingPrice: 35,
-      distance: "1.2 mi",
-      availability: "limited",
-      isVerified: true,
-      isPopular: false,
-      isFavorited: true,
-      openingHours: { start: "7:00 AM", end: "11:00 PM" },
-      amenities: [
-        { id: 1, name: "Parking", icon: "Car" },
-        { id: 2, name: "Equipment", icon: "Dumbbell" },
-        { id: 3, name: "Cafeteria", icon: "Coffee" },
-      ],
-    },
-    {
-      id: 3,
-      name: "Riverside Badminton Center",
-      image:
-        "https://images.pixabay.com/photo/2017/09/03/21/45/badminton-2713062_1280.jpg?w=400&h=300&fit=crop",
-      sports: ["Badminton", "Table Tennis"],
-      rating: 4.4,
-      reviewCount: 67,
-      startingPrice: 25,
-      distance: "2.1 mi",
-      availability: "available",
-      isVerified: false,
-      isPopular: false,
-      isFavorited: false,
-      openingHours: { start: "6:30 AM", end: "9:30 PM" },
-      amenities: [
-        { id: 1, name: "Locker", icon: "Lock" },
-        { id: 2, name: "Equipment", icon: "Dumbbell" },
-        { id: 3, name: "WiFi", icon: "Wifi" },
-      ],
-    },
-    {
-      id: 4,
-      name: "Central Park Sports Complex",
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop",
-      sports: ["Football", "Cricket", "Tennis"],
-      rating: 4.7,
-      reviewCount: 156,
-      startingPrice: 55,
-      distance: "1.8 mi",
-      availability: "busy",
-      isVerified: true,
-      isPopular: true,
-      isFavorited: false,
-      openingHours: { start: "5:00 AM", end: "11:00 PM" },
-      amenities: [
-        { id: 1, name: "Parking", icon: "Car" },
-        { id: 2, name: "Locker", icon: "Lock" },
-        { id: 3, name: "Shower", icon: "Droplets" },
-        { id: 4, name: "Cafeteria", icon: "Coffee" },
-        { id: 5, name: "Pro Shop", icon: "ShoppingBag" },
-      ],
-    },
-    {
-      id: 5,
-      name: "Aquatic Swimming Center",
-      image:
-        "https://images.pexels.com/photos/863988/pexels-photo-863988.jpeg?w=400&h=300&fit=crop",
-      sports: ["Swimming", "Water Polo"],
-      rating: 4.5,
-      reviewCount: 92,
-      startingPrice: 30,
-      distance: "3.2 mi",
-      availability: "available",
-      isVerified: true,
-      isPopular: false,
-      isFavorited: true,
-      openingHours: { start: "6:00 AM", end: "10:00 PM" },
-      amenities: [
-        { id: 1, name: "Parking", icon: "Car" },
-        { id: 2, name: "Locker", icon: "Lock" },
-        { id: 3, name: "Shower", icon: "Droplets" },
-      ],
-    },
-    {
-      id: 6,
-      name: "Urban Squash Club",
-      image:
-        "https://images.pixabay.com/photo/2016/11/29/13/39/squash-1869047_1280.jpg?w=400&h=300&fit=crop",
-      sports: ["Squash", "Racquetball"],
-      rating: 4.3,
-      reviewCount: 45,
-      startingPrice: 40,
-      distance: "2.5 mi",
-      availability: "limited",
-      isVerified: false,
-      isPopular: false,
-      isFavorited: false,
-      openingHours: { start: "7:00 AM", end: "9:00 PM" },
-      amenities: [
-        { id: 1, name: "Equipment", icon: "Dumbbell" },
-        { id: 2, name: "WiFi", icon: "Wifi" },
-      ],
-    },
-  ];
+  const [filteredVenues, setFilteredVenues] = useState([]);
 
-  const [venues, setVenues] = useState(mockVenues);
-  const [filteredVenues, setFilteredVenues] = useState(mockVenues);
+  // Transform API data to match component expectations
+  const transformVenueData = (apiVenues) => {
+    return (
+      apiVenues?.map((venue) => ({
+        id: venue.id,
+        name: venue.name,
+        image: venue.photos?.[0]
+          ? `http://localhost:7000${venue.photos[0]}`
+          : "/placeholder-venue.jpg",
+        sports: venue.sports || [],
+        rating: venue.averageRating || 0,
+        reviewCount: venue.totalReviews || 0,
+        startingPrice: venue.basePrice || 50, // You might need to add this field to your API
+        distance: "0.0 mi", // You'll need to calculate this based on user location
+        availability: venue.status === "APPROVED" ? "available" : "unavailable",
+        isVerified: venue.status === "APPROVED",
+        isPopular: venue.totalReviews > 50, // Define your own logic
+        isFavorited: false, // This would come from user favorites
+        openingHours: {
+          start: venue.openingTime || "6:00 AM",
+          end: venue.closingTime || "10:00 PM",
+        },
+        amenities:
+          venue.amenities?.map((amenity, index) => ({
+            id: index + 1,
+            name: amenity,
+            icon: getAmenityIcon(amenity),
+          })) || [],
+        address: venue.address,
+        phone: venue.phone,
+        description: venue.description,
+        latitude: parseFloat(venue.latitude),
+        longitude: parseFloat(venue.longitude),
+        ownerName: venue.ownerName,
+        createdAt: venue.createdAt,
+      })) || []
+    );
+  };
 
-  // Filter venues based on current filters
+  // Helper function to map amenities to icons
+  const getAmenityIcon = (amenity) => {
+    const iconMap = {
+      Parking: "Car",
+      Locker: "Lock",
+      Shower: "Droplets",
+      WiFi: "Wifi",
+      "First Aid": "Heart",
+      Lighting: "Sun",
+      Equipment: "Dumbbell",
+      Cafeteria: "Coffee",
+      "Pro Shop": "ShoppingBag",
+    };
+    return iconMap[amenity] || "Star";
+  };
+
+  // Initial data fetch
   useEffect(() => {
-    let filtered = [...venues];
+    const fetchInitialVenues = async () => {
+      try {
+        await getFacilities([], "", 0, 12);
+      } catch (error) {
+        console.error("Error fetching venues:", error);
+      }
+    };
+
+    fetchInitialVenues();
+  }, []);
+
+  // Transform and filter venues when data changes
+  useEffect(() => {
+    const transformedVenues = transformVenueData(venues);
+    let filtered = [...transformedVenues];
 
     // Search query filter
     if (searchQuery) {
-      filtered = filtered?.filter(
+      filtered = filtered.filter(
         (venue) =>
           venue?.name?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
           venue?.sports?.some((sport) =>
             sport?.toLowerCase()?.includes(searchQuery?.toLowerCase())
-          )
+          ) ||
+          venue?.description
+            ?.toLowerCase()
+            ?.includes(searchQuery?.toLowerCase())
       );
     }
 
     // Sports filter
     if (filters?.sports?.length > 0) {
-      filtered = filtered?.filter((venue) =>
+      filtered = filtered.filter((venue) =>
         venue?.sports?.some((sport) =>
           filters?.sports?.includes(sport?.toLowerCase())
         )
@@ -190,7 +137,7 @@ const VenueSearchListings = () => {
     }
 
     // Price range filter
-    filtered = filtered?.filter(
+    filtered = filtered.filter(
       (venue) =>
         venue?.startingPrice >= filters?.priceRange?.min &&
         venue?.startingPrice <= filters?.priceRange?.max
@@ -198,24 +145,26 @@ const VenueSearchListings = () => {
 
     // Rating filter
     if (filters?.minRating > 0) {
-      filtered = filtered?.filter(
+      filtered = filtered.filter(
         (venue) => venue?.rating >= filters?.minRating
       );
     }
 
     // Amenities filter
     if (filters?.amenities?.length > 0) {
-      filtered = filtered?.filter((venue) =>
-        filters?.amenities?.some((amenityId) =>
+      filtered = filtered.filter((venue) =>
+        filters?.amenities?.some((amenityFilter) =>
           venue?.amenities?.some((amenity) =>
-            amenity?.name?.toLowerCase()?.includes(amenityId?.replace("-", " "))
+            amenity?.name
+              ?.toLowerCase()
+              ?.includes(amenityFilter?.replace("-", " ")?.toLowerCase())
           )
         )
       );
     }
 
     // Sort venues
-    filtered?.sort((a, b) => {
+    filtered.sort((a, b) => {
       switch (sortBy) {
         case "price-low":
           return a?.startingPrice - b?.startingPrice;
@@ -228,7 +177,7 @@ const VenueSearchListings = () => {
         case "popular":
           return (b?.isPopular ? 1 : 0) - (a?.isPopular ? 1 : 0);
         case "newest":
-          return b?.id - a?.id;
+          return new Date(b?.createdAt) - new Date(a?.createdAt);
         default:
           return 0;
       }
@@ -242,34 +191,44 @@ const VenueSearchListings = () => {
     const active = [];
 
     filters?.sports?.forEach((sport) => {
-      active?.push({ type: "sport", value: sport });
+      active.push({ type: "sport", value: sport });
     });
 
     if (filters?.priceRange?.min > 0 || filters?.priceRange?.max < 200) {
-      active?.push({ type: "priceRange", value: filters?.priceRange });
+      active.push({ type: "priceRange", value: filters?.priceRange });
     }
 
     filters?.venueTypes?.forEach((type) => {
-      active?.push({ type: "venueType", value: type });
+      active.push({ type: "venueType", value: type });
     });
 
     if (filters?.minRating > 0) {
-      active?.push({ type: "rating", value: filters?.minRating });
+      active.push({ type: "rating", value: filters?.minRating });
     }
 
     filters?.amenities?.forEach((amenity) => {
-      active?.push({ type: "amenity", value: amenity });
+      active.push({ type: "amenity", value: amenity });
     });
 
     return active;
   };
 
-  const handleSearchSubmit = (query) => {
+  const handleSearchSubmit = async (query) => {
     setSearchQuery(query);
     if (query) {
       setSearchParams({ q: query });
+      try {
+        await searchVenues(filters.sports, query);
+      } catch (error) {
+        console.error("Search error:", error);
+      }
     } else {
       setSearchParams({});
+      try {
+        await getFacilities(filters.sports);
+      } catch (error) {
+        console.error("Fetch error:", error);
+      }
     }
   };
 
@@ -314,14 +273,14 @@ const VenueSearchListings = () => {
     });
   };
 
-  const loadMoreVenues = () => {
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setPage((prev) => prev + 1);
-      setIsLoading(false);
-      if (page >= 3) setHasMore(false);
-    }, 1000);
+  const handleLoadMoreVenues = async () => {
+    if (pagination.hasNext && !loading) {
+      try {
+        await loadMoreVenues(filters.sports, searchQuery);
+      } catch (error) {
+        console.error("Load more error:", error);
+      }
+    }
   };
 
   const activeFilterCount = getActiveFilters()?.length;
@@ -337,6 +296,7 @@ const VenueSearchListings = () => {
         onRemoveFilter={handleRemoveFilter}
         onClearAllFilters={handleClearAllFilters}
       />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 mt-12">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Desktop Filter Sidebar */}
@@ -403,6 +363,13 @@ const VenueSearchListings = () => {
               </div>
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <p className="text-red-800">{error}</p>
+              </div>
+            )}
+
             {/* Content Area */}
             {viewMode === "list" ? (
               <>
@@ -413,24 +380,26 @@ const VenueSearchListings = () => {
                   ))}
 
                   {/* Loading Skeletons */}
-                  {isLoading && <LoadingSkeleton count={6} />}
+                  {loading && <LoadingSkeleton count={6} />}
                 </div>
 
                 {/* Load More Button */}
-                {hasMore && !isLoading && filteredVenues?.length > 0 && (
-                  <div className="text-center mt-8">
-                    <Button
-                      variant="outline"
-                      onClick={loadMoreVenues}
-                      className="px-8"
-                    >
-                      Load More Venues
-                    </Button>
-                  </div>
-                )}
+                {pagination.hasNext &&
+                  !loading &&
+                  filteredVenues?.length > 0 && (
+                    <div className="text-center mt-8">
+                      <Button
+                        variant="outline"
+                        onClick={handleLoadMoreVenues}
+                        className="px-8"
+                      >
+                        Load More Venues
+                      </Button>
+                    </div>
+                  )}
 
                 {/* No Results */}
-                {filteredVenues?.length === 0 && !isLoading && (
+                {filteredVenues?.length === 0 && !loading && (
                   <div className="text-center py-12">
                     <Icon
                       name="Search"
@@ -462,6 +431,7 @@ const VenueSearchListings = () => {
           </div>
         </div>
       </div>
+
       {/* Mobile Filter Panel */}
       <FilterPanel
         filters={filters}
