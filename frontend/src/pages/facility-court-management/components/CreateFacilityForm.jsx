@@ -14,6 +14,8 @@ const CreateFacilityForm = ({
     name: '',
     description: '',
     address: '',
+    email: '', // Added email field
+    phoneNumber: '', // Added phone number field
     sports: [],
     amenities: [],
     active: true
@@ -103,6 +105,19 @@ const CreateFacilityForm = ({
     setSelectedPhoto(null);
   };
 
+  // Email validation function
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Phone number validation function
+  const validatePhoneNumber = (phone) => {
+    // Allow various phone number formats: +1234567890, (123) 456-7890, 123-456-7890, etc.
+    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$|^[\+]?[\d\s\-\(\)]{10,}$/;
+    return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -116,6 +131,20 @@ const CreateFacilityForm = ({
 
     if (!formData.address.trim()) {
       newErrors.address = 'Address is required';
+    }
+
+    // Email validation
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    // Phone number validation
+    if (!formData.phoneNumber.trim()) {
+      newErrors.phoneNumber = 'Phone number is required';
+    } else if (!validatePhoneNumber(formData.phoneNumber)) {
+      newErrors.phoneNumber = 'Please enter a valid phone number';
     }
 
     if (formData.sports.length === 0) {
@@ -132,6 +161,8 @@ const CreateFacilityForm = ({
       name: '',
       description: '',
       address: '',
+      email: '', // Clear email
+      phoneNumber: '', // Clear phone number
       sports: [],
       amenities: [],
       active: true
@@ -155,6 +186,8 @@ const CreateFacilityForm = ({
       formDataToSend.append('name', formData.name);
       formDataToSend.append('description', formData.description);
       formDataToSend.append('address', formData.address);
+      formDataToSend.append('email', formData.email); // Add email to form data
+      formDataToSend.append('phoneNumber', formData.phoneNumber); // Add phone number to form data
       formDataToSend.append('active', formData.active);
       
       formData.sports.forEach(sport => {
@@ -223,7 +256,7 @@ const CreateFacilityForm = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+    <div className="fixed mt-[3.5rem] inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
       <div className="bg-card border border-border/50 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
         {/* Modal Header */}
         <div className="sticky top-0 bg-card border-b border-border p-6 rounded-t-xl">
@@ -271,8 +304,9 @@ const CreateFacilityForm = ({
                 Basic Information
               </h2>
               
-              <div className="grid grid-cols-1 gap-4">
-                <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Facility Name - Full Width */}
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-foreground mb-2">
                     Facility Name *
                   </label>
@@ -289,7 +323,58 @@ const CreateFacilityForm = ({
                   {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
                 </div>
 
+                {/* Email */}
                 <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Email Address *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all ${
+                        errors.email ? 'border-red-500' : 'border-border'
+                      }`}
+                      placeholder="Enter email address"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      disabled={isSubmitting}
+                    />
+                    <Icon 
+                      name="Mail" 
+                      size={16} 
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary"
+                    />
+                  </div>
+                  {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                </div>
+
+                {/* Phone Number */}
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Phone Number *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="tel"
+                      className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all ${
+                        errors.phoneNumber ? 'border-red-500' : 'border-border'
+                      }`}
+                      placeholder="Enter phone number"
+                      value={formData.phoneNumber}
+                      onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                      disabled={isSubmitting}
+                    />
+                    <Icon 
+                      name="Phone" 
+                      size={16} 
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary"
+                    />
+                  </div>
+                  {errors.phoneNumber && <p className="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>}
+                </div>
+
+                {/* Description - Full Width */}
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-foreground mb-2">
                     Description *
                   </label>
@@ -306,20 +391,28 @@ const CreateFacilityForm = ({
                   {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
                 </div>
 
-                <div>
+                {/* Address - Full Width */}
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-foreground mb-2">
                     Address *
                   </label>
-                  <input
-                    type="text"
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all ${
-                      errors.address ? 'border-red-500' : 'border-border'
-                    }`}
-                    placeholder="Enter complete address"
-                    value={formData.address}
-                    onChange={(e) => handleInputChange('address', e.target.value)}
-                    disabled={isSubmitting}
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all ${
+                        errors.address ? 'border-red-500' : 'border-border'
+                      }`}
+                      placeholder="Enter complete address"
+                      value={formData.address}
+                      onChange={(e) => handleInputChange('address', e.target.value)}
+                      disabled={isSubmitting}
+                    />
+                    <Icon 
+                      name="MapPin" 
+                      size={16} 
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-secondary"
+                    />
+                  </div>
                   {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
                 </div>
               </div>
