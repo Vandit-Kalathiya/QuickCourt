@@ -297,7 +297,7 @@ const VenueSearchListings = () => {
         onClearAllFilters={handleClearAllFilters}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 mt-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 mt-2">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Desktop Filter Sidebar */}
           <div className="hidden lg:block lg:w-80 flex-shrink-0">

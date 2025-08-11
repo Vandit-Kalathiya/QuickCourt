@@ -149,7 +149,6 @@ const Header = () => {
           label: "My Bookings",
           path: "/my-bookings",
           icon: "Calendar",
-          badge: "3",
           description: "Manage your reservations",
         },
       ],
@@ -608,62 +607,6 @@ const Header = () => {
                     </div>
                   </div>
 
-                  {/* Enhanced Menu Items */}
-                  <div className="p-3">
-                    {[
-                      {
-                        path: "/profile",
-                        label: "My Profile",
-                        icon: "User",
-                        description: "Manage your account",
-                      },
-                      {
-                        path: "/settings",
-                        label: "Settings",
-                        icon: "Settings",
-                        description: "Customize preferences",
-                      },
-                      {
-                        path: "/billing",
-                        label: "Billing",
-                        icon: "CreditCard",
-                        description: "Payment & plans",
-                      },
-                      {
-                        path: "/help",
-                        label: "Help & Support",
-                        icon: "HelpCircle",
-                        description: "Get assistance",
-                      },
-                    ].map((item, index) => (
-                      <button
-                        key={item.path}
-                        onClick={() => {
-                          navigate(item.path);
-                          setIsProfileMenuOpen(false);
-                        }}
-                        className="flex items-center space-x-4 px-4 py-3.5 text-sm text-gray-800 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 rounded-2xl transition-all duration-300 group w-full text-left focus:outline-none focus:ring-2 focus:ring-blue-500/30 hover:scale-[1.02]"
-                        role="menuitem"
-                        style={{ animationDelay: `${index * 50}ms` }}
-                      >
-                        <div className="p-2 bg-gray-100 rounded-xl group-hover:bg-white group-hover:scale-110 transition-all duration-300">
-                          <Icon
-                            name={item.icon}
-                            size={16}
-                            className="group-hover:text-blue-600 transition-colors duration-300"
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-semibold">{item.label}</p>
-                          <p className="text-xs text-gray-500">
-                            {item.description}
-                          </p>
-                        </div>
-                      </button>
-                    ))}
-
-                    <div className="border-t border-gray-200/50 my-3" />
-
                     <button
                       onClick={() => {
                         handleLogout();
@@ -687,7 +630,6 @@ const Header = () => {
                       </div>
                     </button>
                   </div>
-                </div>
               )}
             </div>
 
