@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-
 import Button from '../../../components/ui/Button';
 
 const BookingActivityChart = () => {
@@ -43,132 +42,175 @@ const BookingActivityChart = () => {
   };
 
   return (
-    <div className="bg-card border border-border rounded-lg p-6 shadow-subtle">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-        <div>
-          <h3 className="text-lg font-semibold text-foreground">Booking Activity Trends</h3>
-          <p className="text-sm text-text-secondary mt-1">Platform booking patterns over time</p>
-        </div>
-        <div className="flex items-center space-x-3 mt-4 sm:mt-0">
-          <div className="flex items-center space-x-2">
-            {timeRangeOptions?.map((option) => (
+    <div className="relative bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl p-8 shadow-xl shadow-gray-900/5 hover:shadow-2xl hover:shadow-gray-900/10 transition-all duration-500 group overflow-hidden">
+      {/* Subtle gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 via-pink-50/30 to-cyan-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      
+      <div className="relative">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+          <div>
+            <div className="inline-flex items-center bg-purple-100/80 backdrop-blur-sm rounded-full px-2 py-2 mb-4 border border-purple-200/50 shadow-sm">
+              <div className="w-2 h-2 bg-purple-500 rounded-full mr-2 animate-pulse"></div>
+              <span className="text-purple-700 text-sm font-semibold">Analytics</span>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Booking Activity Trends</h3>
+            <p className="text-gray-600 font-medium">Platform booking patterns over time</p>
+          </div>
+          
+          <div className="flex items-center space-x-1 mt-6 sm:mt-0">
+            {/* Time Range Buttons */}
+            <div className="flex items-center bg-white/80 backdrop-blur-xl rounded-2xl p-1 border border-white/50 shadow-lg shadow-gray-900/5">
+              {timeRangeOptions?.map((option) => (
+                <button
+                  key={option?.value}
+                  onClick={() => setTimeRange(option?.value)}
+                  className={`px-4 py-2 text-sm rounded-xl font-semibold transition-all duration-300 ${
+                    timeRange === option?.value
+                      ? 'bg-gradient-to-r from-purple-500 to-cyan-500 text-white shadow-lg'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-white/80'
+                  }`}
+                >
+                  {option?.label}
+                </button>
+              ))}
+            </div>
+            
+            {/* Chart Type Buttons */}
+            <div className="flex items-center bg-white/80 backdrop-blur-xl rounded-2xl p-1 border border-white/50 shadow-lg shadow-gray-900/5">
               <button
-                key={option?.value}
-                onClick={() => setTimeRange(option?.value)}
-                className={`px-3 py-1 text-sm rounded-md transition-smooth ${
-                  timeRange === option?.value
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-text-secondary hover:bg-muted/80'
+                onClick={() => setChartType('line')}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                  chartType === 'line'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-white/80'
                 }`}
               >
-                {option?.label}
+                <span>📈</span>
+                <span>Line</span>
               </button>
-            ))}
+              <button
+                onClick={() => setChartType('bar')}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                  chartType === 'bar'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-white/80'
+                }`}
+              >
+                <span>📊</span>
+                <span>Bar</span>
+              </button>
+            </div>         
           </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant={chartType === 'line' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setChartType('line')}
-              iconName="TrendingUp"
+        </div>
+
+        {/* Enhanced Chart Container */}
+        <div className="w-full h-80 bg-white/50 backdrop-blur-sm rounded-2xl p-4 border border-white/30 shadow-inner" aria-label="Booking Activity Chart">
+          <ResponsiveContainer width="100%" height="100%">
+            {chartType === 'line' ? (
+              <LineChart data={bookingData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="#6B7280"
+                  fontSize={12}
+                  fontWeight="500"
+                />
+                <YAxis 
+                  stroke="#6B7280"
+                  fontSize={12}
+                  fontWeight="500"
+                />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(229, 231, 235, 0.5)',
+                    borderRadius: '16px',
+                    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+                    fontWeight: '600'
+                  }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="bookings" 
+                  stroke="url(#lineGradient)" 
+                  strokeWidth={3}
+                  dot={{ fill: '#8B5CF6', strokeWidth: 2, r: 5 }}
+                  activeDot={{ r: 8, stroke: '#8B5CF6', strokeWidth: 3, fill: '#fff' }}
+                />
+                <defs>
+                  <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#8B5CF6" />
+                    <stop offset="100%" stopColor="#06B6D4" />
+                  </linearGradient>
+                </defs>
+              </LineChart>
+            ) : (
+              <BarChart data={bookingData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="#6B7280"
+                  fontSize={12}
+                  fontWeight="500"
+                />
+                <YAxis 
+                  stroke="#6B7280"
+                  fontSize={12}
+                  fontWeight="500"
+                />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(229, 231, 235, 0.5)',
+                    borderRadius: '16px',
+                    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+                    fontWeight: '600'
+                  }}
+                />
+                <Bar 
+                  dataKey="bookings" 
+                  fill="url(#barGradient)"
+                  radius={[8, 8, 0, 0]}
+                />
+                <defs>
+                  <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#8B5CF6" />
+                    <stop offset="100%" stopColor="#06B6D4" />
+                  </linearGradient>
+                </defs>
+              </BarChart>
+            )}
+          </ResponsiveContainer>
+        </div>
+
+        {/* Enhanced Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8 pt-8 border-t border-gray-200/50">
+          {[
+            { number: "4,192", label: "Total Bookings", icon: "🎯", gradient: "from-yellow-400 to-orange-500" },
+            { number: "$209,600", label: "Total Revenue", icon: "💰", gradient: "from-emerald-400 to-teal-500" },
+            { number: "349", label: "Avg Daily", icon: "📈", gradient: "from-blue-400 to-indigo-500" },
+            { number: "+18.5%", label: "Growth Rate", icon: "🚀", gradient: "from-purple-400 to-pink-500" }
+          ].map((stat, index) => (
+            <div 
+              key={index}
+              className="relative bg-white/60 backdrop-blur-xl rounded-2xl p-6 border border-white/30 shadow-lg shadow-gray-900/5 hover:shadow-xl hover:shadow-gray-900/10 transition-all duration-500 group hover:-translate-y-2 overflow-hidden"
+              style={{ animationDelay: `${index * 150}ms` }}
             >
-              Line
-            </Button>
-            <Button
-              variant={chartType === 'bar' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setChartType('bar')}
-              iconName="BarChart3"
-            >
-              Bar
-            </Button>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExport}
-            iconName="Download"
-          >
-            Export
-          </Button>
-        </div>
-      </div>
-      <div className="w-full h-80" aria-label="Booking Activity Chart">
-        <ResponsiveContainer width="100%" height="100%">
-          {chartType === 'line' ? (
-            <LineChart data={bookingData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-              <XAxis 
-                dataKey="date" 
-                stroke="#6B7280"
-                fontSize={12}
-              />
-              <YAxis 
-                stroke="#6B7280"
-                fontSize={12}
-              />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: '#FFFFFF',
-                  border: '1px solid #E5E7EB',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                }}
-              />
-              <Line 
-                type="monotone" 
-                dataKey="bookings" 
-                stroke="#1E40AF" 
-                strokeWidth={2}
-                dot={{ fill: '#1E40AF', strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6, stroke: '#1E40AF', strokeWidth: 2 }}
-              />
-            </LineChart>
-          ) : (
-            <BarChart data={bookingData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-              <XAxis 
-                dataKey="date" 
-                stroke="#6B7280"
-                fontSize={12}
-              />
-              <YAxis 
-                stroke="#6B7280"
-                fontSize={12}
-              />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: '#FFFFFF',
-                  border: '1px solid #E5E7EB',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-                }}
-              />
-              <Bar 
-                dataKey="bookings" 
-                fill="#1E40AF"
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          )}
-        </ResponsiveContainer>
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-border">
-        <div className="text-center">
-          <p className="text-2xl font-bold text-foreground">4,192</p>
-          <p className="text-sm text-text-secondary">Total Bookings</p>
-        </div>
-        <div className="text-center">
-          <p className="text-2xl font-bold text-success">$209,600</p>
-          <p className="text-sm text-text-secondary">Total Revenue</p>
-        </div>
-        <div className="text-center">
-          <p className="text-2xl font-bold text-foreground">349</p>
-          <p className="text-sm text-text-secondary">Avg Daily</p>
-        </div>
-        <div className="text-center">
-          <p className="text-2xl font-bold text-accent">+18.5%</p>
-          <p className="text-sm text-text-secondary">Growth Rate</p>
+              <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
+              
+              <div className="relative text-center">
+                <div className="text-3xl mb-3 group-hover:scale-125 transition-transform duration-500">
+                  {stat.icon}
+                </div>
+                <p className="text-2xl font-black text-gray-900 mb-1 group-hover:text-purple-600 transition-colors duration-300">
+                  {stat.number}
+                </p>
+                <p className="text-sm text-gray-600 font-semibold">{stat.label}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
