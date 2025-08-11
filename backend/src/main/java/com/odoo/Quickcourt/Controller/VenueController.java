@@ -4,6 +4,7 @@ package com.odoo.Quickcourt.Controller;
 import com.odoo.Quickcourt.Dto.Facility.FacilityResponse;
 import com.odoo.Quickcourt.Dto.Review.ReviewResponse;
 import com.odoo.Quickcourt.Entities.Facility;
+import com.odoo.Quickcourt.Exception.BadRequestException;
 import com.odoo.Quickcourt.Services.FacilityService;
 import com.odoo.Quickcourt.Services.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,9 +12,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,6 +35,15 @@ public class VenueController {
             @RequestParam(required = false) List<Facility.Sport> sports,
             @RequestParam(required = false) String name,
             Pageable pageable) {
+        // Validate sort fields
+        List<String> validSortFields = Arrays.asList("name", "id", "status", "createdAt");
+        for (Sort.Order order : pageable.getSort()) {
+            String sortProperty = order.getProperty();
+            if (!validSortFields.contains(sortProperty)) {
+                throw new BadRequestException("Invalid sort field: " + sortProperty + ". Valid fields are: " + validSortFields);
+            }
+        }
+
         Page<FacilityResponse> facilities = facilityService.getApprovedFacilities(sports, name, pageable);
         return ResponseEntity.ok(facilities);
     }
