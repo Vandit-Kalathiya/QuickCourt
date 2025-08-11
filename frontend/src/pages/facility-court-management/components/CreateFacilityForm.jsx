@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const CreateFacilityForm = ({ onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -21,6 +23,7 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const availableAmenities = [
     'Parking', 'Changing Rooms', 'Showers', 'Equipment Rental',
@@ -210,7 +213,7 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
       console.log(formData)
 
       // Submit the multipart form data
-      const response = await fetch('/api/facilities', {
+      const response = await fetch('http://localhost:7000/owner/facilities', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
@@ -221,7 +224,9 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
 
       if (response.ok) {
         const result = await response.json();
-        onSubmit(result);
+        navigate("/facility-court-management");
+        toast.success('Facility created successfully!');
+        // onSubmit(result);
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to create facility');
