@@ -125,7 +125,7 @@ const AuthPage = () => {
       // Call your email verification API here
 
       const response = await sendEmailOTP(formData.email);
-      if (!response.ok) {
+      if (!response.success) {
         throw new Error("Failed to send OTP");
       }
       setIsEmailOtpSent(true);
@@ -181,7 +181,7 @@ const AuthPage = () => {
 
       const response = await verifyOtp(formData.email, otpValue);
 
-      if (!response.ok) {
+      if (!response.success) {
         throw new Error("Invalid OTP");
       }
 
