@@ -344,6 +344,7 @@ const FacilityCourtManagement = () => {
           isOpen={showCreateForm}
           onSubmit={handleFacilityCreate}
           onCancel={() => setShowCreateForm(false)}
+          setShowCreateForm={() => setShowCreateForm}
         />
       </div>
     );
@@ -470,7 +471,7 @@ const FacilityCourtManagement = () => {
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-success">
-                  ${selectedFacility.monthlyRevenue || 0}
+                  ₹ {selectedFacility.monthlyRevenue || 0}
                 </div>
                 <div className="text-sm text-text-secondary">
                   Monthly Revenue
@@ -511,6 +512,7 @@ const FacilityCourtManagement = () => {
         isOpen={showCreateForm}
         onSubmit={handleFacilityCreate}
         onCancel={() => setShowCreateForm(false)}
+        setShowCreateForm={() => setShowCreateForm(false)}
       />
     </div>
   );
