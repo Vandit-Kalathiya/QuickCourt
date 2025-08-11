@@ -194,9 +194,14 @@ const CreateFacilityForm = ({ onSubmit, onCancel, apiEndpoint = 'http://localhos
       }
 
       const result = await response.json();
-      
+      console.log('Facility created:', result);
+
+      toast.success('Facility created successfully');
+
+      navigate("/facility-court-management");
+
       // Call parent component's onSubmit with the response
-      onSubmit(result);
+      // onSubmit(result);
       
     } catch (error) {
       console.error('Error creating facility:', error);

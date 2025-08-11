@@ -18,6 +18,7 @@ const FacilityInfoTab = ({ facility, onUpdate }) => {
   const [photos, setPhotos] = useState(facility?.photos);
   const [draggedIndex, setDraggedIndex] = useState(null);
 
+
   const availableAmenities = [
     'Parking', 'Changing Rooms', 'Showers', 'Equipment Rental',
     'Cafeteria', 'First Aid', 'Air Conditioning', 'WiFi',

@@ -24,7 +24,6 @@ public class Facility extends BaseEntity {
     @Column(nullable = false)
     private UUID ownerId;
 
-
     @NotBlank
     @Column(nullable = false)
     private String name;
