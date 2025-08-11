@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Icon from '../AppIcon';
 import Button from './Button';
 import Input from './Input';
-import Select from './Select';
 import { useAuth } from 'context/AuthContext';
+import Select from './Select';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -29,19 +29,30 @@ const Header = () => {
     }
   }, [userProfile]);
 
-  // Get role label based on role value
-  const getRoleLabel = (role) => {
-    const roleLabels = {
-      'user': 'Sports Enthusiast',
-      'owner': 'Facility Owner',
-      'admin': 'Administrator'
-    };
-    return roleLabels[role] || 'Sports Enthusiast';
+  // console.log(userProfile.role, user);
+
+  // Role options - only show if user has multiple roles or is admin
+  const getAllRoleOptions = () => [
+    { value: 'user', label: 'Sports Enthusiast' },
+    { value: 'owner', label: 'Facility Owner' },
+    { value: 'admin', label: 'Administrator' }
+  ];
+
+  // Determine if role switching should be allowed
+  const canSwitchRoles = userProfile?.role?.toLowerCase() !== 'user';
+  
+  // Get available role options based on user's actual role
+  const getRoleOptions = () => {
+    if (!canSwitchRoles) {
+      // If user is 'USER', only show their current role (no switching allowed)
+      return [{ value: 'user', label: 'Sports Enthusiast' }];
+    }
+    
+    // For owners/admins, show all available roles
+    return getAllRoleOptions()
   };
 
-  // For this updated requirement, no role switching is allowed for any user
-  // Each user sees only their current role as a read-only display
-  const canSwitchRoles = false; // Disabled role switching completely
+  const roleOptions = getRoleOptions();
 
   const navigationItems = {
     user: [
