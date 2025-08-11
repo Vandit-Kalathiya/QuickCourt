@@ -5,6 +5,7 @@ package com.odoo.Quickcourt.Services;
 import com.odoo.Quickcourt.Auth.Entities.UserPrincipal;
 import com.odoo.Quickcourt.Dto.Booking.BookingRequest;
 import com.odoo.Quickcourt.Dto.Booking.BookingResponse;
+import com.odoo.Quickcourt.Dto.Payment.CreateOrderRequest;
 import com.odoo.Quickcourt.Entities.Booking;
 import com.odoo.Quickcourt.Entities.Court;
 import com.odoo.Quickcourt.Entities.Facility;
@@ -89,7 +90,12 @@ public class BookingService {
         booking = bookingRepository.save(booking);
 
         // Process payment
-        paymentService.processPayment(booking.getId(), totalPrice);
+        paymentService.createOrder(CreateOrderRequest.builder()
+                .amount(totalPrice)
+                .currency("INR")
+                .description("Booking for court " + court.getName())
+                .bookingId(booking.getId())
+                .build());
 
         return mapToResponse(booking, facility, court);
     }

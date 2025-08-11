@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -19,6 +20,8 @@ import java.util.UUID;
 @Builder
 public class Payment extends BaseEntity {
 
+    @NotNull
+    @Column(nullable = false)
     private UUID bookingId;
 
     @NotNull
@@ -33,7 +36,20 @@ public class Payment extends BaseEntity {
 
     private String transactionId;
 
+    // Razorpay specific fields
+    private String razorpayOrderId;
+    private String razorpayPaymentId;
+    private String razorpaySignature;
+
+    private String failureReason;
+    private LocalDateTime paidAt;
+
+    // Additional metadata
+    private String customerEmail;
+    private String customerPhone;
+
     public enum PaymentStatus {
-        PENDING, COMPLETED, FAILED, REFUNDED
+        PENDING, CREATED, AUTHORIZED, COMPLETED, FAILED, REFUNDED
     }
 }
+
