@@ -45,7 +45,7 @@ public interface SlotRepository extends JpaRepository<Court, UUID> {
                 FROM bookings b
                 WHERE b.court_id = sr.court_id
                   AND b.date = :bookingDate
-                  AND b.status = 'CONFIRMED'
+                  AND b.status = 'COMPLETED'
                   AND (b.start_time < sr.end_time AND b.end_time > sr.start_time)
             )
             AND NOT EXISTS (

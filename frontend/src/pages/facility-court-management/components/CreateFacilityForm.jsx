@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import toast from 'react-hot-toast';
+import { Navigate } from 'react-router-dom';
 
 const CreateFacilityForm = ({ 
   isOpen, 
@@ -222,7 +223,9 @@ const CreateFacilityForm = ({
 
       // Clear form and close modal
       clearForm();
+    
       onSubmit(result);
+      
       
     } catch (error) {
       console.error('Error creating facility:', error);
