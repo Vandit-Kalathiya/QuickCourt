@@ -56,21 +56,20 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
     @PostMapping("/email/send")
-    public String sendEmailOtp(@RequestParam String email) {
+    public ResponseEntity<String> sendEmailOtp(@RequestParam String email) {
         String otp = otpService.sendEmailOtp(email);
-        return "OTP sent successfully to " + email + ". Please check your SMS.";
+        return ResponseEntity.ok("OTP sent successfully to " + email + ". Please check your SMS.");
     }
 
     @PostMapping("/verify-otp")
     public ResponseEntity<ApiResponse> verifyOtp(@RequestBody OtpVerificationRequest request) throws BadRequestException {
         if(!otpService.verifyOtp(request.getEmail(),  request.getOtp()))
         {
-            return ResponseEntity.ok(
-                    ApiResponse.builder()
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.builder()
                             .success(false)
-                            .message("Invalid OTP.")
-                            .build()
-            );
+                            .message("Invalid OTP or OTP expired.")
+                            .build());
         }
         return ResponseEntity.ok(
                 ApiResponse.builder()

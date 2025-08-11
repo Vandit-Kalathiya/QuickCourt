@@ -204,7 +204,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
 
-      const response = await fetch(`${API_BASE_URL}/api/auth/otp/email/send`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/email/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -213,8 +213,9 @@ export const AuthProvider = ({ children }) => {
           email: email,
         }),
       });
-
+      console.log("res : ", response);
       await handleApiError(response);
+      console.log("response : ", response);
       const message = await response.text();
       return { success: true, message };
     } catch (error) {
@@ -222,36 +223,69 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
-
   const verifyOtp = async (identifier, otp) => {
     try {
       setError(null);
 
-      const response = await fetch(`${API_BASE_URL}/api/auth/otp/verify`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/json",
         },
-        body: new URLSearchParams({
-          identifier: identifier,
+        body: JSON.stringify({
+          email: identifier,
           otp: otp,
         }),
       });
 
       await handleApiError(response);
-      const result = await response.text();
 
-      // Check if verification was successful
-      const isValid = result === "true";
+      const result = await response.json(); // Parse JSON
+      console.log("Backend JSON response:", result); // ✅ This will show your { success, message, data }
+
+      const isValid = result.success === true;
+
       return {
         success: isValid,
-        message: isValid ? "OTP verified successfully" : result,
+        message:
+          result.message ||
+          (isValid ? "OTP verified successfully" : "Invalid OTP"),
       };
     } catch (error) {
       setError(error.message || "Failed to verify OTP");
       throw error;
     }
   };
+
+  // const verifyOtp = async (identifier, otp) => {
+  //   try {
+  //     setError(null);
+
+  //     const response = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: {
+  //         email: identifier,
+  //         otp: otp,
+  //       },
+  //     });
+
+  //     await handleApiError(response);
+  //     const result = await response.text();
+
+  //     // Check if verification was successful
+  //     const isValid = result.success === "true";
+  //     return {
+  //       success: isValid,
+  //       message: isValid ? "OTP verified successfully" : result,
+  //     };
+  //   } catch (error) {
+  //     setError(error.message || "Failed to verify OTP");
+  //     throw error;
+  //   }
+  // };
 
   const value = {
     user,
@@ -262,7 +296,7 @@ export const AuthProvider = ({ children }) => {
     signUp,
     signOut,
     sendEmailOTP,
-    verifyOtp
+    verifyOtp,
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
