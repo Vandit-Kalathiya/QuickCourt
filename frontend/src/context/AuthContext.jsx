@@ -302,6 +302,7 @@ export const AuthProvider = ({ children }) => {
     signOut,
     sendEmailOTP,
     verifyOtp,
+    getCurrentUser,
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

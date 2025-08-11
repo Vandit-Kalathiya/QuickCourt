@@ -45,6 +45,9 @@ public class Facility extends BaseEntity {
     @ElementCollection
     private List<String> amenities;
 
+    private String longitude;
+    private String latitude;
+
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private FacilityStatus status = FacilityStatus.PENDING;
