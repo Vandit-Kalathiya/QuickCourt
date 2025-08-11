@@ -1,184 +1,183 @@
-import React, { useState } from 'react';
-import Icon from '../../components/AppIcon';
-import Button from '../../components/ui/Button';
-import FacilityInfoTab from './components/FacilityInfoTab';
-import CourtManagementTab from './components/CourtManagementTab';
-import AvailabilityTab from './components/AvailabilityTab';
-import PricingTab from './components/PricingTab';
-import CreateFacilityForm from './components/CreateFacilityForm';
-import { useOwner } from 'context/OwnerContext';
+import React, { useEffect, useState } from "react";
+import Icon from "../../components/AppIcon";
+import Button from "../../components/ui/Button";
+import FacilityInfoTab from "./components/FacilityInfoTab";
+import CourtManagementTab from "./components/CourtManagementTab";
+import AvailabilityTab from "./components/AvailabilityTab";
+import PricingTab from "./components/PricingTab";
+import CreateFacilityForm from "./components/CreateFacilityForm";
+import { useOwner } from "context/OwnerContext";
 
 const FacilityCourtManagement = () => {
-  const [activeTab, setActiveTab] = useState('facility');
+  const [activeTab, setActiveTab] = useState("facility");
   const [showCreateForm, setShowCreateForm] = useState(false);
-  
-  // Set this to true to simulate no facilities for new users
-  const [hasFacilities, setHasFacilities] = useState(false);
-  const {createFacility} = useOwner();
+  const [selectedFacilityIndex, setSelectedFacilityIndex] = useState(0);
 
-  // Mock facility data
-  const [facility, setFacility] = useState(hasFacilities ? {
-    id: 1,
-    name: "Elite Sports Complex",
-    description: `Premier sports facility offering world-class courts and amenities for athletes of all levels.\n\nOur state-of-the-art complex features professional-grade surfaces, modern lighting systems, and comprehensive support facilities to ensure the best possible sporting experience.`,
-    address: "123 Sports Avenue, Downtown District, New York, NY 10001",
-    phone: "+1 (555) 123-4567",
-    email: "info@elitesportscomplex.com",
-    coordinates: {
-      lat: 40.7589,
-      lng: -73.9851
-    },
-    amenities: [
-      'Parking', 'Changing Rooms', 'Showers', 'Equipment Rental',
-      'Cafeteria', 'First Aid', 'Air Conditioning', 'WiFi', 'Lockers'
-    ],
-    photos: [
-      { id: 1, url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800', name: 'Main Court' },
-      { id: 2, url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800', name: 'Tennis Courts' },
-      { id: 3, url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800', name: 'Basketball Court' },
-      { id: 4, url: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800', name: 'Facilities' }
-    ]
-  } : null);
+  const { createFacility, getOwnerFacilities, loading } = useOwner();
+  const [facilities, setFacilities] = useState([]);
+  const [courts, setCourts] = useState([]);
+  const [availability, setAvailability] = useState({});
+  const [pricingRules, setPricingRules] = useState([]);
 
-  // Mock courts data
-  const [courts, setCourts] = useState(hasFacilities ? [
-    {
-      id: 1,
-      name: "Tennis Court A",
-      sportType: "tennis",
-      hourlyRate: 45.00,
-      operatingHours: { start: "06:00", end: "22:00" },
-      status: "active",
-      description: "Professional tennis court with synthetic grass surface"
-    },
-    {
-      id: 2,
-      name: "Basketball Court 1",
-      sportType: "basketball",
-      hourlyRate: 35.00,
-      operatingHours: { start: "07:00", end: "23:00" },
-      status: "active",
-      description: "Indoor basketball court with wooden flooring"
-    },
-    {
-      id: 3,
-      name: "Badminton Court B",
-      sportType: "badminton",
-      hourlyRate: 25.00,
-      operatingHours: { start: "06:00", end: "21:00" },
-      status: "active",
-      description: "Air-conditioned badminton court with professional lighting"
-    },
-    {
-      id: 4,
-      name: "Squash Court 1",
-      sportType: "squash",
-      hourlyRate: 30.00,
-      operatingHours: { start: "08:00", end: "22:00" },
-      status: "maintenance",
-      description: "Glass-walled squash court with climate control"
+  // Get currently selected facility
+  const selectedFacility = facilities[selectedFacilityIndex];
+
+  useEffect(() => {
+    const fetchFacilities = async () => {
+      try {
+        const facilitiesData = await getOwnerFacilities();
+        setFacilities(facilitiesData || []);
+
+        // Initialize data for first facility if exists
+        if (facilitiesData && facilitiesData.length > 0) {
+          // Mock data for courts, availability, and pricing
+          // In real app, these would be fetched based on selected facility
+          initializeFacilityData(facilitiesData[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching facilities:", error);
+        setFacilities([]);
+      }
+    };
+
+    fetchFacilities();
+  }, [getOwnerFacilities]);
+
+  // Initialize data when facility selection changes
+  useEffect(() => {
+    if (selectedFacility) {
+      initializeFacilityData(selectedFacility);
     }
-  ] : []);
+  }, [selectedFacility]);
 
-  // Mock availability data
-  const [availability, setAvailability] = useState(hasFacilities ? {
-    '1-2025-01-11-09:00': 'booked',
-    '1-2025-01-11-10:00': 'booked',
-    '1-2025-01-11-18:00': 'blocked',
-    '1-2025-01-11-19:00': 'blocked',
-    '2-2025-01-11-15:00': 'booked',
-    '2-2025-01-11-16:00': 'booked',
-    '3-2025-01-11-20:00': 'maintenance',
-    '4-2025-01-11-14:00': 'maintenance',
-    '4-2025-01-11-15:00': 'maintenance'
-  } : {});
+  console.log(selectedFacility);
 
-  // Mock pricing rules
-  const [pricingRules, setPricingRules] = useState(hasFacilities ? [
-    {
-      id: 1,
-      courtId: 1,
-      name: "Evening Peak Hours",
-      type: "peak_hours",
-      conditions: {
-        days: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-        timeStart: "18:00",
-        timeEnd: "22:00"
+  const initializeFacilityData = (facility) => {
+    // Mock courts data - in real app, fetch from API based on facility ID
+    setCourts([
+      {
+        id: 1,
+        facilityId: facility.id,
+        name: "Tennis Court A",
+        sportType: "tennis",
+        hourlyRate: 45.0,
+        operatingHours: { start: "06:00", end: "22:00" },
+        status: "active",
+        description: "Professional tennis court with synthetic grass surface",
       },
-      adjustment: { type: "percentage", value: 25 },
-      active: true,
-      createdAt: "2025-01-01T00:00:00Z"
-    },
-    {
-      id: 2,
-      courtId: 1,
-      name: "Weekend Premium",
-      type: "weekend",
-      conditions: {
-        days: ['saturday', 'sunday'],
-        timeStart: "08:00",
-        timeEnd: "20:00"
+      {
+        id: 2,
+        facilityId: facility.id,
+        name: "Basketball Court 1",
+        sportType: "basketball",
+        hourlyRate: 35.0,
+        operatingHours: { start: "07:00", end: "23:00" },
+        status: "active",
+        description: "Indoor basketball court with wooden flooring",
       },
-      adjustment: { type: "percentage", value: 15 },
-      active: true,
-      createdAt: "2025-01-01T00:00:00Z"
-    },
-    {
-      id: 3,
-      courtId: 2,
-      name: "Prime Time Basketball",
-      type: "peak_hours",
-      conditions: {
-        days: ['friday', 'saturday', 'sunday'],
-        timeStart: "19:00",
-        timeEnd: "23:00"
+      {
+        id: 3,
+        facilityId: facility.id,
+        name: "Badminton Court B",
+        sportType: "badminton",
+        hourlyRate: 25.0,
+        operatingHours: { start: "06:00", end: "21:00" },
+        status: "active",
+        description:
+          "Air-conditioned badminton court with professional lighting",
       },
-      adjustment: { type: "fixed", value: 10 },
-      active: true,
-      createdAt: "2025-01-01T00:00:00Z"
-    }
-  ] : []);
+    ]);
+
+    // Mock availability data
+    setAvailability({
+      "1-2025-01-11-09:00": "booked",
+      "1-2025-01-11-10:00": "booked",
+      "1-2025-01-11-18:00": "blocked",
+      "1-2025-01-11-19:00": "blocked",
+      "2-2025-01-11-15:00": "booked",
+      "2-2025-01-11-16:00": "booked",
+      "3-2025-01-11-20:00": "maintenance",
+    });
+
+    // Mock pricing rules
+    setPricingRules([
+      {
+        id: 1,
+        facilityId: facility.id,
+        courtId: 1,
+        name: "Evening Peak Hours",
+        type: "peak_hours",
+        conditions: {
+          days: ["monday", "tuesday", "wednesday", "thursday", "friday"],
+          timeStart: "18:00",
+          timeEnd: "22:00",
+        },
+        adjustment: { type: "percentage", value: 25 },
+        active: true,
+        createdAt: "2025-01-01T00:00:00Z",
+      },
+    ]);
+  };
 
   const tabs = [
-    { id: 'facility', label: 'Facility Info', icon: 'Building' },
-    { id: 'courts', label: 'Court Management', icon: 'Grid3x3' },
-    { id: 'availability', label: 'Availability', icon: 'Calendar' },
-    { id: 'pricing', label: 'Pricing Rules', icon: 'DollarSign' }
+    { id: "facility", label: "Facility Info", icon: "Building" },
+    { id: "courts", label: "Court Management", icon: "Grid3x3" },
+    { id: "availability", label: "Availability", icon: "Calendar" },
+    { id: "pricing", label: "Pricing Rules", icon: "DollarSign" },
   ];
 
   const handleFacilityCreate = async (newFacilityData) => {
-    setFacility({
-      id: Date.now(),
-      ...newFacilityData
-    });
-    setHasFacilities(true);
-    console.log('New facility created:', newFacilityData);
-    await createFacility(newFacilityData)
-    setShowCreateForm(false);
+    try {
+      const createdFacility = await createFacility(newFacilityData);
 
+      // Add the new facility to the list
+      setFacilities((prev) => [...prev, createdFacility]);
+
+      // Select the newly created facility
+      setSelectedFacilityIndex(facilities.length);
+
+      setShowCreateForm(false);
+      console.log("New facility created:", createdFacility);
+    } catch (error) {
+      console.error("Error creating facility:", error);
+    }
   };
 
   const handleFacilityUpdate = (updatedData) => {
-    setFacility(prev => ({ ...prev, ...updatedData }));
-    console.log('Facility updated:', updatedData);
+    setFacilities((prev) =>
+      prev.map((facility, index) =>
+        index === selectedFacilityIndex
+          ? { ...facility, ...updatedData }
+          : facility
+      )
+    );
+    console.log("Facility updated:", updatedData);
+  };
+
+  const handleFacilitySelect = (index) => {
+    setSelectedFacilityIndex(index);
+    setActiveTab("facility"); // Reset to facility tab when switching
   };
 
   const handleCourtUpdate = (updatedCourt) => {
-    setCourts(prev => prev?.map(court => 
-      court?.id === updatedCourt?.id ? updatedCourt : court
-    ));
+    setCourts((prev) =>
+      prev.map((court) => (court.id === updatedCourt.id ? updatedCourt : court))
+    );
   };
 
   const handleCourtAdd = (newCourt) => {
-    setCourts(prev => [...prev, newCourt]);
+    setCourts((prev) => [
+      ...prev,
+      { ...newCourt, facilityId: selectedFacility.id },
+    ]);
   };
 
   const handleCourtDelete = (courtId) => {
-    setCourts(prev => prev?.filter(court => court?.id !== courtId));
+    setCourts((prev) => prev.filter((court) => court.id !== courtId));
   };
 
   const handleAvailabilityUpdate = (updates) => {
-    setAvailability(prev => ({ ...prev, ...updates }));
+    setAvailability((prev) => ({ ...prev, ...updates }));
   };
 
   const handlePricingUpdate = (updatedRules) => {
@@ -186,36 +185,41 @@ const FacilityCourtManagement = () => {
   };
 
   const renderTabContent = () => {
+    if (!selectedFacility) return null;
+
     switch (activeTab) {
-      case 'facility':
+      case "facility":
         return (
           <FacilityInfoTab
-            facility={facility}
+            facility={selectedFacility}
             onUpdate={handleFacilityUpdate}
           />
         );
-      case 'courts':
+      case "courts":
         return (
           <CourtManagementTab
             courts={courts}
+            facilityId={selectedFacility.id}
             onCourtUpdate={handleCourtUpdate}
             onCourtAdd={handleCourtAdd}
             onCourtDelete={handleCourtDelete}
           />
         );
-      case 'availability':
+      case "availability":
         return (
           <AvailabilityTab
             courts={courts}
             availability={availability}
+            facilityId={selectedFacility.id}
             onAvailabilityUpdate={handleAvailabilityUpdate}
           />
         );
-      case 'pricing':
+      case "pricing":
         return (
           <PricingTab
             courts={courts}
             pricingRules={pricingRules}
+            facilityId={selectedFacility.id}
             onPricingUpdate={handlePricingUpdate}
           />
         );
@@ -223,6 +227,18 @@ const FacilityCourtManagement = () => {
         return null;
     }
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-text-secondary">Loading facilities...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Show create facility form
   if (showCreateForm) {
@@ -235,18 +251,27 @@ const FacilityCourtManagement = () => {
   }
 
   // Show empty state for new users
-  if (!hasFacilities) {
+  if (!facilities || facilities.length === 0) {
     return (
       <div className="min-h-screen bg-background">
         {/* Breadcrumb */}
         <div className="bg-card border-b border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <nav className="flex items-center space-x-2 text-sm">
-              <a href="/dashboard" className="text-text-secondary hover:text-primary transition-colors">
+              <a
+                href="/dashboard"
+                className="text-text-secondary hover:text-primary transition-colors"
+              >
                 Dashboard
               </a>
-              <Icon name="ChevronRight" size={16} className="text-text-secondary" />
-              <span className="text-foreground font-medium">Facility Management</span>
+              <Icon
+                name="ChevronRight"
+                size={16}
+                className="text-text-secondary"
+              />
+              <span className="text-foreground font-medium">
+                Facility Management
+              </span>
             </nav>
           </div>
         </div>
@@ -257,52 +282,58 @@ const FacilityCourtManagement = () => {
             <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-6">
               <Icon name="Building" size={48} className="text-primary" />
             </div>
-            
+
             <h1 className="text-3xl font-bold text-foreground mb-4">
               Welcome to Facility Management
             </h1>
-            
+
             <p className="text-text-secondary text-lg max-w-md mb-8">
-              Get started by creating your first facility. You can add courts, set availability, 
-              and manage pricing all in one place.
+              Get started by creating your first facility. You can add courts,
+              set availability, and manage pricing all in one place.
             </p>
-            
-            <Button 
-              size="lg" 
+
+            <Button
+              size="lg"
               iconName="Plus"
               onClick={() => setShowCreateForm(true)}
               className="px-8 py-3"
             >
               Create New Facility
             </Button>
-            
+
             {/* Features Preview */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 max-w-4xl">
               <div className="text-center p-6">
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                   <Icon name="Building" size={24} className="text-blue-600" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-2">Facility Info</h3>
+                <h3 className="font-semibold text-foreground mb-2">
+                  Facility Info
+                </h3>
                 <p className="text-text-secondary text-sm">
                   Manage your facility details, photos, and amenities
                 </p>
               </div>
-              
+
               <div className="text-center p-6">
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                   <Icon name="Grid3x3" size={24} className="text-green-600" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-2">Court Management</h3>
+                <h3 className="font-semibold text-foreground mb-2">
+                  Court Management
+                </h3>
                 <p className="text-text-secondary text-sm">
                   Add and configure courts with pricing and schedules
                 </p>
               </div>
-              
+
               <div className="text-center p-6">
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                   <Icon name="Calendar" size={24} className="text-purple-600" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-2">Availability & Pricing</h3>
+                <h3 className="font-semibold text-foreground mb-2">
+                  Availability & Pricing
+                </h3>
                 <p className="text-text-secondary text-sm">
                   Set availability and dynamic pricing rules
                 </p>
@@ -320,21 +351,32 @@ const FacilityCourtManagement = () => {
       <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <nav className="flex items-center space-x-2 text-sm">
-            <a href="/dashboard" className="text-text-secondary hover:text-primary transition-colors">
+            <a
+              href="/dashboard"
+              className="text-text-secondary hover:text-primary transition-colors"
+            >
               Dashboard
             </a>
-            <Icon name="ChevronRight" size={16} className="text-text-secondary" />
-            <span className="text-foreground font-medium">Facility Management</span>
+            <Icon
+              name="ChevronRight"
+              size={16}
+              className="text-text-secondary"
+            />
+            <span className="text-foreground font-medium">
+              Facility Management
+            </span>
           </nav>
         </div>
       </div>
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Facility Management</h1>
+              <h1 className="text-3xl font-bold text-foreground">
+                Facility Management
+              </h1>
               <p className="text-text-secondary mt-2">
                 Manage your facility details, courts, availability, and pricing
               </p>
@@ -346,68 +388,117 @@ const FacilityCourtManagement = () => {
               <Button variant="outline" iconName="Settings">
                 Settings
               </Button>
+              <Button iconName="Plus" onClick={() => setShowCreateForm(true)}>
+                Add Facility
+              </Button>
             </div>
           </div>
         </div>
 
+        {/* Facility Selector */}
+        {facilities.length > 1 && (
+          <div className="bg-card rounded-lg border border-border p-4 mb-6">
+            <label className="block text-sm font-medium text-foreground mb-2">
+              Select Facility
+            </label>
+            <select
+              value={selectedFacilityIndex}
+              onChange={(e) => handleFacilitySelect(parseInt(e.target.value))}
+              className="w-full max-w-md px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
+            >
+              {facilities.map((facility, index) => (
+                <option key={facility.id} value={index}>
+                  {facility.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {/* Facility Overview Card */}
-        <div className="bg-card rounded-lg border border-border p-6 mb-8">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start space-x-4">
-              <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center">
-                <Icon name="Building" size={32} className="text-primary" />
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold text-foreground">{facility?.name}</h2>
-                <p className="text-text-secondary mt-1">{facility?.address}</p>
-                <div className="flex items-center space-x-4 mt-3">
-                  <div className="flex items-center space-x-2">
-                    <Icon name="Grid3x3" size={16} className="text-text-secondary" />
-                    <span className="text-sm text-text-secondary">{courts?.length} Courts</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Icon name="Star" size={16} className="text-text-secondary" />
-                    <span className="text-sm text-text-secondary">4.8 Rating</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Icon name="Users" size={16} className="text-text-secondary" />
-                    <span className="text-sm text-text-secondary">1,247 Bookings</span>
+        {selectedFacility && (
+          <div className="bg-card rounded-lg border border-border p-6 mb-8">
+            <div className="flex items-start justify-between">
+              <div className="flex items-start space-x-4">
+                <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <Icon name="Building" size={32} className="text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-foreground">
+                    {selectedFacility.name}
+                  </h2>
+                  <p className="text-text-secondary mt-1">
+                    {selectedFacility.address}
+                  </p>
+                  <div className="flex items-center space-x-4 mt-3">
+                    <div className="flex items-center space-x-2">
+                      <Icon
+                        name="Grid3x3"
+                        size={16}
+                        className="text-text-secondary"
+                      />
+                      <span className="text-sm text-text-secondary">
+                        {courts.length} Courts
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Icon
+                        name="Star"
+                        size={16}
+                        className="text-text-secondary"
+                      />
+                      <span className="text-sm text-text-secondary">
+                        {selectedFacility.averageRating || 0} Rating
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Icon
+                        name="Users"
+                        size={16}
+                        className="text-text-secondary"
+                      />
+                      <span className="text-sm text-text-secondary">
+                        {selectedFacility.totalBookings || 0} Bookings
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-success">$12,450</div>
-              <div className="text-sm text-text-secondary">Monthly Revenue</div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-success">
+                  ${selectedFacility.monthlyRevenue || 0}
+                </div>
+                <div className="text-sm text-text-secondary">
+                  Monthly Revenue
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Tab Navigation */}
         <div className="bg-card rounded-lg border border-border mb-8">
           <div className="border-b border-border">
             <nav className="flex space-x-8 px-6" aria-label="Tabs">
-              {tabs?.map((tab) => (
+              {tabs.map((tab) => (
                 <button
-                  key={tab?.id}
-                  onClick={() => setActiveTab(tab?.id)}
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                    activeTab === tab?.id
-                      ? 'border-primary text-primary' 
-                      : 'border-transparent text-text-secondary hover:text-foreground hover:border-border'
+                    activeTab === tab.id
+                      ? "border-primary text-primary"
+                      : "border-transparent text-text-secondary hover:text-foreground hover:border-border"
                   }`}
                 >
-                  <Icon name={tab?.icon} size={18} />
-                  <span>{tab?.label}</span>
+                  <Icon name={tab.icon} size={18} />
+                  <span>{tab.label}</span>
                 </button>
               ))}
             </nav>
           </div>
 
           {/* Tab Content */}
-          <div className="p-6">
-            {renderTabContent()}
-          </div>
+          <div className="p-6">{renderTabContent()}</div>
         </div>
       </div>
     </div>
