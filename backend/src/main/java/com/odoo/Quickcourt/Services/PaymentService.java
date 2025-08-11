@@ -17,6 +17,7 @@ import com.razorpay.Payment;
 import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 import com.razorpay.Utils;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -56,7 +57,7 @@ public class PaymentService {
     @Value("${app.frontend.base.url}")
     private String frontendBaseUrl;
 
-    public CreateOrderResponse createOrder(CreateOrderRequest request) {
+    public CreateOrderResponse  createOrder(CreateOrderRequest request) {
         try {
             UserPrincipal userPrincipal = getCurrentUser();
 
@@ -77,28 +78,26 @@ public class PaymentService {
             User user = userRepository.findById(userPrincipal.getId())
                     .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-            // Create Razorpay order
+            // Create a Razorpay order
+            RazorpayClient razorpay = new RazorpayClient(keyId, keySecret);
             JSONObject orderRequest = new JSONObject();
-            orderRequest.put("amount", request.getAmount().multiply(BigDecimal.valueOf(100)).intValue()); // Convert to paise
-            orderRequest.put("currency", "INR");
-            orderRequest.put("receipt", "booking_" + request.getBookingId());
+            orderRequest.put("amount", request.getAmount().longValue() * 100); // In paise
+            orderRequest.put("currency", request.getCurrency());
+            orderRequest.put("payment_capture", 0);
 
-            // Add notes
-            JSONObject notes = new JSONObject();
-            notes.put("booking_id", request.getBookingId().toString());
-            notes.put("user_id", userPrincipal.getId().toString());
-            orderRequest.put("notes", notes);
+            com.razorpay.Order razorpayOrder = razorpay.orders.create(orderRequest);
+            String razorpayOrderId = razorpayOrder.get("id");
 
-            Order razorpayOrder = razorpayClient.orders.create(orderRequest);
+            booking.setRazorpayOrderId(razorpayOrderId);
+            bookingRepository.save(booking);
 
             // Save payment record
             com.odoo.Quickcourt.Entities.Payment payment = com.odoo.Quickcourt.Entities.Payment.builder()
                     .bookingId(request.getBookingId())
                     .amount(request.getAmount())
-                    .status(com.odoo.Quickcourt.Entities.Payment.PaymentStatus.CREATED)
+                        .status(com.odoo.Quickcourt.Entities.Payment.PaymentStatus.CREATED)
                     .razorpayOrderId(razorpayOrder.get("id"))
                     .customerEmail(user.getEmail())
-                    .customerPhone(request.getCustomerPhone())
                     .build();
 
             paymentRepository.save(payment);
@@ -106,13 +105,12 @@ public class PaymentService {
             log.info("Razorpay order created: {} for booking: {}", razorpayOrder.get("id"), request.getBookingId());
 
             return CreateOrderResponse.builder()
-                    .orderId(razorpayOrder.get("id"))
-                    .amount(request.getAmount())
+                    .razorpayOrderId(razorpayOrderId)
+                    .amount(request.getAmount().longValue())
                     .currency("INR")
                     .keyId(keyId)
                     .customerName(user.getName())
                     .customerEmail(user.getEmail())
-                    .customerPhone(request.getCustomerPhone())
                     .description("Sports Facility Booking Payment")
                     .callbackUrl(frontendBaseUrl + "/payment/callback")
                     .build();
@@ -164,7 +162,7 @@ public class PaymentService {
                     // Update booking status to CONFIRMED
                     Booking booking = bookingRepository.findById(payment.getBookingId())
                             .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
-                    booking.setStatus(Booking.BookingStatus.CONFIRMED);
+                    booking.setStatus(Booking.BookingStatus.COMPLETED);
                     bookingRepository.save(booking);
 
                     // Send confirmation email
@@ -349,5 +347,37 @@ public class PaymentService {
 
     private UserPrincipal getCurrentUser() {
         return (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    public com.odoo.Quickcourt.Entities.Payment getPaymentByRazorpayOrderId(String uuid) {
+        com.odoo.Quickcourt.Entities.Payment payment = paymentRepository.findByRazorpayOrderId(uuid)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found for order ID: " + uuid));
+
+        return payment;
+    }
+
+    public void verifyAndReleasePayment(String bookingId) throws Exception {
+        com.odoo.Quickcourt.Entities.Payment payment = paymentRepository.findByRazorpayOrderId(bookingId).orElseThrow(() -> new EntityNotFoundException("Payment not found"));
+        if (payment == null || !com.odoo.Quickcourt.Entities.Payment.PaymentStatus.AUTHORIZED.equals(payment.getStatus())) {
+            throw new Exception("Payment not found or not authorized");
+        }
+
+        Booking booking = bookingRepository.findById(payment.getBookingId())
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+
+        RazorpayClient razorpay = new RazorpayClient(keyId, keySecret);
+        com.razorpay.Payment razorpayPayment = razorpay.payments.fetch(payment.getRazorpayPaymentId());
+        if ("authorized".equals(razorpayPayment.get("status"))) {
+            JSONObject captureRequest = new JSONObject();
+            captureRequest.put("amount", payment.getAmount().longValue() * 100);
+            captureRequest.put("currency", "INR");
+            razorpay.payments.capture(payment.getRazorpayPaymentId(), captureRequest);
+            payment.setStatus(com.odoo.Quickcourt.Entities.Payment.PaymentStatus.COMPLETED);
+            booking.setStatus(Booking.BookingStatus.COMPLETED);
+            bookingRepository.save(booking);
+            paymentRepository.save(payment);
+        } else {
+            throw new Exception("Payment not authorized");
+        }
     }
 }

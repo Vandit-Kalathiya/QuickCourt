@@ -6,6 +6,7 @@ import com.odoo.Quickcourt.Auth.Entities.UserPrincipal;
 import com.odoo.Quickcourt.Dto.Booking.BookingRequest;
 import com.odoo.Quickcourt.Dto.Booking.BookingResponse;
 import com.odoo.Quickcourt.Dto.Payment.CreateOrderRequest;
+import com.odoo.Quickcourt.Dto.Payment.CreateOrderResponse;
 import com.odoo.Quickcourt.Entities.Booking.Booking;
 import com.odoo.Quickcourt.Entities.Court;
 import com.odoo.Quickcourt.Entities.Facility;
@@ -38,7 +39,7 @@ public class BookingService {
     private final CourtAvailabilityRepository availabilityRepository;
     private final PaymentService paymentService;
 
-    public BookingResponse createBooking(BookingRequest request) throws BadRequestException {
+    public CreateOrderResponse createBooking(BookingRequest request) throws BadRequestException {
         UserPrincipal userPrincipal = getCurrentUser();
 
         Court court = courtRepository.findById(request.getCourtId())
@@ -83,20 +84,21 @@ public class BookingService {
                 .startTime(request.getStartTime())
                 .endTime(request.getEndTime())
                 .totalPrice(totalPrice)
-                .status(Booking.BookingStatus.CONFIRMED)
                 .build();
 
         booking = bookingRepository.save(booking);
 
         // Process payment
-        paymentService.createOrder(CreateOrderRequest.builder()
+
+//        return mapToResponse(booking, facility, court);
+        return paymentService.createOrder(CreateOrderRequest.builder()
                 .amount(totalPrice)
                 .currency("INR")
+                .userId(userPrincipal.getId().toString())
+                .ownerId(facility.getOwnerId().toString())
                 .description("Booking for court " + court.getName())
                 .bookingId(booking.getId())
                 .build());
-
-        return mapToResponse(booking, facility, court);
     }
 
     public Page<BookingResponse> getUserBookings(Pageable pageable) {
@@ -116,7 +118,7 @@ public class BookingService {
             throw new BadRequestException("Not authorized to cancel this booking");
         }
 
-        if (booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
+        if (booking.getStatus() != Booking.BookingStatus.CREATED) {
             throw new BadRequestException("Cannot cancel this booking");
         }
 

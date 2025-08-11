@@ -49,13 +49,16 @@ public class Booking extends BaseEntity {
     @Column(nullable = false)
     private BigDecimal totalPrice;
 
+    private String razorpayOrderId;
+
+    @Column(name = "status", length = 50, nullable = false)
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private BookingStatus status = BookingStatus.CONFIRMED;
+    private BookingStatus status = BookingStatus.CREATED;
 
     private UUID payment;
 
     public enum BookingStatus {
-        CONFIRMED, CANCELLED, COMPLETED
+        CREATED, CANCELLED, COMPLETED
     }
 }

@@ -24,4 +24,6 @@ public class BookingRequest {
 
     @NotNull
     private LocalTime endTime;
+
+    private Long amount;
 }

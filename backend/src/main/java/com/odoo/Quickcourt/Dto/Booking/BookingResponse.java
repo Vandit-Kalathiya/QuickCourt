@@ -28,6 +28,7 @@ public class BookingResponse {
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
+    private String currency = "INR";
     private BigDecimal totalPrice;
     private Booking.BookingStatus status;
     private LocalDateTime createdAt;
