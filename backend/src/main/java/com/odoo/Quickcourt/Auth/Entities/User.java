@@ -31,7 +31,7 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private UserRole role = UserRole.USER;
+    private Role role = Role.USER;
 
     private String avatar;
 

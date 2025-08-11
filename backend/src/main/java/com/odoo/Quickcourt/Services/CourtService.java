@@ -3,6 +3,8 @@ package com.odoo.Quickcourt.Services;
 // service/CourtService.java
 
 import com.odoo.Quickcourt.Auth.Entities.UserPrincipal;
+import com.odoo.Quickcourt.Dto.Court.CourtRequest;
+import com.odoo.Quickcourt.Dto.Court.CourtResponse;
 import com.odoo.Quickcourt.Entities.Court;
 import com.odoo.Quickcourt.Entities.CourtAvailability;
 import com.odoo.Quickcourt.Entities.Facility;
