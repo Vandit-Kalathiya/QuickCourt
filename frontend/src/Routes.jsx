@@ -9,6 +9,8 @@ import FacilityOwnerDashboard from './pages/facility-owner-dashboard';
 import FacilityCourtManagement from './pages/facility-court-management';
 import VenueDetailsBooking from './pages/venue-details-booking';
 import AdminPlatformManagement from './pages/admin-platform-management';
+import AuthPage from "pages/auth/AuthPage";
+import Homepage from "pages/landingPage/HomePage";
 
 const Routes = () => {
   return (
@@ -17,7 +19,9 @@ const Routes = () => {
       <ScrollToTop />
       <RouterRoutes>
         {/* Define your route here */}
-        <Route path="/" element={<AdminPlatformManagement />} />
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/" element={<Homepage />} />
+        <Route path="/admin-dashboard" element={<AdminPlatformManagement />} />
         <Route path="/user-dashboard-booking-management" element={<UserDashboardBookingManagement />} />
         <Route path="/venue-search-listings" element={<VenueSearchListings />} />
         <Route path="/facility-owner-dashboard" element={<FacilityOwnerDashboard />} />

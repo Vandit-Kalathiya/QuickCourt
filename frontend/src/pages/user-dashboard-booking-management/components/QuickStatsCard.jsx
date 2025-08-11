@@ -9,27 +9,37 @@ const QuickStatsCard = ({ title, value, icon, trend, trendValue, color = 'primar
     accent: 'bg-accent/10 text-accent border-accent/20'
   };
 
+  const gradientClasses = {
+    primary: 'from-primary/5 to-transparent',
+    success: 'from-success/5 to-transparent',
+    warning: 'from-warning/5 to-transparent',
+    accent: 'from-accent/5 to-transparent'
+  };
+
   return (
-    <div className="bg-card border border-border rounded-lg p-6 shadow-subtle">
+    <div className={`bg-gradient-to-br ${gradientClasses[color]} bg-card border border-border rounded-xl p-6 shadow-subtle hover:shadow-medium transition-all duration-300 group`}>
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-text-secondary mb-1">{title}</p>
-          <p className="text-2xl font-bold text-foreground">{value}</p>
+          <p className="text-sm font-medium text-text-secondary mb-2 tracking-wide uppercase">{title}</p>
+          <p className="text-3xl font-bold text-foreground mb-1 tracking-tight">{value}</p>
           {trend && (
-            <div className="flex items-center mt-2">
-              <Icon 
-                name={trend === 'up' ? 'TrendingUp' : 'TrendingDown'} 
-                size={16} 
-                className={trend === 'up' ? 'text-success' : 'text-error'} 
-              />
-              <span className={`text-sm ml-1 ${trend === 'up' ? 'text-success' : 'text-error'}`}>
+            <div className="flex items-center mt-3">
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-2 ${trend === 'up' ? 'bg-success/10' : 'bg-error/10'}`}>
+                <Icon 
+                  name={trend === 'up' ? 'TrendingUp' : 'TrendingDown'} 
+                  size={14} 
+                  className={trend === 'up' ? 'text-success' : 'text-error'} 
+                />
+              </div>
+              <span className={`text-sm font-semibold ${trend === 'up' ? 'text-success' : 'text-error'}`}>
                 {trendValue}
               </span>
+              <span className="text-xs text-text-secondary ml-1">vs last month</span>
             </div>
           )}
         </div>
-        <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${colorClasses?.[color]}`}>
-          <Icon name={icon} size={24} />
+        <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${colorClasses?.[color]} group-hover:scale-105 transition-transform duration-200 shadow-sm`}>
+          <Icon name={icon} size={26} />
         </div>
       </div>
     </div>
