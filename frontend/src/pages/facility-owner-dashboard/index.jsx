@@ -8,12 +8,14 @@ import PeakHoursChart from "./components/PeakHoursChart";
 import QuickActions from "./components/QuickActions";
 import NotificationCenter from "./components/NotificationCenter";
 import BookingCalendar from "./components/BookingCalendar";
+import { useAuth } from "context/AuthContext";
 
 const FacilityOwnerDashboard = () => {
+  const {userProfile} = useAuth();
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       {/* <Header /> */}
-      <main className="pt-nav">
+      <main className="">
 
         {/* Breadcrumb - Enhanced */}
         <div className="bg-gradient-to-r from-muted/60 to-muted/40 border-b border-border/50 backdrop-blur-sm">
@@ -47,7 +49,7 @@ const FacilityOwnerDashboard = () => {
                     </span>
                   </div>
                   <h1 className="text-4xl font-bold text-foreground mb-3 tracking-tight">
-                    Welcome back, <span className="text-primary">Alex</span>!
+                    Welcome back, <span className="text-primary">{userProfile.name}</span>!
                   </h1>
                   <p className="text-text-secondary text-lg leading-relaxed max-w-2xl">
                     Here's what's happening with your sports facility today.

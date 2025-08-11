@@ -379,7 +379,7 @@ const MyBookings = () => {
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
-                onClick={() => window.location.href = '/venue-search-listings'}
+                onClick={() => window.location.href = '/listings'}
                 className="bg-white text-blue-600 hover:bg-blue-50 border-0 shadow-lg hover:shadow-xl transition-all duration-300"
                 iconName="Plus"
                 size="lg"
@@ -524,7 +524,7 @@ const MyBookings = () => {
               }
             </p>
             <Button 
-              onClick={() => window.location.href = '/venue-search-listings'}
+              onClick={() => window.location.href = '/listings'}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 shadow-lg px-8 py-3"
               iconName="Search"
               size="lg"
