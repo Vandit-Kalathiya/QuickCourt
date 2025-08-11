@@ -3,6 +3,8 @@ package com.odoo.Quickcourt.Services;
 // service/ReviewService.java
 
 import com.odoo.Quickcourt.Auth.Entities.UserPrincipal;
+import com.odoo.Quickcourt.Dto.Review.ReviewRequest;
+import com.odoo.Quickcourt.Dto.Review.ReviewResponse;
 import com.odoo.Quickcourt.Entities.Review;
 import com.odoo.Quickcourt.Exception.BadRequestException;
 import com.odoo.Quickcourt.Exception.ResourceNotFoundException;

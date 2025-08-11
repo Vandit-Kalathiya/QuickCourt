@@ -6,6 +6,7 @@ import com.odoo.Quickcourt.Auth.Entities.User;
 import com.odoo.Quickcourt.Auth.Repository.UserRepository;
 import com.odoo.Quickcourt.Dto.Admin.AdminDashboardResponse;
 import com.odoo.Quickcourt.Dto.Facility.FacilityResponse;
+import com.odoo.Quickcourt.Dto.User.UserResponse;
 import com.odoo.Quickcourt.Entities.Facility;
 import com.odoo.Quickcourt.Exception.BadRequestException;
 import com.odoo.Quickcourt.Exception.ResourceNotFoundException;

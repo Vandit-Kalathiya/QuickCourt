@@ -35,11 +35,11 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(System.currentTimeMillis() + jwtExpirationMs);
 
         return Jwts.builder()
-                .subject(userPrincipal.getId().toString())
+                .setSubject(userPrincipal.getId().toString())
                 .claim("email", userPrincipal.getEmail())
                 .claim("role", userPrincipal.getAuthorities().iterator().next().getAuthority())
-                .issuedAt(new Date())
-                .expiration(expiryDate)
+                .setIssuedAt(new Date())
+                .setExpiration(expiryDate)
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -49,28 +49,29 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(System.currentTimeMillis() + refreshTokenExpirationMs);
 
         return Jwts.builder()
-                .subject(userPrincipal.getId().toString())
-                .issuedAt(new Date())
-                .expiration(expiryDate)
+                .setSubject(userPrincipal.getId().toString())
+                .setIssuedAt(new Date())
+                .setExpiration(expiryDate)
                 .signWith(getSigningKey())
                 .compact();
     }
 
     public String getUserIdFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(getSigningKey())
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(jwtSecret)
                 .build()
-                .parseSignedClaims(token)
-                .getPayload();
+                .parseClaimsJws(token)
+                .getBody();
         return claims.getSubject();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser()
-                    .verifyWith(getSigningKey())
+            Jwts.parserBuilder()
+                    .setSigningKey(jwtSecret)
                     .build()
-                    .parseSignedClaims(token);
+                    .parseClaimsJws(token)
+                    .getBody();
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             log.error("Invalid JWT token: {}", e.getMessage());
