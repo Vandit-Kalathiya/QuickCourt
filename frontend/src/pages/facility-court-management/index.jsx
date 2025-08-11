@@ -5,12 +5,19 @@ import FacilityInfoTab from './components/FacilityInfoTab';
 import CourtManagementTab from './components/CourtManagementTab';
 import AvailabilityTab from './components/AvailabilityTab';
 import PricingTab from './components/PricingTab';
+import CreateFacilityForm from './components/CreateFacilityForm';
+import { useOwner } from 'context/OwnerContext';
 
 const FacilityCourtManagement = () => {
   const [activeTab, setActiveTab] = useState('facility');
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  
+  // Set this to true to simulate no facilities for new users
+  const [hasFacilities, setHasFacilities] = useState(false);
+  const {createFacility} = useOwner();
 
   // Mock facility data
-  const [facility] = useState({
+  const [facility, setFacility] = useState(hasFacilities ? {
     id: 1,
     name: "Elite Sports Complex",
     description: `Premier sports facility offering world-class courts and amenities for athletes of all levels.\n\nOur state-of-the-art complex features professional-grade surfaces, modern lighting systems, and comprehensive support facilities to ensure the best possible sporting experience.`,
@@ -31,10 +38,10 @@ const FacilityCourtManagement = () => {
       { id: 3, url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800', name: 'Basketball Court' },
       { id: 4, url: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800', name: 'Facilities' }
     ]
-  });
+  } : null);
 
   // Mock courts data
-  const [courts, setCourts] = useState([
+  const [courts, setCourts] = useState(hasFacilities ? [
     {
       id: 1,
       name: "Tennis Court A",
@@ -71,10 +78,10 @@ const FacilityCourtManagement = () => {
       status: "maintenance",
       description: "Glass-walled squash court with climate control"
     }
-  ]);
+  ] : []);
 
   // Mock availability data
-  const [availability, setAvailability] = useState({
+  const [availability, setAvailability] = useState(hasFacilities ? {
     '1-2025-01-11-09:00': 'booked',
     '1-2025-01-11-10:00': 'booked',
     '1-2025-01-11-18:00': 'blocked',
@@ -84,10 +91,10 @@ const FacilityCourtManagement = () => {
     '3-2025-01-11-20:00': 'maintenance',
     '4-2025-01-11-14:00': 'maintenance',
     '4-2025-01-11-15:00': 'maintenance'
-  });
+  } : {});
 
   // Mock pricing rules
-  const [pricingRules, setPricingRules] = useState([
+  const [pricingRules, setPricingRules] = useState(hasFacilities ? [
     {
       id: 1,
       courtId: 1,
@@ -130,7 +137,7 @@ const FacilityCourtManagement = () => {
       active: true,
       createdAt: "2025-01-01T00:00:00Z"
     }
-  ]);
+  ] : []);
 
   const tabs = [
     { id: 'facility', label: 'Facility Info', icon: 'Building' },
@@ -139,9 +146,21 @@ const FacilityCourtManagement = () => {
     { id: 'pricing', label: 'Pricing Rules', icon: 'DollarSign' }
   ];
 
+  const handleFacilityCreate = async (newFacilityData) => {
+    setFacility({
+      id: Date.now(),
+      ...newFacilityData
+    });
+    setHasFacilities(true);
+    console.log('New facility created:', newFacilityData);
+    await createFacility(newFacilityData)
+    setShowCreateForm(false);
+
+  };
+
   const handleFacilityUpdate = (updatedData) => {
+    setFacility(prev => ({ ...prev, ...updatedData }));
     console.log('Facility updated:', updatedData);
-    // In real app, this would update the facility data
   };
 
   const handleCourtUpdate = (updatedCourt) => {
@@ -205,6 +224,96 @@ const FacilityCourtManagement = () => {
     }
   };
 
+  // Show create facility form
+  if (showCreateForm) {
+    return (
+      <CreateFacilityForm
+        onSubmit={handleFacilityCreate}
+        onCancel={() => setShowCreateForm(false)}
+      />
+    );
+  }
+
+  // Show empty state for new users
+  if (!hasFacilities) {
+    return (
+      <div className="min-h-screen bg-background">
+        {/* Breadcrumb */}
+        <div className="bg-card border-b border-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <nav className="flex items-center space-x-2 text-sm">
+              <a href="/facility-owner-dashboard" className="text-text-secondary hover:text-primary transition-colors">
+                Dashboard
+              </a>
+              <Icon name="ChevronRight" size={16} className="text-text-secondary" />
+              <span className="text-foreground font-medium">Facility Management</span>
+            </nav>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Empty State */}
+          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+            <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+              <Icon name="Building" size={48} className="text-primary" />
+            </div>
+            
+            <h1 className="text-3xl font-bold text-foreground mb-4">
+              Welcome to Facility Management
+            </h1>
+            
+            <p className="text-text-secondary text-lg max-w-md mb-8">
+              Get started by creating your first facility. You can add courts, set availability, 
+              and manage pricing all in one place.
+            </p>
+            
+            <Button 
+              size="lg" 
+              iconName="Plus"
+              onClick={() => setShowCreateForm(true)}
+              className="px-8 py-3"
+            >
+              Create New Facility
+            </Button>
+            
+            {/* Features Preview */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 max-w-4xl">
+              <div className="text-center p-6">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <Icon name="Building" size={24} className="text-blue-600" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-2">Facility Info</h3>
+                <p className="text-text-secondary text-sm">
+                  Manage your facility details, photos, and amenities
+                </p>
+              </div>
+              
+              <div className="text-center p-6">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <Icon name="Grid3x3" size={24} className="text-green-600" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-2">Court Management</h3>
+                <p className="text-text-secondary text-sm">
+                  Add and configure courts with pricing and schedules
+                </p>
+              </div>
+              
+              <div className="text-center p-6">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <Icon name="Calendar" size={24} className="text-purple-600" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-2">Availability & Pricing</h3>
+                <p className="text-text-secondary text-sm">
+                  Set availability and dynamic pricing rules
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Breadcrumb */}
@@ -219,6 +328,7 @@ const FacilityCourtManagement = () => {
           </nav>
         </div>
       </div>
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -283,7 +393,8 @@ const FacilityCourtManagement = () => {
                   onClick={() => setActiveTab(tab?.id)}
                   className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                     activeTab === tab?.id
-                      ? 'border-primary text-primary' :'border-transparent text-text-secondary hover:text-foreground hover:border-border'
+                      ? 'border-primary text-primary' 
+                      : 'border-transparent text-text-secondary hover:text-foreground hover:border-border'
                   }`}
                 >
                   <Icon name={tab?.icon} size={18} />

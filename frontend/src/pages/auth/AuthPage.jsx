@@ -220,19 +220,14 @@ const AuthPage = () => {
     try {
       if (isLogin) {
         // Login using AuthContext
+        console.log(formData);
         await signIn(formData.email, formData.password);
         toast.success("Login successful!");
-        console.log(formData);
       } else {
-        // Prepare signup data based on your API structure
-        const [firstName, ...lastNameParts] = formData.fullName.split(" ");
-        const lastName = lastNameParts.join(" ") || "";
-
         const signUpData = {
           email: formData.email,
-          password: formData.password,
-          firstName: firstName,
-          lastName: lastName,
+          passwordHash: formData.password,
+          name: formData.fullName,
           role: formData.userType.toUpperCase(), // Convert 'player' to 'PLAYER', 'facility' to 'FACILITY'
           // Add any other fields your API expects
         };

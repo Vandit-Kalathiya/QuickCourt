@@ -26,7 +26,7 @@ const Header = () => {
   const navigationItems = {
     user: [
       { label: 'Find Venues', path: '/venue-search-listings', icon: 'Search' },
-      { label: 'My Bookings', path: '/user-dashboard-booking-management', icon: 'Calendar' }
+      { label: 'My Bookings', path: '/user-dashboard', icon: 'Calendar' }
     ],
     owner: [
       { label: 'Dashboard', path: '/facility-owner-dashboard', icon: 'BarChart3' },

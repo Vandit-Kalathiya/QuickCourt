@@ -88,7 +88,7 @@ const Routes = () => {
             <Route path="/auth" element={<AuthPage />} />
           </Route>
 
-          <Route element={<ProtectedRoute />}>
+          {/* <Route element={<ProtectedRoute />}> */}
             <Route
               path="/admin-dashboard"
               element={<AdminPlatformManagement />}
@@ -117,7 +117,7 @@ const Routes = () => {
               path="/admin-platform-management"
               element={<AdminPlatformManagement />}
             />
-          </Route>
+          {/* </Route> */}
           <Route path="*" element={<NotFound />} />
         </RouterRoutes>
       </ErrorBoundary>
