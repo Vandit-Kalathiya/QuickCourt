@@ -202,8 +202,6 @@ export const OwnerProvider = ({ children }) => {
 
   // Get facility courts - corresponds to OwnerController.getFacilityCourts()
   const getFacilityCourts = async (facilityId) => {
-    if (!isAuthenticated || !isOwner()) return;
-
     try {
       const courts = await ownerService.getFacilityCourts(facilityId);
       

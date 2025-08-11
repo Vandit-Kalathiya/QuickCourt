@@ -109,8 +109,8 @@ const Routes = () => {
         <ScrollToTop />
         <RouterRoutes>
           {/* Public routes */}
+          <Route path="/" element={<Homepage />} />
           <Route element={<PublicLayout />}>
-            <Route path="/" element={<Homepage />} />
             <Route path="/listings" element={<VenueSearchListings />} />
             <Route
               path="/facility-court-management"

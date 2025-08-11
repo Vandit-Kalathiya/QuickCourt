@@ -46,7 +46,7 @@ public class CourtService {
         Court court = Court.builder()
                 .facilityId(facilityId)
                 .name(request.getName())
-                .sportType(request.getSportType())
+                .sportType(Facility.Sport.valueOf(request.getSportType().toUpperCase()))
                 .pricePerHour(request.getPricePerHour())
                 .openingTime(request.getOpeningTime())
                 .closingTime(request.getClosingTime())
@@ -71,7 +71,7 @@ public class CourtService {
         }
 
         court.setName(request.getName());
-        court.setSportType(request.getSportType());
+        court.setSportType(Facility.Sport.valueOf(request.getSportType()));
         court.setPricePerHour(request.getPricePerHour());
         court.setOpeningTime(request.getOpeningTime());
         court.setClosingTime(request.getClosingTime());

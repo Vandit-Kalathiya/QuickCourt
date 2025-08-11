@@ -13,7 +13,7 @@ const FacilityCourtManagement = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedFacilityIndex, setSelectedFacilityIndex] = useState(0);
 
-  const { createFacility, getOwnerFacilities, loading } = useOwner();
+  const { createFacility, getOwnerFacilities, loading, getFacilityCourts } = useOwner();
   const [facilities, setFacilities] = useState([]);
   const [courts, setCourts] = useState([]);
   const [availability, setAvailability] = useState({});
@@ -28,10 +28,7 @@ const FacilityCourtManagement = () => {
         const facilitiesData = await getOwnerFacilities();
         setFacilities(facilitiesData || []);
 
-        // Initialize data for first facility if exists
         if (facilitiesData && facilitiesData.length > 0) {
-          // Mock data for courts, availability, and pricing
-          // In real app, these would be fetched based on selected facility
           initializeFacilityData(facilitiesData[0]);
         }
       } catch (error) {
@@ -43,52 +40,13 @@ const FacilityCourtManagement = () => {
     fetchFacilities();
   }, [getOwnerFacilities]);
 
-  // Initialize data when facility selection changes
   useEffect(() => {
     if (selectedFacility) {
       initializeFacilityData(selectedFacility);
     }
   }, [selectedFacility]);
 
-  console.log(selectedFacility);
-
   const initializeFacilityData = (facility) => {
-    // Mock courts data - in real app, fetch from API based on facility ID
-    setCourts([
-      {
-        id: 1,
-        facilityId: facility.id,
-        name: "Tennis Court A",
-        sportType: "tennis",
-        hourlyRate: 45.0,
-        operatingHours: { start: "06:00", end: "22:00" },
-        status: "active",
-        description: "Professional tennis court with synthetic grass surface",
-      },
-      {
-        id: 2,
-        facilityId: facility.id,
-        name: "Basketball Court 1",
-        sportType: "basketball",
-        hourlyRate: 35.0,
-        operatingHours: { start: "07:00", end: "23:00" },
-        status: "active",
-        description: "Indoor basketball court with wooden flooring",
-      },
-      {
-        id: 3,
-        facilityId: facility.id,
-        name: "Badminton Court B",
-        sportType: "badminton",
-        hourlyRate: 25.0,
-        operatingHours: { start: "06:00", end: "21:00" },
-        status: "active",
-        description:
-          "Air-conditioned badminton court with professional lighting",
-      },
-    ]);
-
-    // Mock availability data
     setAvailability({
       "1-2025-01-11-09:00": "booked",
       "1-2025-01-11-10:00": "booked",
@@ -99,7 +57,6 @@ const FacilityCourtManagement = () => {
       "3-2025-01-11-20:00": "maintenance",
     });
 
-    // Mock pricing rules
     setPricingRules([
       {
         id: 1,
@@ -126,20 +83,20 @@ const FacilityCourtManagement = () => {
     { id: "pricing", label: "Pricing Rules", icon: "DollarSign" },
   ];
 
-  const handleFacilityCreate = async (newFacilityData) => {
+  const handleFacilityCreate = async (createdFacility) => {
     try {
-      const createdFacility = await createFacility(newFacilityData);
-
       // Add the new facility to the list
       setFacilities((prev) => [...prev, createdFacility]);
 
       // Select the newly created facility
       setSelectedFacilityIndex(facilities.length);
 
+      // Close the modal
       setShowCreateForm(false);
+      
       console.log("New facility created:", createdFacility);
     } catch (error) {
-      console.error("Error creating facility:", error);
+      console.error("Error handling facility creation:", error);
     }
   };
 
@@ -156,7 +113,7 @@ const FacilityCourtManagement = () => {
 
   const handleFacilitySelect = (index) => {
     setSelectedFacilityIndex(index);
-    setActiveTab("facility"); // Reset to facility tab when switching
+    setActiveTab("facility");
   };
 
   const handleCourtUpdate = (updatedCourt) => {
@@ -228,7 +185,6 @@ const FacilityCourtManagement = () => {
     }
   };
 
-  // Show loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -240,21 +196,9 @@ const FacilityCourtManagement = () => {
     );
   }
 
-  // Show create facility form
-  if (showCreateForm) {
-    return (
-      <CreateFacilityForm
-        onSubmit={handleFacilityCreate}
-        onCancel={() => setShowCreateForm(false)}
-      />
-    );
-  }
-
-  // Show empty state for new users
   if (!facilities || facilities.length === 0) {
     return (
       <div className="min-h-screen bg-background">
-        {/* Breadcrumb */}
         <div className="bg-card border-b border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <nav className="flex items-center space-x-2 text-sm">
@@ -277,7 +221,6 @@ const FacilityCourtManagement = () => {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Empty State */}
           <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
             <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-6">
               <Icon name="Building" size={48} className="text-primary" />
@@ -301,7 +244,6 @@ const FacilityCourtManagement = () => {
               Create New Facility
             </Button>
 
-            {/* Features Preview */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 max-w-4xl">
               <div className="text-center p-6">
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -341,6 +283,13 @@ const FacilityCourtManagement = () => {
             </div>
           </div>
         </div>
+
+        {/* Modal */}
+        <CreateFacilityForm
+          isOpen={showCreateForm}
+          onSubmit={handleFacilityCreate}
+          onCancel={() => setShowCreateForm(false)}
+        />
       </div>
     );
   }
@@ -501,6 +450,13 @@ const FacilityCourtManagement = () => {
           <div className="p-6">{renderTabContent()}</div>
         </div>
       </div>
+
+      {/* Modal */}
+      <CreateFacilityForm
+        isOpen={showCreateForm}
+        onSubmit={handleFacilityCreate}
+        onCancel={() => setShowCreateForm(false)}
+      />
     </div>
   );
 };

@@ -40,7 +40,7 @@ export const CourtProvider = ({ children }) => {
 
   const createCourt = async (courtData) => {
     try {
-      const response = await axios.post("/api/courts", courtData, {
+      const response = await axios.post(`http://localhost:7000/owner/facilities/${courtData.facilityId}/courts`, courtData, {
         headers: getHeaders(),
       });
       toast.success("Court Created Successfully")
