@@ -115,6 +115,7 @@ export const BookingProvider = ({ children }) => {
       });
 
       const result = response.data;
+      console.log(result)
       
       // Update state with paginated data
       setBookings(result.content || []);
