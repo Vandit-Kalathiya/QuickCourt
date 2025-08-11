@@ -7,9 +7,10 @@ import com.odoo.Quickcourt.Auth.Payload.auth.AuthResponse;
 import com.odoo.Quickcourt.Auth.Payload.auth.LoginRequest;
 import com.odoo.Quickcourt.Auth.Payload.auth.OtpVerificationRequest;
 import com.odoo.Quickcourt.Auth.Payload.auth.SignupRequest;
-import com.odoo.Quickcourt.Auth.Repository.OtpRepository;
 import com.odoo.Quickcourt.Auth.Repository.UserRepository;
 import com.odoo.Quickcourt.Auth.Utills.JwtTokenProvider;
+import com.odoo.Quickcourt.Exception.ResourceNotFoundException;
+import com.odoo.Quickcourt.Services.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +31,6 @@ import java.util.Random;
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final OtpRepository otpRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
@@ -63,21 +63,21 @@ public class AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        Otp otp = otpRepository.findByUserIdAndCodeAndUsedFalseAndExpiresAtAfter(
-                        user.getId(), request.getOtp(), LocalDateTime.now())
-                .orElseThrow(() -> new BadRequestException("Invalid or expired OTP"));
-
-        otp.setUsed(true);
-        user.setVerified(true);
-
-        otpRepository.save(otp);
-        userRepository.save(user);
-
-        // Clean up expired OTPs
-        otpRepository.deleteByUserId(user.getId());
+//        Otp otp = otpRepository.findByUserIdAndCodeAndUsedFalseAndExpiresAtAfter(
+//                        user.getId(), request.getOtp(), LocalDateTime.now())
+//                .orElseThrow(() -> new BadRequestException("Invalid or expired OTP"));
+//
+//        otp.setUsed(true);
+//        user.setVerified(true);
+//
+//        otpRepository.save(otp);
+//        userRepository.save(user);
+//
+//        // Clean up expired OTPs
+//        otpRepository.deleteByUserId(user.getId());
     }
 
-    public AuthResponse login(LoginRequest request) {
+    public AuthResponse login(LoginRequest request) throws BadRequestException {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BadRequestException("Invalid credentials"));
 
@@ -111,22 +111,22 @@ public class AuthService {
 
     private void generateAndSendOtp(User user) {
         // Delete existing OTPs
-        otpRepository.deleteByUserId(user.getId());
-
-        // Generate new OTP
-        String code = String.format("%06d", new Random().nextInt(999999));
-
-        Otp otp = Otp.builder()
-                .userId(user.getId())
-                .code(code)
-                .expiresAt(LocalDateTime.now().plusMinutes(otpExpirationMinutes))
-                .used(false)
-                .build();
-
-        otpRepository.save(otp);
-
-        // Send OTP via email
-        emailService.sendOtpEmail(user.getEmail(), code);
+//        otpRepository.deleteByUserId(user.getId());
+//
+//        // Generate new OTP
+//        String code = String.format("%06d", new Random().nextInt(999999));
+//
+//        Otp otp = Otp.builder()
+//                .userId(user.getId())
+//                .code(code)
+//                .expiresAt(LocalDateTime.now().plusMinutes(otpExpirationMinutes))
+//                .used(false)
+//                .build();
+//
+//        otpRepository.save(otp);
+//
+//        // Send OTP via email
+//        emailService.sendOtpEmail(user.getEmail(), code);
     }
 }
 

@@ -8,6 +8,8 @@ import com.odoo.Quickcourt.Auth.Payload.auth.SignupRequest;
 import com.odoo.Quickcourt.Auth.Services.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +44,7 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "User login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) throws BadRequestException {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }

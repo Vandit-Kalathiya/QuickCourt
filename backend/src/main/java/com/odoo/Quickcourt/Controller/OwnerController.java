@@ -2,8 +2,14 @@ package com.odoo.Quickcourt.Controller;
 
 // controller/OwnerController.java
 
+import com.odoo.Quickcourt.Dto.Court.CourtRequest;
+import com.odoo.Quickcourt.Dto.Court.CourtResponse;
+import com.odoo.Quickcourt.Dto.Dashboard.OwnerDashboardResponse;
+import com.odoo.Quickcourt.Dto.Facility.FacilityRequest;
+import com.odoo.Quickcourt.Dto.Facility.FacilityResponse;
 import com.odoo.Quickcourt.Services.CourtService;
 import com.odoo.Quickcourt.Services.FacilityService;
+import com.odoo.Quickcourt.Services.OwnerDashboardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
