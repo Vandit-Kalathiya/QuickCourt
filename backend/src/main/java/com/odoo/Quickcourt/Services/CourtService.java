@@ -39,6 +39,7 @@ public class CourtService {
         Facility facility = facilityRepository.findById(facilityId)
                 .orElseThrow(() -> new ResourceNotFoundException("Facility not found"));
 
+
         if (!facility.getOwnerId().equals(userPrincipal.getId())) {
             throw new BadRequestException("Not authorized to add courts to this facility");
         }
@@ -46,7 +47,7 @@ public class CourtService {
         Court court = Court.builder()
                 .facilityId(facilityId)
                 .name(request.getName())
-                .sportType(request.getSportType())
+                .sportType(Facility.Sport.valueOf(request.getSportType().toUpperCase()))
                 .pricePerHour(request.getPricePerHour())
                 .openingTime(request.getOpeningTime())
                 .closingTime(request.getClosingTime())
@@ -71,7 +72,7 @@ public class CourtService {
         }
 
         court.setName(request.getName());
-        court.setSportType(request.getSportType());
+        court.setSportType(Facility.Sport.valueOf(request.getSportType()));
         court.setPricePerHour(request.getPricePerHour());
         court.setOpeningTime(request.getOpeningTime());
         court.setClosingTime(request.getClosingTime());

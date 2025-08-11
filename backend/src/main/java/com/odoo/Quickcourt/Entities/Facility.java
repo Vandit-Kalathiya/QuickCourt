@@ -24,7 +24,6 @@ public class Facility extends BaseEntity {
     @Column(nullable = false)
     private UUID ownerId;
 
-
     @NotBlank
     @Column(nullable = false)
     private String name;
@@ -45,6 +44,9 @@ public class Facility extends BaseEntity {
 
     @ElementCollection
     private List<String> amenities;
+
+    private String longitude;
+    private String latitude;
 
     @Enumerated(EnumType.STRING)
     @Builder.Default

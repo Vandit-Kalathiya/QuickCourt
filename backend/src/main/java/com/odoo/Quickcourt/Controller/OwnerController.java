@@ -61,6 +61,12 @@ public class OwnerController {
         List<FacilityResponse> facilities = facilityService.getOwnerFacilities();
         return ResponseEntity.ok(facilities);
     }
+    @GetMapping("/approved-facilities")
+    @Operation(summary = "Get owner's approved facilities")
+    public ResponseEntity<List<FacilityResponse>> getOwnerApprovedFacilities() {
+        List<FacilityResponse> facilities = facilityService.getOwnerApprovedFacilities();
+        return ResponseEntity.ok(facilities);
+    }
 
     // Court Management
     @PostMapping("/facilities/{facilityId}/courts")

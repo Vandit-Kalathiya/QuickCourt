@@ -108,20 +108,16 @@ const Routes = () => {
       <ErrorBoundary>
         <ScrollToTop />
         <RouterRoutes>
- 
           {/* Public routes */}
+          <Route path="/" element={<Homepage />} />
           <Route element={<PublicLayout />}>
-            <Route path="/" element={<Homepage />} />
+            <Route path="/listings" element={<VenueSearchListings />} />
             <Route
-              path="/listings"
-              element={<VenueSearchListings />}
+              path="/facility-court-management"
+              element={<FacilityCourtManagement />}
             />
-            <Route
-              path="/venue-booking"
-              element={<VenueDetailsBooking />}
-            />
+            <Route path="/venue-booking" element={<VenueDetailsBooking />} />
             <Route path="/my-bookings" element={<MyBookings />} />
-
           </Route>
 
           {/* Auth route (redirects to dashboard if already logged in) */}
@@ -134,10 +130,6 @@ const Routes = () => {
 
             {/* Other protected routes */}
           </Route>
-          <Route
-            path="/facility-court-management"
-            element={<FacilityCourtManagement />}
-          />
 
           {/* Fallback route */}
           <Route path="*" element={<NotFound />} />

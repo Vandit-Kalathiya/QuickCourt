@@ -17,7 +17,7 @@ public class CourtRequest {
     private String name;
 
     @NotNull
-    private Facility.Sport sportType;
+    private String sportType;
 
     @NotNull
     @DecimalMin("0.0")

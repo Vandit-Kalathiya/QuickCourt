@@ -121,11 +121,16 @@ public class AdminService {
     }
 
     private FacilityResponse mapFacilityToResponse(Facility facility) {
+        User owner = userRepository.findById(facility.getOwnerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
         return FacilityResponse.builder()
                 .id(facility.getId())
                 .name(facility.getName())
                 .description(facility.getDescription())
                 .address(facility.getAddress())
+                .ownerName(owner.getName())
+                .ownerEmail(facility.getEmail())
+                .phone(facility.getPhone())
                 .sports(facility.getSports())
                 .amenities(facility.getAmenities())
                 .status(facility.getStatus())

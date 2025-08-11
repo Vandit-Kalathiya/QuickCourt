@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import { useAuth } from './AuthContext';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 
 const OwnerContext = createContext();
 
@@ -85,11 +86,11 @@ const initialState = {
 
 export const OwnerProvider = ({ children }) => {
   const [state, dispatch] = useReducer(ownerReducer, initialState);
-  const { isAuthenticated, isOwner } = useAuth();
+  const { user, isOwner } = useAuth();
 
   // Create facility - corresponds to OwnerController.createFacility()
   const createFacility = async (facilityData, photos) => {
-    if (!isAuthenticated || !isOwner()) {
+    if (!user || !isOwner()) {
       throw new Error('Unauthorized');
     }
 
@@ -139,20 +140,14 @@ export const OwnerProvider = ({ children }) => {
 
   // Get owner facilities - corresponds to OwnerController.getOwnerFacilities()
   const getOwnerFacilities = async () => {
-    if (!isAuthenticated || !isOwner()) return;
+    const res = await axios.get(`http://localhost:7000/owner/facilities`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem("jwtToken")}`
+      }
+    });
 
-    try {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      
-      const facilities = await ownerService.getOwnerFacilities();
-      
-      dispatch({ type: 'SET_OWNER_FACILITIES', payload: facilities });
-      return facilities;
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch facilities';
-      dispatch({ type: 'SET_ERROR', payload: errorMessage });
-      throw error;
-    }
+    console.log(res.data);
+    return res.data;
   };
 
   // Create court - corresponds to OwnerController.createCourt()
@@ -207,8 +202,6 @@ export const OwnerProvider = ({ children }) => {
 
   // Get facility courts - corresponds to OwnerController.getFacilityCourts()
   const getFacilityCourts = async (facilityId) => {
-    if (!isAuthenticated || !isOwner()) return;
-
     try {
       const courts = await ownerService.getFacilityCourts(facilityId);
       
@@ -273,6 +266,17 @@ export const OwnerProvider = ({ children }) => {
     }
   };
 
+  const getApprovedFacilities = async () => {
+    const res = await axios.get(`http://localhost:7000/owner/approved-facilities`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+      },
+    });
+
+    console.log(res.data);
+    return res.data;
+  }
+
   // Clear error
   const clearError = () => {
     dispatch({ type: 'CLEAR_ERROR' });
@@ -288,6 +292,7 @@ export const OwnerProvider = ({ children }) => {
     getFacilityCourts,
     blockTimeSlot,
     unblockTimeSlot,
+    getApprovedFacilities,
     getOwnerDashboard,
     clearError
   };

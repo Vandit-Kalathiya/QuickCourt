@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Icon from "../../../components/AppIcon";
 import Button from "../../../components/ui/Button";
-import Input from "../../../components/ui/Input";
-import Select from "../../../components/ui/Select";
-import { Checkbox } from "../../../components/ui/Checkbox";
 import { useCourt } from "context/CourtContext";
+import { useOwner } from "context/OwnerContext";
+import AddNewCourt from "./AddNewCourt";
 
 const QuickActions = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
+    facilityId: "",
     sportType: "",
     pricePerHour: "",
     openingTime: "06:00",
@@ -42,7 +42,7 @@ const QuickActions = () => {
       color: "success",
       href: "/dashboard",
     },
-    { 
+    {
       title: "Pricing & Availability",
       description: "Manage rates and schedules",
       icon: "DollarSign",
@@ -51,25 +51,12 @@ const QuickActions = () => {
     },
   ];
 
-  const sportTypes = [
-    { value: "tennis", label: "Tennis" },
-    { value: "basketball", label: "Basketball" },
-    { value: "badminton", label: "Badminton" },
-    { value: "squash", label: "Squash" },
-    { value: "volleyball", label: "Volleyball" },
-    { value: "football", label: "Football" },
-    { value: "cricket", label: "Cricket" },
-    { value: "other", label: "Other" },
-  ];
 
   const getColorClasses = (color) => {
     const colors = {
-      primary:
-        "bg-primary/10 text-primary hover:bg-primary/20 border-primary/20",
-      success:
-        "bg-success/10 text-success hover:bg-success/20 border-success/20",
-      warning:
-        "bg-warning/10 text-warning hover:bg-warning/20 border-warning/20",
+      primary: "bg-primary/10 text-primary hover:bg-primary/20 border-primary/20",
+      success: "bg-success/10 text-success hover:bg-success/20 border-success/20",
+      warning: "bg-warning/10 text-warning hover:bg-warning/20 border-warning/20",
       accent: "bg-accent/10 text-accent hover:bg-accent/20 border-accent/20",
     };
     return colors?.[color] || colors?.primary;
@@ -85,7 +72,7 @@ const QuickActions = () => {
     return gradients?.[color] || gradients?.primary;
   };
 
-  const handleInputChange = (field, value) => {
+  const handleFormChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -95,6 +82,7 @@ const QuickActions = () => {
   const resetForm = () => {
     setFormData({
       name: "",
+      facilityId: "",
       sportType: "",
       pricePerHour: "",
       openingTime: "06:00",
@@ -108,38 +96,24 @@ const QuickActions = () => {
     setIsSubmitting(true);
 
     try {
-      // Prepare the data for API
       const courtData = {
         name: formData.name,
+        facilityId: formData.facilityId,
         sportType: formData.sportType,
         pricePerHour: parseFloat(formData.pricePerHour),
         openingTime: formData.openingTime,
         closingTime: formData.closingTime,
-        active: false,
+        active: formData.active,
       };
 
       console.log(courtData);
-
       const response = await createCourt(courtData);
-      console.log(response)
+      console.log(response);
 
-      //   // Close modal and reset form
       setIsModalOpen(false);
       resetForm();
     } catch (error) {
       console.error("Error creating court:", error);
-
-      // Error handling
-      if (error.response) {
-        console.error("Server Error:", error.response.data);
-        toast.error(error.response.data.message || 'Failed to create court');
-      } else if (error.request) {
-        console.error("Network Error:", error.request);
-        toast.error('Network error. Please check your connection.');
-      } else {
-        console.error("Error:", error.message);
-        toast.error('An unexpected error occurred');
-      }
     } finally {
       setIsSubmitting(false);
     }
@@ -153,20 +127,18 @@ const QuickActions = () => {
   return (
     <>
       <div className="bg-card border border-border/50 rounded-xl shadow-subtle overflow-hidden">
-        {/* Header - Enhanced */}
+        {/* Header */}
         <div className="p-6 border-b border-border bg-gradient-to-r from-primary/5 to-transparent">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
               <Icon name="Zap" size={16} className="text-primary" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground">
-              Quick Actions
-            </h3>
+            <h3 className="text-xl font-semibold text-foreground">Quick Actions</h3>
           </div>
         </div>
 
         <div className="p-6">
-          {/* Action Grid - Enhanced */}
+          {/* Action Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             {quickActions?.map((action, index) => (
               <a
@@ -204,7 +176,7 @@ const QuickActions = () => {
             ))}
           </div>
 
-          {/* Action Buttons - Enhanced */}
+          {/* Action Buttons */}
           <div className="pt-6 border-t border-border">
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
               <Button
@@ -231,141 +203,16 @@ const QuickActions = () => {
         </div>
       </div>
 
-      {/* Add Court Modal */}
-      {isModalOpen && (
-        <div className="fixed mt-10 inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-          <div className="bg-card border border-border/50 rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
-            {/* Modal Header */}
-            <div className="p-3 border-b border-border bg-gradient-to-r from-primary/5 to-transparent">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-4 h-4 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Icon name="Plus" size={16} className="text-primary" />
-                  </div>
-                  <h2 className="text-xl font-semibold text-foreground">
-                    Add New Court
-                  </h2>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleModalClose}
-                  iconName="X"
-                  className="hover:bg-muted/50 rounded-lg"
-                />
-              </div>
-            </div>
-
-            {/* Modal Content */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              {/* Court Name */}
-              <Input
-                label="Court Name"
-                placeholder="e.g., Tennis Court A"
-                value={formData.name}
-                onChange={(e) => handleInputChange("name", e.target.value)}
-                required
-                className="transition-all focus:shadow-sm"
-              />
-
-              {/* Sport Type */}
-              <Select
-                label="Sport Type"
-                options={sportTypes}
-                value={formData.sportType}
-                onChange={(value) => handleInputChange("sportType", value)}
-                placeholder="Select sport type"
-                required
-              />
-
-              {/* Price Per Hour */}
-              <Input
-                label="Price Per Hour ($)"
-                type="number"
-                placeholder="e.g., 25.00"
-                value={formData.pricePerHour}
-                onChange={(e) =>
-                  handleInputChange("pricePerHour", e.target.value)
-                }
-                min="0"
-                step="0.01"
-                required
-                className="transition-all focus:shadow-sm"
-              />
-
-              {/* Operating Hours */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Opening Time
-                  </label>
-                  <input
-                    type="time"
-                    value={formData.openingTime}
-                    onChange={(e) =>
-                      handleInputChange("openingTime", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Closing Time
-                  </label>
-                  <input
-                    type="time"
-                    value={formData.closingTime}
-                    onChange={(e) =>
-                      handleInputChange("closingTime", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Active Status */}
-              <div className="bg-gradient-to-r from-muted/20 to-transparent p-4 rounded-lg">
-                <Checkbox
-                  label="Active"
-                  description="Court is available for bookings"
-                  checked={formData.active}
-                  onChange={(e) =>
-                    handleInputChange("active", e.target.checked)
-                  }
-                />
-              </div>
-
-              {/* Form Actions */}
-              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-border">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleModalClose}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={
-                    isSubmitting ||
-                    !formData.name ||
-                    !formData.sportType ||
-                    !formData.pricePerHour
-                  }
-                  loading={isSubmitting}
-                  iconName="Plus"
-                  className="bg-primary hover:bg-primary/90"
-                >
-                  Add Court
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Shared Add Court Modal */}
+      <AddNewCourt
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onSubmit={handleSubmit}
+        formData={formData}
+        onFormChange={handleFormChange}
+        isSubmitting={isSubmitting}
+        showFacilitySelect={true}
+      />
     </>
   );
 };
