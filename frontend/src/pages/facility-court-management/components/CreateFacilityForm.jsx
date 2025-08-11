@@ -14,7 +14,7 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
       lat: '',
       lng: ''
     },
-    sports: [], // Added sports array
+    sports: [],
     amenities: [],
     photos: []
   });
@@ -23,29 +23,14 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const availableAmenities = [
-    'Parking',
-    'Changing Rooms',
-    'Showers',
-    'Equipment Rental',
-    'Cafeteria',
-    'First Aid',
-    'Air Conditioning',
-    'WiFi',
-    'Lockers',
-    'Lighting',
-    'Sound System',
-    'Seating Area'
+    'Parking', 'Changing Rooms', 'Showers', 'Equipment Rental',
+    'Cafeteria', 'First Aid', 'Air Conditioning', 'WiFi', 
+    'Lockers', 'Lighting', 'Sound System', 'Seating Area'
   ];
 
-  // Added available sports
   const availableSports = [
-    'FOOTBALL',
-    'BASKETBALL', 
-    'TENNIS',
-    'BADMINTON',
-    'VOLLEYBALL',
-    'CRICKET',
-    'SWIMMING'
+    'FOOTBALL', 'BASKETBALL', 'TENNIS', 'BADMINTON',
+    'VOLLEYBALL', 'CRICKET', 'SWIMMING'
   ];
 
   const handleInputChange = (field, value) => {
@@ -54,7 +39,6 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
       [field]: value
     }));
     
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
@@ -73,7 +57,6 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
     }));
   };
 
-  // Added sports toggle handler
   const handleSportsToggle = (sport) => {
     setFormData(prev => ({
       ...prev,
@@ -92,17 +75,38 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
     }));
   };
 
+  // Enhanced photo upload handler with file validation
   const handlePhotoUpload = (e) => {
     const files = Array.from(e.target.files);
     
-    files.forEach(file => {
+    // Validate files
+    const validFiles = files.filter(file => {
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        alert(`${file.name} is not an image file`);
+        return false;
+      }
+      
+      // Check file size (10MB limit)
+      if (file.size > 10 * 1024 * 1024) {
+        alert(`${file.name} is too large. Maximum size is 10MB`);
+        return false;
+      }
+      
+      return true;
+    });
+
+    // Process valid files
+    validFiles.forEach(file => {
       const reader = new FileReader();
       reader.onload = (event) => {
         const newPhoto = {
           id: Date.now() + Math.random(),
-          url: event.target.result,
+          url: event.target.result, // For preview
           name: file.name,
-          file: file
+          file: file, // Store the actual file for upload
+          size: file.size,
+          type: file.type
         };
         
         setFormData(prev => ({
@@ -112,6 +116,9 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
       };
       reader.readAsDataURL(file);
     });
+
+    // Clear the input
+    e.target.value = '';
   };
 
   const handlePhotoRemove = (photoId) => {
@@ -146,7 +153,6 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
       newErrors.email = 'Please enter a valid email address';
     }
 
-    // Added sports validation
     if (formData.sports.length === 0) {
       newErrors.sports = 'Please select at least one sport';
     }
@@ -155,6 +161,7 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Updated handleSubmit with multipart form data
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -165,17 +172,68 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      onSubmit(formData);
+      // Create FormData for multipart request
+      const multipartFormData = new FormData();
+      
+      // Add text fields
+      multipartFormData.append('name', formData.name);
+      multipartFormData.append('description', formData.description);
+      multipartFormData.append('address', formData.address);
+      multipartFormData.append('phone', formData.phone);
+      multipartFormData.append('email', formData.email);
+      
+      // Add coordinates if provided
+      if (formData.coordinates.lat) {
+        multipartFormData.append('lat', formData.coordinates.lat);
+      }
+      if (formData.coordinates.lng) {
+        multipartFormData.append('lng', formData.coordinates.lng);
+      }
+      
+      // Add sports array
+      formData.sports.forEach(sport => {
+        multipartFormData.append('sports', sport);
+      });
+      
+      // Add amenities array
+      formData.amenities.forEach(amenity => {
+        multipartFormData.append('amenities', amenity);
+      });
+      
+      // Add photo files
+      formData.photos.forEach(photo => {
+        if (photo.file) {
+          multipartFormData.append('photos', photo.file);
+        }
+      });
+
+      console.log(formData)
+
+      // Submit the multipart form data
+      const response = await fetch('/api/facilities', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+          // Don't set Content-Type - browser will set it with boundary for multipart/form-data
+        },
+        body: multipartFormData
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        onSubmit(result);
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create facility');
+      }
     } catch (error) {
       console.error('Error creating facility:', error);
+      alert('Failed to create facility. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Helper function to get sport icon
   const getSportIcon = (sport) => {
     const sportIcons = {
       'FOOTBALL': 'Circle',
@@ -187,6 +245,15 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
       'SWIMMING': 'Waves'
     };
     return sportIcons[sport] || 'Circle';
+  };
+
+  // Format file size for display
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   return (
@@ -201,7 +268,12 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
                 Set up your sports facility with all the necessary details
               </p>
             </div>
-            <Button variant="outline" onClick={onCancel} iconName="X">
+            <Button 
+              variant="outline" 
+              onClick={onCancel} 
+              iconName="X"
+              disabled={isSubmitting}
+            >
               Cancel
             </Button>
           </div>
@@ -227,6 +299,7 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
                   placeholder="Enter facility name"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
+                  disabled={isSubmitting}
                 />
                 {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
               </div>
@@ -243,6 +316,7 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
                   placeholder="Describe your facility, amenities, and what makes it special..."
                   value={formData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
+                  disabled={isSubmitting}
                 />
                 {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
               </div>
@@ -259,6 +333,7 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
                   placeholder="Enter complete address"
                   value={formData.address}
                   onChange={(e) => handleInputChange('address', e.target.value)}
+                  disabled={isSubmitting}
                 />
                 {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
               </div>
@@ -275,6 +350,7 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
                   placeholder="+1 (555) 123-4567"
                   value={formData.phone}
                   onChange={(e) => handleInputChange('phone', e.target.value)}
+                  disabled={isSubmitting}
                 />
                 {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
               </div>
@@ -291,13 +367,14 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
                   placeholder="contact@facility.com"
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
+                  disabled={isSubmitting}
                 />
                 {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </div>
             </div>
           </div>
 
-          {/* Sports Selection - NEW SECTION */}
+          {/* Sports Selection */}
           <div className="bg-card rounded-lg border border-border p-6">
             <h2 className="text-lg font-semibold text-foreground mb-6">Available Sports *</h2>
             <p className="text-text-secondary text-sm mb-4">
@@ -312,13 +389,14 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
                     formData.sports.includes(sport)
                       ? 'border-primary bg-primary/5 shadow-sm'
                       : 'border-border hover:border-border/80'
-                  }`}
+                  } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <input
                     type="checkbox"
                     className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
                     checked={formData.sports.includes(sport)}
                     onChange={() => handleSportsToggle(sport)}
+                    disabled={isSubmitting}
                   />
                   <div className="flex items-center space-x-2">
                     <Icon 
@@ -367,6 +445,7 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
                   placeholder="40.7589"
                   value={formData.coordinates.lat}
                   onChange={(e) => handleCoordinateChange('lat', e.target.value)}
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -381,6 +460,7 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
                   placeholder="-73.9851"
                   value={formData.coordinates.lng}
                   onChange={(e) => handleCoordinateChange('lng', e.target.value)}
+                  disabled={isSubmitting}
                 />
               </div>
             </div>
@@ -398,13 +478,16 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
               {availableAmenities.map((amenity) => (
                 <label
                   key={amenity}
-                  className="flex items-center space-x-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-background transition-colors"
+                  className={`flex items-center space-x-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-background transition-colors ${
+                    isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
                   <input
                     type="checkbox"
                     className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
                     checked={formData.amenities.includes(amenity)}
                     onChange={() => handleAmenityToggle(amenity)}
+                    disabled={isSubmitting}
                   />
                   <span className="text-sm text-foreground">{amenity}</span>
                 </label>
@@ -412,18 +495,23 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
             </div>
           </div>
 
-          {/* Photos */}
+          {/* Photos Section */}
           <div className="bg-card rounded-lg border border-border p-6">
             <h2 className="text-lg font-semibold text-foreground mb-6">Facility Photos</h2>
+            <p className="text-text-secondary text-sm mb-4">
+              Upload high-quality images of your facility (Max: 10MB per image)
+            </p>
             
             <div className="mb-6">
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer bg-background hover:bg-background/50 transition-colors">
+              <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-lg cursor-pointer bg-background hover:bg-background/50 transition-colors ${
+                isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+              }`}>
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <Icon name="Upload" size={24} className="text-text-secondary mb-2" />
                   <p className="text-sm text-text-secondary">
                     <span className="font-semibold">Click to upload</span> or drag and drop
                   </p>
-                  <p className="text-xs text-text-secondary">PNG, JPG, GIF up to 10MB</p>
+                  <p className="text-xs text-text-secondary">PNG, JPG, GIF up to 10MB each</p>
                 </div>
                 <input
                   type="file"
@@ -431,29 +519,50 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
                   multiple
                   accept="image/*"
                   onChange={handlePhotoUpload}
+                  disabled={isSubmitting}
                 />
               </label>
             </div>
 
             {formData.photos.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {formData.photos.map((photo) => (
-                  <div key={photo.id} className="relative group">
-                    <img
-                      src={photo.url}
-                      alt={photo.name}
-                      className="w-full h-24 object-cover rounded-lg"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handlePhotoRemove(photo.id)}
-                      className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Icon name="X" size={12} />
-                    </button>
-                    <p className="text-xs text-text-secondary mt-1 truncate">{photo.name}</p>
-                  </div>
-                ))}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-medium text-foreground">
+                    Uploaded Photos ({formData.photos.length})
+                  </h3>
+                  <p className="text-xs text-text-secondary">
+                    Total size: {formatFileSize(formData.photos.reduce((acc, photo) => acc + photo.size, 0))}
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {formData.photos.map((photo) => (
+                    <div key={photo.id} className="relative group">
+                      <div className="aspect-square overflow-hidden rounded-lg border border-border">
+                        <img
+                          src={photo.url}
+                          alt={photo.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      
+                      {!isSubmitting && (
+                        <button
+                          type="button"
+                          onClick={() => handlePhotoRemove(photo.id)}
+                          className="absolute top-2 right-2 w-6 h-6 bg-error text-error-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:scale-110"
+                        >
+                          <Icon name="X" size={12} />
+                        </button>
+                      )}
+                      
+                      {/* Photo info overlay */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/75 text-white p-2 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <p className="text-xs truncate font-medium">{photo.name}</p>
+                        <p className="text-xs text-gray-300">{formatFileSize(photo.size)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -464,6 +573,7 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
               type="button"
               variant="outline"
               onClick={onCancel}
+              disabled={isSubmitting}
             >
               Cancel
             </Button>
@@ -472,9 +582,21 @@ const CreateFacilityForm = ({ onSubmit, onCancel }) => {
               disabled={isSubmitting}
               iconName={isSubmitting ? "Loader" : "Check"}
             >
-              {isSubmitting ? 'Creating...' : 'Create Facility'}
+              {isSubmitting ? 'Creating Facility...' : 'Create Facility'}
             </Button>
           </div>
+          
+          {/* Progress indicator */}
+          {isSubmitting && (
+            <div className="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <Icon name="Loader" size={16} className="text-primary animate-spin" />
+                <span className="text-sm text-primary font-medium">
+                  Creating your facility...
+                </span>
+              </div>
+            </div>
+          )}
         </form>
       </div>
     </div>

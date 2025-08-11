@@ -7,6 +7,7 @@ import BookingFilters from './components/BookingFilters';
 import BookingDetailsModal from './components/BookingDetailsModal';
 import ReviewModal from './components/ReviewModal';
 import AccountSettings from './components/AccountSettings';
+import Header from 'components/ui/Header';
 
 const UserDashboardBookingManagement = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
@@ -351,7 +352,8 @@ const UserDashboardBookingManagement = () => {
   const filteredBookingHistory = filterBookings(bookingHistory);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 pt-5">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 pt-10">
+      <Header />
       {/* Subtle Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-full blur-3xl"></div>

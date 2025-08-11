@@ -3,6 +3,7 @@ import Icon from '../AppIcon';
 import Button from './Button';
 import Input from './Input';
 import Select from './Select';
+import { useAuth } from 'context/AuthContext';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -16,6 +17,8 @@ const Header = () => {
     { id: 2, type: 'reminder', message: 'Upcoming booking tomorrow at 3 PM', time: '1 hour ago', unread: true },
     { id: 3, type: 'update', message: 'New facility added near you', time: '3 hours ago', unread: false }
   ]);
+  const {userProfile, user} = useAuth();
+  console.log(userProfile, user)
 
   const roleOptions = [
     { value: 'user', label: 'Sports Enthusiast' },
@@ -71,7 +74,7 @@ const Header = () => {
   const handleNotificationClick = (notification) => {
     // Mark as read and navigate based on type
     if (notification?.type === 'booking') {
-      window.location.href = '/user-dashboard-booking-management';
+      window.location.href = '/user-dashboard';
     }
   };
 

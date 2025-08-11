@@ -105,7 +105,7 @@ const BookingWidget = ({ venue, onBookingComplete }) => {
 
   if (showBookingSummary) {
     return (
-      <div className="bg-card border border-border rounded-lg p-6 sticky top-20">
+      <div className="bg-card border border-border rounded-lg p-6 sticky top-10">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-semibold text-foreground">Booking Summary</h3>
           <Button
@@ -166,7 +166,7 @@ const BookingWidget = ({ venue, onBookingComplete }) => {
   }
 
   return (
-    <div className="bg-card border border-border rounded-lg p-6 sticky top-20">
+    <div className="bg-card border border-border rounded-lg p-6 sticky top-2">
       <h3 className="text-xl font-semibold text-foreground mb-6">Book This Venue</h3>
       <div className="space-y-6">
         {/* Date Selection */}
