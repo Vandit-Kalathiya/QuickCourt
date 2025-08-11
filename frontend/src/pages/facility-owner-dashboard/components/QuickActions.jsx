@@ -42,7 +42,7 @@ const QuickActions = () => {
       color: "success",
       href: "/dashboard",
     },
-    {
+    { 
       title: "Pricing & Availability",
       description: "Manage rates and schedules",
       icon: "DollarSign",

@@ -40,8 +40,6 @@ export const AuthProvider = ({ children }) => {
     return response;
   };
 
-  console.log(userProfile);
-
   const getHeaders = () => ({
     Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
     "Content-Type": "application/json",
