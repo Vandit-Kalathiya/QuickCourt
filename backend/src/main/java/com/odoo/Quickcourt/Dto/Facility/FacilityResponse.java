@@ -26,6 +26,12 @@ public class FacilityResponse {
     private Facility.FacilityStatus status;
     private Double averageRating;
     private Integer totalReviews;
+    private String longitude;
+    private String latitude;
+    private String ownerName;
+    private String ownerEmail;
+    private String ownerPhone;
+    private String phone;
     private List<String> photos;
     private LocalDateTime createdAt;
 }
