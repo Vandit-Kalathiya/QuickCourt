@@ -1,6 +1,7 @@
 import { useAuth } from "context/AuthContext";
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const AuthPage = () => {
   const {
@@ -30,6 +31,7 @@ const AuthPage = () => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isEmailLoading, setIsEmailLoading] = useState(false);
+  const navigate = useNavigate();
 
   // Display auth errors using toast
   useEffect(() => {
@@ -223,6 +225,7 @@ const AuthPage = () => {
         console.log(formData);
         const loginRes = await signIn(formData.email, formData.password);
         console.log("Login response:", loginRes);
+        navigate("/dashboard");
         toast.success("Login successful!");
       } else {
         const signUpData = {
