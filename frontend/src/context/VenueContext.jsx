@@ -1,237 +1,249 @@
 // src/contexts/VenueContext.jsx
-import React, { createContext, useContext, useReducer } from 'react';
-import { venueService } from '../services/venueService';
-import { toast } from 'react-toastify';
+import React, { createContext, useContext, useState } from "react";
+import axios from "axios";
+import { toast } from "react-hot-toast";
 
 const VenueContext = createContext();
 
-const venueReducer = (state, action) => {
-  switch (action.type) {
-    case 'SET_LOADING':
-      return {
-        ...state,
-        loading: action.payload
-      };
-    case 'SET_VENUES':
-      return {
-        ...state,
-        venues: action.payload,
-        loading: false
-      };
-    case 'SET_CURRENT_VENUE':
-      return {
-        ...state,
-        currentVenue: action.payload,
-        loading: false
-      };
-    case 'SET_VENUE_REVIEWS':
-      return {
-        ...state,
-        venueReviews: action.payload
-      };
-    case 'ADD_REVIEW':
-      return {
-        ...state,
-        venueReviews: [action.payload, ...state.venueReviews]
-      };
-    case 'SET_FILTERS':
-      return {
-        ...state,
-        filters: { ...state.filters, ...action.payload }
-      };
-    case 'SET_PAGINATION':
-      return {
-        ...state,
-        pagination: action.payload
-      };
-    case 'SET_ERROR':
-      return {
-        ...state,
-        error: action.payload,
-        loading: false
-      };
-    case 'CLEAR_ERROR':
-      return {
-        ...state,
-        error: null
-      };
-    case 'CLEAR_CURRENT_VENUE':
-      return {
-        ...state,
-        currentVenue: null,
-        venueReviews: []
-      };
-    default:
-      return state;
-  }
-};
+// Create axios instance with base configuration
+const api = axios.create({
+  baseURL: "http://localhost:7000",
+  timeout: 10000,
+});
 
-const initialState = {
-  venues: [],
-  currentVenue: null,
-  venueReviews: [],
-  filters: {
-    sports: [],
-    name: '',
-    sortBy: 'name',
-    sortOrder: 'asc'
+// Add request interceptor for auth token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("jwtToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
   },
-  pagination: {
+  (error) => Promise.reject(error)
+);
+
+// Add response interceptor for error handling
+api.interceptors.response.use(
+  (response) => response.data,
+  (error) => {
+    const message = error.response?.data?.message || "An error occurred";
+    return Promise.reject(new Error(message));
+  }
+);
+
+export const VenueProvider = ({ children }) => {
+  const [venues, setVenues] = useState([]);
+  const [currentVenue, setCurrentVenue] = useState(null);
+  const [venueReviews, setVenueReviews] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [pagination, setPagination] = useState({
     page: 0,
     size: 12,
     totalPages: 0,
     totalElements: 0,
     hasNext: false,
-    hasPrevious: false
-  },
-  loading: false,
-  error: null
-};
+    hasPrevious: false,
+  });
 
-export const VenueProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(venueReducer, initialState);
-
-  // Fetch venues - corresponds to VenueController.getFacilities()
-  const fetchVenues = async (page = 0, size = 12, filters = {}) => {
+  // Get all approved facilities
+  const getFacilities = async (sports = [], name = "", page = 0, size = 12) => {
     try {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      
-      const response = await venueService.getVenues(page, size, filters);
-      
-      dispatch({
-        type: 'SET_PAGINATION',
-        payload: {
-          page: response.number,
-          size: response.size,
-          totalPages: response.totalPages,
-          totalElements: response.totalElements,
-          hasNext: !response.last,
-          hasPrevious: response.number > 0
-        }
+      setLoading(true);
+      setError(null);
+
+      const params = {
+        page,
+        size,
+        ...(name && { name }),
+        ...(sports.length > 0 && { sports: sports.join(",") }),
+      };
+
+      const response = await api.get("/venues", { params });
+
+      setVenues(response.content || []);
+      setPagination({
+        page: response.number,
+        size: response.size,
+        totalPages: response.totalPages,
+        totalElements: response.totalElements,
+        hasNext: !response.last,
+        hasPrevious: response.number > 0,
       });
 
-      dispatch({ type: 'SET_VENUES', payload: response.content });
       return response;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch venues';
-      dispatch({ type: 'SET_ERROR', payload: errorMessage });
-      toast.error(errorMessage);
+      setError(error.message);
+      toast.error(error.message);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Get venue by ID - corresponds to VenueController.getFacility()
-  const getVenueById = async (venueId) => {
+  // Get facility by ID
+  const getFacilityById = async (id) => {
     try {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      
-      const venue = await venueService.getVenueById(venueId);
-      
-      dispatch({ type: 'SET_CURRENT_VENUE', payload: venue });
+      setLoading(true);
+      setError(null);
+
+      const venue = await api.get(`/facilities/${id}`);
+
+      setCurrentVenue(venue);
       return venue;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch venue details';
-      dispatch({ type: 'SET_ERROR', payload: errorMessage });
-      toast.error(errorMessage);
+      setError(error.message);
+      toast.error(error.message);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Get venue reviews - corresponds to VenueController.getFacilityReviews()
-  const getVenueReviews = async (venueId, page = 0, size = 10) => {
+  // Get facility reviews
+  const getFacilityReviews = async (id, page = 0, size = 10) => {
     try {
-      const response = await venueService.getVenueReviews(venueId, page, size);
-      
+      setError(null);
+
+      const response = await api.get(`/facilities/${id}/reviews`, {
+        params: { page, size },
+      });
+
       if (page === 0) {
-        dispatch({ type: 'SET_VENUE_REVIEWS', payload: response.content });
+        setVenueReviews(response.content || []);
       } else {
-        dispatch({ 
-          type: 'SET_VENUE_REVIEWS', 
-          payload: [...state.venueReviews, ...response.content] 
-        });
+        setVenueReviews((prev) => [...prev, ...(response.content || [])]);
       }
-      
+
       return response;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch reviews';
-      toast.error(errorMessage);
+      setError(error.message);
+      toast.error(error.message);
       throw error;
     }
   };
 
-  // Set filters
-  const setFilters = (newFilters) => {
-    dispatch({ type: 'SET_FILTERS', payload: newFilters });
+  // Add a new review
+  const addFacilityReview = async (facilityId, reviewData) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await api.post(
+        `/facilities/${facilityId}/reviews`,
+        reviewData
+      );
+
+      // Add the new review to the beginning of the list
+      setVenueReviews((prev) => [response, ...prev]);
+
+      toast.success("Review added successfully!");
+      return response;
+    } catch (error) {
+      setError(error.message);
+      toast.error(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load more venues for pagination
+  const loadMoreVenues = async (sports = [], name = "") => {
+    if (!pagination.hasNext) return;
+
+    try {
+      setLoading(true);
+
+      const params = {
+        page: pagination.page + 1,
+        size: pagination.size,
+        ...(name && { name }),
+        ...(sports.length > 0 && { sports: sports.join(",") }),
+      };
+
+      const response = await api.get("/facilities", { params });
+
+      setVenues((prev) => [...prev, ...(response.content || [])]);
+      setPagination({
+        page: response.number,
+        size: response.size,
+        totalPages: response.totalPages,
+        totalElements: response.totalElements,
+        hasNext: !response.last,
+        hasPrevious: response.number > 0,
+      });
+
+      return response;
+    } catch (error) {
+      setError(error.message);
+      toast.error(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Search venues
+  const searchVenues = async (sports = [], name = "") => {
+    return await getFacilities(sports, name, 0, pagination.size);
   };
 
   // Clear current venue
   const clearCurrentVenue = () => {
-    dispatch({ type: 'CLEAR_CURRENT_VENUE' });
+    setCurrentVenue(null);
+    setVenueReviews([]);
   };
 
   // Clear error
   const clearError = () => {
-    dispatch({ type: 'CLEAR_ERROR' });
+    setError(null);
   };
 
-  // Search venues with filters
-  const searchVenues = async (searchFilters = {}) => {
-    const mergedFilters = { ...state.filters, ...searchFilters };
-    dispatch({ type: 'SET_FILTERS', payload: mergedFilters });
-    await fetchVenues(0, state.pagination.size, mergedFilters);
-  };
-
-  // Load more venues (pagination)
-  const loadMoreVenues = async () => {
-    if (state.pagination.hasNext) {
-      const response = await venueService.getVenues(
-        state.pagination.page + 1, 
-        state.pagination.size, 
-        state.filters
-      );
-      
-      dispatch({
-        type: 'SET_PAGINATION',
-        payload: {
-          page: response.number,
-          size: response.size,
-          totalPages: response.totalPages,
-          totalElements: response.totalElements,
-          hasNext: !response.last,
-          hasPrevious: response.number > 0
-        }
-      });
-
-      dispatch({ 
-        type: 'SET_VENUES', 
-        payload: [...state.venues, ...response.content] 
-      });
-    }
+  // Reset venues list
+  const resetVenues = () => {
+    setVenues([]);
+    setPagination({
+      page: 0,
+      size: 12,
+      totalPages: 0,
+      totalElements: 0,
+      hasNext: false,
+      hasPrevious: false,
+    });
   };
 
   const value = {
-    ...state,
-    fetchVenues,
-    getVenueById,
-    getVenueReviews,
-    setFilters,
+    // State
+    venues,
+    currentVenue,
+    venueReviews,
+    loading,
+    error,
+    pagination,
+
+    // Actions
+    getFacilities,
+    getFacilityById,
+    getFacilityReviews,
+    addFacilityReview,
+    loadMoreVenues,
+    searchVenues,
     clearCurrentVenue,
     clearError,
-    searchVenues,
-    loadMoreVenues
+    resetVenues,
   };
 
   return (
-    <VenueContext.Provider value={value}>
-      {children}
-    </VenueContext.Provider>
+    <VenueContext.Provider value={value}>{children}</VenueContext.Provider>
   );
 };
 
 export const useVenue = () => {
   const context = useContext(VenueContext);
   if (!context) {
-    throw new Error('useVenue must be used within a VenueProvider');
+    throw new Error("useVenue must be used within a VenueProvider");
   }
   return context;
 };

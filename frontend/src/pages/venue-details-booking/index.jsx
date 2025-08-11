@@ -5,48 +5,74 @@ import BookingWidget from './components/BookingWidget';
 import ReviewsSection from './components/ReviewsSection';
 import BookingSuccessModal from './components/BookingSuccessModal';
 import Breadcrumb from './components/Breadcrumb';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 const VenueDetailsBooking = () => {
-  const [bookingData, setBookingData] = useState(null);
+  const [venue, setVenue] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
+
+  useEffect(() => {
+    // Fetch venue details using the id
+    const fetchVenueDetails = async () => {
+      try {
+        console.log(id);
+        const response = await fetch(`http://localhost:7000/venues/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("jwtToken")}`
+          }
+        });
+        const data = await response.json();
+        console.log(data);
+        setVenue(data);
+      } catch (error) {
+        console.error("Error fetching venue details:", error);
+      }
+    };
+
+    fetchVenueDetails();
+  }, [id]);
 
   // Mock venue data
-  const venue = {
-    id: 1,
-    name: "Elite Sports Complex",
-    description: `Premier sports facility featuring state-of-the-art courts and equipment. Our complex offers a comprehensive range of sports activities in a modern, well-maintained environment. Perfect for both casual players and serious athletes looking for top-quality facilities.\n\nWith over 15 years of experience in sports facility management, we pride ourselves on providing exceptional service and maintaining the highest standards of cleanliness and safety. Our facility is equipped with the latest technology and amenities to ensure you have the best possible experience.`,
-    rating: 4.7,
-    reviewCount: 284,
-    operatingHours: "6:00 AM - 10:00 PM",
-    location: {
-      address: "1234 Sports Avenue",
-      city: "Los Angeles",
-      state: "CA",
-      zipCode: "90210",
-      lat: 34.0522,
-      lng: -118.2437
-    },
-    sports: ["Tennis", "Basketball", "Badminton", "Swimming"],
-    amenities: [
-      "Parking",
-      "WiFi",
-      "Changing Rooms",
-      "Equipment Rental",
-      "Cafeteria",
-      "First Aid",
-      "Air Conditioning",
-      "Lighting",
-      "Security",
-      "Lockers"
-    ],
-    images: [
-      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop"
-    ]
-  };
+  // const venue = {
+  //   id: 1,
+  //   name: "Elite Sports Complex",
+  //   description: `Premier sports facility featuring state-of-the-art courts and equipment. Our complex offers a comprehensive range of sports activities in a modern, well-maintained environment. Perfect for both casual players and serious athletes looking for top-quality facilities.\n\nWith over 15 years of experience in sports facility management, we pride ourselves on providing exceptional service and maintaining the highest standards of cleanliness and safety. Our facility is equipped with the latest technology and amenities to ensure you have the best possible experience.`,
+  //   rating: 4.7,
+  //   reviewCount: 284,
+  //   operatingHours: "6:00 AM - 10:00 PM",
+  //   location: {
+  //     address: "1234 Sports Avenue",
+  //     city: "Los Angeles",
+  //     state: "CA",
+  //     zipCode: "90210",
+  //     lat: 34.0522,
+  //     lng: -118.2437
+  //   },
+  //   sports: ["Tennis", "Basketball", "Badminton", "Swimming"],
+  //   amenities: [
+  //     "Parking",
+  //     "WiFi",
+  //     "Changing Rooms",
+  //     "Equipment Rental",
+  //     "Cafeteria",
+  //     "First Aid",
+  //     "Air Conditioning",
+  //     "Lighting",
+  //     "Security",
+  //     "Lockers"
+  //   ],
+  //   images: [
+  //     "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
+  //     "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=800&h=600&fit=crop",
+  //     "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
+  //     "https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=800&h=600&fit=crop",
+  //     "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop"
+  //   ]
+  // };
 
   // Mock reviews data
   const reviews = [
@@ -134,13 +160,15 @@ const VenueDetailsBooking = () => {
 
   const handleCloseSuccessModal = () => {
     setShowSuccessModal(false);
-    setBookingData(null);
+    setVenue(null);
   };
 
   useEffect(() => {
+
     // Scroll to top when component mounts
     window.scrollTo(0, 0);
   }, []);
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -155,7 +183,7 @@ const VenueDetailsBooking = () => {
           {/* Left Column - Main Content */}
           <div className="lg:col-span-8 space-y-8">
             {/* Image Gallery */}
-            <ImageGallery images={venue?.images} venueName={venue?.name} />
+            <ImageGallery images={venue?.photos} venueName={venue?.name} />
 
             {/* Venue Information */}
             <VenueInfo venue={venue} />
@@ -181,7 +209,7 @@ const VenueDetailsBooking = () => {
       <BookingSuccessModal
         isOpen={showSuccessModal}
         onClose={handleCloseSuccessModal}
-        bookingData={bookingData}
+        bookingData={venue}
       />
     </div>
   );

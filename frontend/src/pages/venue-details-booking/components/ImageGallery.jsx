@@ -31,12 +31,12 @@ const ImageGallery = ({ images, venueName }) => {
         {/* Main Image */}
         <div className="relative h-64 md:h-80 lg:h-96">
           <Image
-            src={images?.[currentImageIndex]}
+            src={`http://localhost:7000${images?.[0]}`}
             alt={`${venueName} - Image ${currentImageIndex + 1}`}
             className="w-full h-full object-cover cursor-pointer"
             onClick={() => openLightbox(currentImageIndex)}
           />
-          
+
           {/* Navigation Arrows */}
           {images?.length > 1 && (
             <>
@@ -82,7 +82,9 @@ const ImageGallery = ({ images, venueName }) => {
               <div
                 key={index}
                 className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
-                  index === currentImageIndex ? 'border-primary' : 'border-transparent'
+                  index === currentImageIndex
+                    ? "border-primary"
+                    : "border-transparent"
                 }`}
                 onClick={() => setCurrentImageIndex(index)}
               >
@@ -105,7 +107,7 @@ const ImageGallery = ({ images, venueName }) => {
               alt={`${venueName} - Image ${currentImageIndex + 1}`}
               className="max-w-full max-h-full object-contain"
             />
-            
+
             {/* Close Button */}
             <Button
               variant="ghost"

@@ -3,6 +3,8 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Select from '../../../components/ui/Select';
 import Input from '../../../components/ui/Input';
+import { useOwner } from 'context/OwnerContext';
+import { useSearchParams } from 'react-router-dom';
 
 const BookingWidget = ({ venue, onBookingComplete }) => {
   const [selectedDate, setSelectedDate] = useState('');
@@ -12,6 +14,19 @@ const BookingWidget = ({ venue, onBookingComplete }) => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [showBookingSummary, setShowBookingSummary] = useState(false);
+  const [courts, setCourts] = useState([]);
+  const { getFacilityCourts } = useOwner();
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
+
+
+  useEffect(() => {
+    const fetchCourts = async () => {
+      const courts = await getFacilityCourts(id);
+      setCourts(courts);
+    };
+    fetchCourts();
+  }, []);
 
   // Mock time slots data
   const timeSlots = [
@@ -33,9 +48,9 @@ const BookingWidget = ({ venue, onBookingComplete }) => {
     { id: '21:00', time: '9:00 PM', price: 35, available: true }
   ];
 
-  const sportOptions = venue?.sports?.map(sport => ({
-    value: sport?.toLowerCase(),
-    label: sport
+  const sportOptions = courts?.map(court => ({
+    value: court?.id,
+    label: court?.name + ' - ' + court?.sportType
   }));
 
   // Get minimum date (today)
@@ -82,6 +97,7 @@ const BookingWidget = ({ venue, onBookingComplete }) => {
     // Simulate payment processing
     setTimeout(() => {
       setIsLoading(false);
+      
       const bookingData = {
         venue: venue?.name,
         date: selectedDate,
@@ -102,6 +118,8 @@ const BookingWidget = ({ venue, onBookingComplete }) => {
       setSelectedTimeSlots([]);
     }, 2000);
   };
+
+  console.log(courts);
 
   if (showBookingSummary) {
     return (
@@ -179,10 +197,10 @@ const BookingWidget = ({ venue, onBookingComplete }) => {
           required
         />
 
-        {/* Sport Selection */}
+        {/* Court Selection */}
         <Select
-          label="Choose Sport"
-          placeholder="Select a sport"
+          label="Choose Court"
+          placeholder="Select a court"
           options={sportOptions}
           value={selectedSport}
           onChange={setSelectedSport}
