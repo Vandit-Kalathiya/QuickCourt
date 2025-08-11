@@ -20,7 +20,7 @@ public class CreateOrderRequest {
 
     private String description;
     private String currency;
-    private String customerEmail;
-    private String customerPhone;
+    private String userId;
+    private String ownerId;
 }
 
