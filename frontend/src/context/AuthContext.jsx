@@ -61,10 +61,8 @@ export const AuthProvider = ({ children }) => {
       console.log("Current User : ", data);
 
       return {
-        mobileNumber: data.mobileNumber,
         email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
+        name: data.name,
         role: data.role,
       };
     } catch (err) {

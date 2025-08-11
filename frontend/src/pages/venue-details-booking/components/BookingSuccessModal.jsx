@@ -15,7 +15,7 @@ const BookingSuccessModal = ({ isOpen, onClose, bookingData }) => {
   };
 
   const handleViewBookings = () => {
-    window.location.href = '/user-dashboard-booking-management';
+    window.location.href = '/user-dashboard';
   };
 
   return (

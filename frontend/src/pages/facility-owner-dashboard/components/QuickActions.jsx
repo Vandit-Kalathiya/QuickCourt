@@ -40,9 +40,9 @@ const QuickActions = () => {
       description: "See complete booking history",
       icon: "Calendar",
       color: "success",
-      href: "/user-dashboard",
+      href: "/dashboard",
     },
-    {
+    { 
       title: "Pricing & Availability",
       description: "Manage rates and schedules",
       icon: "DollarSign",

@@ -7,6 +7,8 @@ import BookingFilters from './components/BookingFilters';
 import BookingDetailsModal from './components/BookingDetailsModal';
 import ReviewModal from './components/ReviewModal';
 import AccountSettings from './components/AccountSettings';
+import Header from 'components/ui/Header';
+import { useAuth } from 'context/AuthContext';
 
 const UserDashboardBookingManagement = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
@@ -23,26 +25,29 @@ const UserDashboardBookingManagement = () => {
   });
 
   // Mock user data
-  const [user] = useState({
-    id: 1,
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 (555) 123-4567',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-    preferences: {
-      emailNotifications: true,
-      smsNotifications: false,
-      pushNotifications: true,
-      bookingReminders: true,
-      promotionalEmails: false,
-      weeklyDigest: true,
-      language: 'en',
-      timezone: 'America/New_York',
-      currency: 'USD'
-    }
-  });
+  // const [user] = useState({
+  //   id: 1,
+  //   firstName: 'John',
+  //   lastName: 'Doe',
+  //   email: 'john.doe@example.com',
+  //   phone: '+1 (555) 123-4567',
+  //   avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+  //   preferences: {
+  //     emailNotifications: true,
+  //     smsNotifications: false,
+  //     pushNotifications: true,
+  //     bookingReminders: true,
+  //     promotionalEmails: false,
+  //     weeklyDigest: true,
+  //     language: 'en',
+  //     timezone: 'America/New_York',
+  //     currency: 'USD'
+  //   }
+  // });
 
+  const {userProfile} = useAuth();
+
+  const user = userProfile;
   // Mock bookings data remains the same...
   const [upcomingBookings] = useState([
     {
@@ -351,7 +356,7 @@ const UserDashboardBookingManagement = () => {
   const filteredBookingHistory = filterBookings(bookingHistory);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 pt-5">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
       {/* Subtle Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-full blur-3xl"></div>
@@ -365,7 +370,7 @@ const UserDashboardBookingManagement = () => {
             <div>
               <div className="inline-flex items-center bg-white/60 backdrop-blur-xl rounded-full px-4 py-2 mb-4 border border-white/50 shadow-lg shadow-gray-900/5">
                 <div className="w-2 h-2 bg-emerald-500 rounded-full mr-3 animate-pulse"></div>
-                <span className="text-emerald-700 text-sm font-semibold">Welcome back, {user.firstName}!</span>
+                <span className="text-emerald-700 text-sm font-semibold">Welcome back, {user.name}!</span>
               </div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2">
                 My <span className="bg-gradient-to-r from-purple-600 to-cyan-500 bg-clip-text text-transparent">Dashboard</span>
