@@ -13,7 +13,8 @@ const FacilityCourtManagement = () => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedFacilityIndex, setSelectedFacilityIndex] = useState(0);
 
-  const { createFacility, getOwnerFacilities, loading, getFacilityCourts } = useOwner();
+  const { createFacility, getOwnerFacilities, loading, getFacilityCourts } =
+    useOwner();
   const [facilities, setFacilities] = useState([]);
   const [courts, setCourts] = useState([]);
   const [availability, setAvailability] = useState({});
@@ -22,14 +23,20 @@ const FacilityCourtManagement = () => {
   // Get currently selected facility
   const selectedFacility = facilities[selectedFacilityIndex];
 
+  // Initial facilities fetch
   useEffect(() => {
     const fetchFacilities = async () => {
       try {
         const facilitiesData = await getOwnerFacilities();
         setFacilities(facilitiesData || []);
 
+        // Reset selectedFacilityIndex if it's out of bounds
         if (facilitiesData && facilitiesData.length > 0) {
-          initializeFacilityData(facilitiesData[0]);
+          const validIndex =
+            selectedFacilityIndex >= facilitiesData.length
+              ? 0
+              : selectedFacilityIndex;
+          setSelectedFacilityIndex(validIndex);
         }
       } catch (error) {
         console.error("Error fetching facilities:", error);
@@ -38,8 +45,27 @@ const FacilityCourtManagement = () => {
     };
 
     fetchFacilities();
-  }, [getOwnerFacilities]);
+  }, [getOwnerFacilities]); // Remove selectedFacilityIndex from dependencies
 
+  // Fetch courts when facility changes
+  useEffect(() => {
+    const getCourseList = async () => {
+      if (!selectedFacility) return;
+
+      try {
+        console.log("Fetching courts for facility:", selectedFacility.id);
+        const response = await getFacilityCourts(selectedFacility.id); // Use facility ID, not index
+        setCourts(response || []);
+      } catch (error) {
+        console.error("Error fetching courts:", error);
+        setCourts([]);
+      }
+    };
+
+    getCourseList();
+  }, [selectedFacility, getFacilityCourts]); // Depend on selectedFacility object
+
+  // Initialize facility data when facility changes
   useEffect(() => {
     if (selectedFacility) {
       initializeFacilityData(selectedFacility);
@@ -47,6 +73,7 @@ const FacilityCourtManagement = () => {
   }, [selectedFacility]);
 
   const initializeFacilityData = (facility) => {
+    // Mock availability data
     setAvailability({
       "1-2025-01-11-09:00": "booked",
       "1-2025-01-11-10:00": "booked",
@@ -57,6 +84,7 @@ const FacilityCourtManagement = () => {
       "3-2025-01-11-20:00": "maintenance",
     });
 
+    // Mock pricing rules
     setPricingRules([
       {
         id: 1,
@@ -91,7 +119,7 @@ const FacilityCourtManagement = () => {
       // Add the new facility to the list
       setFacilities((prev) => [...prev, createdFacility]);
 
-      // Select the newly created facility
+      // Select the newly created facility (use the new length as index)
       setSelectedFacilityIndex(facilities.length);
 
       setShowCreateForm(false);
@@ -113,8 +141,11 @@ const FacilityCourtManagement = () => {
   };
 
   const handleFacilitySelect = (index) => {
-    setSelectedFacilityIndex(index);
-    setActiveTab("facility");
+    const newIndex = parseInt(index);
+    if (newIndex >= 0 && newIndex < facilities.length) {
+      setSelectedFacilityIndex(newIndex);
+      setActiveTab("facility"); // Reset to facility tab when switching
+    }
   };
 
   const handleCourtUpdate = (updatedCourt) => {
@@ -124,6 +155,8 @@ const FacilityCourtManagement = () => {
   };
 
   const handleCourtAdd = (newCourt) => {
+    if (!selectedFacility) return;
+
     setCourts((prev) => [
       ...prev,
       { ...newCourt, facilityId: selectedFacility.id },
@@ -143,7 +176,20 @@ const FacilityCourtManagement = () => {
   };
 
   const renderTabContent = () => {
-    if (!selectedFacility) return null;
+    if (!selectedFacility) {
+      return (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <Icon
+              name="AlertCircle"
+              size={48}
+              className="text-text-secondary mx-auto mb-4"
+            />
+            <p className="text-text-secondary">No facility selected</p>
+          </div>
+        </div>
+      );
+    }
 
     switch (activeTab) {
       case "facility":
@@ -185,6 +231,14 @@ const FacilityCourtManagement = () => {
         return null;
     }
   };
+
+  // Debug logging
+  console.log({
+    facilities,
+    selectedFacilityIndex,
+    selectedFacility,
+    courts: courts.length,
+  });
 
   if (loading) {
     return (
@@ -349,11 +403,11 @@ const FacilityCourtManagement = () => {
         {facilities.length > 1 && (
           <div className="bg-card rounded-lg border border-border p-4 mb-6">
             <label className="block text-sm font-medium text-foreground mb-2">
-              Select Facility
+              Select Facility ({facilities.length} facilities)
             </label>
             <select
               value={selectedFacilityIndex}
-              onChange={(e) => handleFacilitySelect(parseInt(e.target.value))}
+              onChange={(e) => handleFacilitySelect(e.target.value)}
               className="w-full max-w-md px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
             >
               {facilities.map((facility, index) => (
