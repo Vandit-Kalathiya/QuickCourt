@@ -26,7 +26,7 @@ function AddNewCourt({
     { value: "cricket", label: "Cricket" },
     { value: "other", label: "Other" },
   ];
-  const { getOwnerFacilities } = useOwner();
+  const { getOwnerFacilities, getApprovedFacilities } = useOwner();
 
   const [facilities, setFacilities] = useState([]);
   const [isLoadingFacilities, setIsLoadingFacilities] = useState(false);
@@ -54,7 +54,7 @@ function AddNewCourt({
   const fetchFacilities = async () => {
     setIsLoadingFacilities(true);
     try {
-      const response = await getOwnerFacilities();
+      const response = await getApprovedFacilities();
       console.log("Facilities response:", response);
 
       const facilityOptions =

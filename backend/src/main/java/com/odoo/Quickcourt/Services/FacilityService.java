@@ -3,7 +3,9 @@ package com.odoo.Quickcourt.Services;
 // service/FacilityService.java
 
 
+import com.odoo.Quickcourt.Auth.Entities.User;
 import com.odoo.Quickcourt.Auth.Entities.UserPrincipal;
+import com.odoo.Quickcourt.Auth.Repository.UserRepository;
 import com.odoo.Quickcourt.Dto.Facility.FacilityRequest;
 import com.odoo.Quickcourt.Dto.Facility.FacilityResponse;
 import com.odoo.Quickcourt.Entities.Facility;
@@ -34,6 +36,7 @@ public class FacilityService {
     private final PhotoRepository photoRepository;
     private final ReviewRepository reviewRepository;
     private final FileStorageService fileStorageService;
+    private final UserRepository userRepository;
 
     public FacilityResponse createFacility(FacilityRequest request, MultipartFile photo) {
         UserPrincipal userPrincipal = getCurrentUser();
@@ -43,6 +46,8 @@ public class FacilityService {
                 .name(request.getName())
                 .description(request.getDescription())
                 .address(request.getAddress())
+                .email(request.getOwnerEmail())
+                .phone(request.getOwnerPhone())
                 .sports(request.getSports())
                 .amenities(request.getAmenities())
                 .active(request.isActive())
@@ -134,6 +139,9 @@ public class FacilityService {
         Double averageRating = reviewRepository.findAverageRatingByFacilityId(facility.getId());
         Long totalReviews = reviewRepository.countByFacilityId(facility.getId());
 
+        User owner = userRepository.findById(facility.getOwnerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+
         return FacilityResponse.builder()
                 .id(facility.getId())
                 .name(facility.getName())
@@ -145,6 +153,8 @@ public class FacilityService {
                 .latitude(facility.getLatitude())
                 .longitude(facility.getLongitude())
                 .phone(facility.getPhone())
+                .ownerName(owner.getName())
+                .ownerEmail(facility.getEmail())
                 .averageRating(averageRating)
                 .totalReviews(totalReviews.intValue())
                 .photos(photos)
@@ -154,5 +164,14 @@ public class FacilityService {
 
     private UserPrincipal getCurrentUser() {
         return (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    public List<FacilityResponse> getOwnerApprovedFacilities() {
+        UserPrincipal userPrincipal = getCurrentUser();
+
+        return facilityRepository.findAllByOwnerIdAndStatus(userPrincipal.getId(), Facility.FacilityStatus.APPROVED)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 }

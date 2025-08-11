@@ -130,7 +130,7 @@ public class AdminService {
                 .address(facility.getAddress())
                 .ownerName(owner.getName())
                 .ownerEmail(facility.getEmail())
-                .ownerPhone(facility.getPhone())
+                .phone(facility.getPhone())
                 .sports(facility.getSports())
                 .amenities(facility.getAmenities())
                 .status(facility.getStatus())

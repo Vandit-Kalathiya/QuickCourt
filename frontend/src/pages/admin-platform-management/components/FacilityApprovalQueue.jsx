@@ -182,8 +182,8 @@ const FacilityApprovalQueue = () => {
                   value={selectedFacility?.name}
                 />
                 <InfoItem label="Owner" value={selectedFacility?.ownerName} />
-                <InfoItem label="Email" value={selectedFacility?.email} />
-                <InfoItem label="Location" value={selectedFacility?.location} />
+                <InfoItem label="Email" value={selectedFacility?.ownerEmail} />
+                <InfoItem label="Location" value={selectedFacility?.address} />
               </div>
 
               {/* Description */}

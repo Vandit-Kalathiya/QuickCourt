@@ -39,6 +39,7 @@ public class CourtService {
         Facility facility = facilityRepository.findById(facilityId)
                 .orElseThrow(() -> new ResourceNotFoundException("Facility not found"));
 
+
         if (!facility.getOwnerId().equals(userPrincipal.getId())) {
             throw new BadRequestException("Not authorized to add courts to this facility");
         }
