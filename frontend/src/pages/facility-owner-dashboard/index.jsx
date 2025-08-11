@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../../components/ui/Header";
 import Icon from "../../components/AppIcon";
 import KPICard from "./components/KPICard";
@@ -9,10 +9,32 @@ import QuickActions from "./components/QuickActions";
 import NotificationCenter from "./components/NotificationCenter";
 import BookingCalendar from "./components/BookingCalendar";
 import { useAuth } from "context/AuthContext";
+import { useBooking } from "context/BookingContext";
+import axios from "axios";
 
 const FacilityOwnerDashboard = () => {
-  const {userProfile} = useAuth();
-  
+  const { userProfile } = useAuth();
+  const [bookings, setBookings] = useState([]);
+
+  useEffect(() => {
+    const fetchBookings = async () => {
+      try {
+        console.log(userProfile);
+        const res = await axios.get(`http://localhost:7000/bookings/${userProfile.id}`, {
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem("jwtToken")}`
+          }
+        });
+        console.log(res.data.content);
+        setBookings(res.data.content);
+      } catch (error) {
+        console.error("Error fetching user bookings:", error);
+      }
+    };
+
+    fetchBookings();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       {/* <Header /> */}
@@ -88,7 +110,7 @@ const FacilityOwnerDashboard = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-5">
             <KPICard
               title="Total Bookings"
-              value="156"
+              value={`${bookings.length}`}
               change="+12%"
               changeType="positive"
               icon="Calendar"
@@ -104,7 +126,7 @@ const FacilityOwnerDashboard = () => {
             />
             <KPICard
               title="Monthly Earnings"
-              value="$12,480"
+              value="$125"
               change="+18%"
               changeType="positive"
               icon="DollarSign"

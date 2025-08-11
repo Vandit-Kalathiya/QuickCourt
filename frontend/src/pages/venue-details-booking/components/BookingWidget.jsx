@@ -222,7 +222,7 @@ const BookingWidget = ({ venue, onBookingComplete }) => {
                 return (
                   <div key={slotId} className="flex justify-between text-sm">
                     <span>{slot?.displayTime}</span>
-                    <span>${slot?.price}</span>
+                    <span>₹ {slot?.price}</span>
                   </div>
                 );
               })}
@@ -231,7 +231,7 @@ const BookingWidget = ({ venue, onBookingComplete }) => {
           <div className="border-t border-border pt-4">
             <div className="flex justify-between text-lg font-semibold">
               <span>Total:</span>
-              <span className="text-primary">${totalPrice}</span>
+              <span className="text-primary">₹ {totalPrice}</span>
             </div>
           </div>
         </div>
@@ -304,7 +304,7 @@ const BookingWidget = ({ venue, onBookingComplete }) => {
                   >
                     <div className="flex justify-between items-center">
                       <span>{slot.displayTime}</span>
-                      <span className="text-xs opacity-80">${slot.price}</span>
+                      <span className="text-xs opacity-80">₹ {slot.price}</span>
                     </div>
                   </button>
                 ))}
@@ -333,7 +333,7 @@ const BookingWidget = ({ venue, onBookingComplete }) => {
             </div>
             <div className="flex justify-between items-center text-lg font-semibold">
               <span>Total Price:</span>
-              <span className="text-primary">${totalPrice}</span>
+              <span className="text-primary">₹ {totalPrice}</span>
             </div>
           </div>
         )}

@@ -3,8 +3,6 @@ import toast from "react-hot-toast";
 import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
-import toast from 'react-hot-toast';
-import { Navigate } from 'react-router-dom';
 
 const CreateFacilityForm = ({
   isOpen,
