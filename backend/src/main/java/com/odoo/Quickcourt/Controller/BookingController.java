@@ -6,9 +6,11 @@ import com.odoo.Quickcourt.Dto.Booking.BookingRequest;
 import com.odoo.Quickcourt.Dto.Booking.BookingResponse;
 import com.odoo.Quickcourt.Dto.Payment.CreateOrderResponse;
 import com.odoo.Quickcourt.Dto.Payment.PaymentResponse;
+import com.odoo.Quickcourt.Dto.SlotHold.HoldSlotRequest;
 import com.odoo.Quickcourt.Entities.Payment;
 import com.odoo.Quickcourt.Repository.PaymentRepository;
 import com.odoo.Quickcourt.Services.BookingService;
+import com.odoo.Quickcourt.Services.CourtSlotHoldService;
 import com.odoo.Quickcourt.Services.PaymentService;
 import com.razorpay.Utils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,6 +43,7 @@ public class BookingController {
 
     private final PaymentService paymentService;
     private final PaymentRepository paymentRepository;
+    private final CourtSlotHoldService holdService;
 
     @Value("${razorpay.key.secret}")
     private String keySecret;
@@ -51,6 +54,13 @@ public class BookingController {
     @PreAuthorize("hasRole('USER') or hasRole('OWNER')")
     @Operation(summary = "Create a new booking")
     public ResponseEntity<CreateOrderResponse> createBooking(@Valid @RequestBody BookingRequest request) throws BadRequestException {
+        holdService.holdSlot(HoldSlotRequest.builder()
+                .courtId(request.getCourtId())
+                .startTime(request.getStartTime())
+                .endTime(request.getEndTime())
+                .date(request.getDate())
+                .build());
+
         CreateOrderResponse response = bookingService.createBooking(request);
         return ResponseEntity.ok(response);
     }

@@ -27,7 +27,7 @@ public class CourtSlotHoldService {
     private final BookingRepository bookingRepository;
     private final CourtAvailabilityRepository availabilityRepository;
 
-    @Value("${app.booking.holdMinutes:5}")
+    @Value("${app.booking.holdMinutes:2}")
     private int holdMinutes;
 
     public HoldSlotResponse holdSlot(HoldSlotRequest request) {
