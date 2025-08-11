@@ -1,17 +1,20 @@
 package com.odoo.Quickcourt.Auth.Controllers;
 // controller/AuthController.java
 
-import com.odoo.Quickcourt.Auth.Payload.auth.AuthResponse;
-import com.odoo.Quickcourt.Auth.Payload.auth.LoginRequest;
-import com.odoo.Quickcourt.Auth.Payload.auth.OtpVerificationRequest;
-import com.odoo.Quickcourt.Auth.Payload.auth.SignupRequest;
+import com.odoo.Quickcourt.Auth.Payload.auth.*;
 import com.odoo.Quickcourt.Auth.Services.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -22,7 +25,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest,
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest,
                                           BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getFieldErrors()

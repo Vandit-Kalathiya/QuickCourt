@@ -52,7 +52,7 @@ public class FileStorageService {
 
             return "/uploads/" + fileName;
         } catch (IOException ex) {
-            throw new BadRequestException("Could not store file " + originalFileName + ". Please try again!", ex);
+            throw new BadRequestException("Could not store file " + originalFileName + ". Please try again!");
         }
     }
 

@@ -1,7 +1,6 @@
 package com.odoo.Quickcourt.Auth.Services;
 // service/AuthService.java
 
-import com.odoo.Quickcourt.Auth.Entities.Otp;
 import com.odoo.Quickcourt.Auth.Entities.User;
 import com.odoo.Quickcourt.Auth.Payload.auth.AuthResponse;
 import com.odoo.Quickcourt.Auth.Payload.auth.LoginRequest;
@@ -22,9 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.Random;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -39,7 +35,7 @@ public class AuthService {
     @Value("${app.otp.expiration}")
     private int otpExpirationMinutes;
 
-    public void signup(SignupRequest request) {
+    public AuthResponse signup(SignupRequest request) throws BadRequestException {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new BadRequestException("Email already exists");
         }
@@ -57,6 +53,7 @@ public class AuthService {
 
         // Generate and send OTP
         generateAndSendOtp(user);
+        return null;
     }
 
     public void verifyOtp(OtpVerificationRequest request) {

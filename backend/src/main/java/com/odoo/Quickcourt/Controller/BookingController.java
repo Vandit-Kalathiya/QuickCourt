@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class BookingController {
     @PostMapping
     @PreAuthorize("hasRole('USER') or hasRole('OWNER')")
     @Operation(summary = "Create a new booking")
-    public ResponseEntity<BookingResponse> createBooking(@Valid @RequestBody BookingRequest request) {
+    public ResponseEntity<BookingResponse> createBooking(@Valid @RequestBody BookingRequest request) throws BadRequestException {
         BookingResponse response = bookingService.createBooking(request);
         return ResponseEntity.ok(response);
     }
@@ -44,7 +45,7 @@ public class BookingController {
     @PutMapping("/{id}/cancel")
     @PreAuthorize("hasRole('USER') or hasRole('OWNER')")
     @Operation(summary = "Cancel a booking")
-    public ResponseEntity<String> cancelBooking(@PathVariable UUID id) {
+    public ResponseEntity<String> cancelBooking(@PathVariable UUID id) throws BadRequestException {
         bookingService.cancelBooking(id);
         return ResponseEntity.ok("Booking cancelled successfully");
     }
