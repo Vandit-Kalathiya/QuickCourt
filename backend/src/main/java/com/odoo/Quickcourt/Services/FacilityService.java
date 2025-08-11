@@ -35,7 +35,7 @@ public class FacilityService {
     private final ReviewRepository reviewRepository;
     private final FileStorageService fileStorageService;
 
-    public FacilityResponse createFacility(FacilityRequest request, List<MultipartFile> photos) {
+    public FacilityResponse createFacility(FacilityRequest request, MultipartFile photo) {
         UserPrincipal userPrincipal = getCurrentUser();
 
         Facility facility = Facility.builder()
@@ -45,20 +45,21 @@ public class FacilityService {
                 .address(request.getAddress())
                 .sports(request.getSports())
                 .amenities(request.getAmenities())
+                .active(request.isActive())
                 .status(Facility.FacilityStatus.PENDING)
                 .build();
 
         facility = facilityRepository.save(facility);
 
         // Save photos if provided
-        if (photos != null && !photos.isEmpty()) {
-            savePhotos(facility.getId(), photos);
+        if (photo != null && !photo.isEmpty()) {
+            savePhotos(facility.getId(), photo);
         }
 
         return mapToResponse(facility);
     }
 
-    public FacilityResponse updateFacility(UUID facilityId, FacilityRequest request, List<MultipartFile> photos) {
+    public FacilityResponse updateFacility(UUID facilityId, FacilityRequest request, MultipartFile photo) {
         UserPrincipal userPrincipal = getCurrentUser();
 
         Facility facility = facilityRepository.findById(facilityId)
@@ -77,11 +78,11 @@ public class FacilityService {
         facility = facilityRepository.save(facility);
 
         // Update photos if provided
-        if (photos != null && !photos.isEmpty()) {
+        if (photo != null && !photo.isEmpty()) {
             // Delete existing photos
             photoRepository.deleteByFacilityId(facilityId);
             // Save new photos
-            savePhotos(facilityId, photos);
+            savePhotos(facilityId, photo);
         }
 
         return mapToResponse(facility);
@@ -112,15 +113,14 @@ public class FacilityService {
                 .collect(Collectors.toList());
     }
 
-    private void savePhotos(UUID facilityId, List<MultipartFile> photos) {
-        for (MultipartFile photo : photos) {
+    private void savePhotos(UUID facilityId, MultipartFile photo) {
             String photoUrl = fileStorageService.storeFile(photo);
             Photo photoEntity = Photo.builder()
                     .facilityId(facilityId)
                     .url(photoUrl)
                     .build();
             photoRepository.save(photoEntity);
-        }
+
     }
 
     private FacilityResponse mapToResponse(Facility facility) {

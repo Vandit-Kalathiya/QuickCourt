@@ -21,7 +21,7 @@ public class FacilityResponse {
     private String name;
     private String description;
     private String address;
-    private List<Facility.Sport> sports;
+    private List<String> sports;
     private List<String> amenities;
     private Facility.FacilityStatus status;
     private Double averageRating;
