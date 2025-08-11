@@ -1,4 +1,4 @@
-package com.odoo.Quickcourt.Entities;
+package com.odoo.Quickcourt.Entities.Booking;
 
 // entity/Booking.java
 
