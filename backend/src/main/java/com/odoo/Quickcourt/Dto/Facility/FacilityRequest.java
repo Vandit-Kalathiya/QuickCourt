@@ -5,6 +5,7 @@ import com.odoo.Quickcourt.Entities.Facility;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,5 +23,6 @@ public class FacilityRequest {
     private List<String> sports;
 
     private List<String> amenities;
+    MultipartFile photo;
     private boolean active;
 }
