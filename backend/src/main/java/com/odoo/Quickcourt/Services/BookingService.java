@@ -187,6 +187,11 @@ public class BookingService {
                 .totalPrice(booking.getTotalPrice())
                 .status(booking.getStatus())
                 .createdAt(booking.getCreatedAt())
+                .facilityAddress(facility.getAddress() != null ? facility.getAddress() : null)
+                .facilityPhone(facility != null ? facility.getPhone() : null)
+                .amenities(facility != null ? facility.getAmenities() : null)
+                .duration((int) Duration.between(booking.getStartTime(), booking.getEndTime()).toHours())
+                .sportType(court.getSportType().toString())
                 .build();
     }
 }

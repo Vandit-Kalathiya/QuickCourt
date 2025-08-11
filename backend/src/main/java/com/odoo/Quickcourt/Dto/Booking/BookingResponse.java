@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -32,4 +33,10 @@ public class BookingResponse {
     private BigDecimal totalPrice;
     private Booking.BookingStatus status;
     private LocalDateTime createdAt;
+    private List<String> amenities;
+    private int duration;
+
+    private String sportType; // Assuming this is a string representation of the sport type
+    private String facilityAddress;
+    private String facilityPhone;
 }

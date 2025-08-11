@@ -5,6 +5,7 @@ import Icon from 'components/AppIcon';
 import Input from 'components/ui/Input';
 import Select from 'components/ui/Select';
 import Button from 'components/ui/Button';
+import { useBooking } from 'context/BookingContext';
 
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -22,8 +23,8 @@ const MyBookings = () => {
     completed: 0,
     totalAmount: 0
   });
-
-  const { user } = useAuth();
+  
+  const {createBooking, getUserBookings} = useBooking();
 
   // Mock data with enhanced information
   const mockBookings = [
@@ -149,10 +150,12 @@ const MyBookings = () => {
   const fetchBookings = async () => {
     setIsLoading(true);
     try {
-      setTimeout(() => {
-        setBookings(mockBookings);
-        setIsLoading(false);
-      }, 1000);
+      const response = await getUserBookings();
+      console.log(response.content)
+      setBookings(response.content || response); // Adjust based on API response structure
+            setIsLoading(false);
+
+      // setBookings(response)
     } catch (error) {
       console.error('Error fetching bookings:', error);
       setIsLoading(false);
@@ -334,14 +337,20 @@ const MyBookings = () => {
     { value: 'thisWeek', label: 'This Week' },
     { value: 'thisMonth', label: 'This Month' }
   ];
-
-  const sortOptions = [
+const sortOptions = [
     { value: 'newest', label: 'Newest First' },
     { value: 'oldest', label: 'Oldest First' },
     { value: 'dateAsc', label: 'Date (Earliest)' },
     { value: 'dateDesc', label: 'Date (Latest)' },
-    { value: 'amount', label: 'Amount (Highest)' }
+    { value: 'amount', label: 'Amount (Highest)' },
   ];
+  // const sortOptions = [
+  //   { value: 'newest', label: 'Newest First' },
+  //   { value: 'oldest', label: 'Oldest First' },
+  //   { value: 'dateAsc', label: 'Date (Earliest)' },
+  //   { value: 'dateDesc', label: 'Date (Latest)' },
+  //   { value: 'amount', label: 'Amount (Highest)' }
+  // ];
 
   if (isLoading) {
     return (
@@ -566,9 +575,9 @@ const MyBookings = () => {
                             </div>
                           </div>
                           <p className="text-gray-600 mb-2">
-                            {booking.courtName} • {booking.sport.charAt(0) + booking.sport.slice(1).toLowerCase()}
+                            {booking.courtName} • {booking.courtName ? booking.courtName : 'N/A'}
                           </p>
-                          {booking.rating && renderStars(booking.rating)}
+                          {booking.rating && renderStars(booking?.rating)}
                         </div>
                       </div>
 
@@ -591,7 +600,7 @@ const MyBookings = () => {
                             {formatTime(booking.startTime)} - {formatTime(booking.endTime)}
                           </p>
                         </div>
-
+              
                         <div className="bg-gray-50 rounded-xl p-4">
                           <div className="flex items-center mb-2">
                             <Icon name="Timer" size={16} className="text-purple-500 mr-2" />
@@ -605,7 +614,7 @@ const MyBookings = () => {
                             <Icon name="DollarSign" size={16} className="text-orange-500 mr-2" />
                             <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Amount</p>
                           </div>
-                          <p className="font-semibold text-gray-900 text-lg">${booking.amount.toFixed(2)}</p>
+                          <p className="font-semibold text-gray-900 text-lg">${booking.totalPrice.toFixed(2)}</p>
                         </div>
                       </div>
 
@@ -707,10 +716,10 @@ const MyBookings = () => {
                       <div className="space-y-4">
                         {[
                           { label: 'Court', value: selectedBooking.courtName, icon: 'MapPin' },
-                          { label: 'Sport', value: selectedBooking.sport.charAt(0) + selectedBooking.sport.slice(1).toLowerCase(), icon: 'Activity' },
+                          { label: 'Sport', value: selectedBooking.sportType, icon: 'Activity' },
                           { label: 'Date', value: formatDate(selectedBooking.date), icon: 'Calendar' },
                           { label: 'Time', value: `${formatTime(selectedBooking.startTime)} - ${formatTime(selectedBooking.endTime)}`, icon: 'Clock' },
-                          { label: 'Duration', value: `${selectedBooking.duration} hours`, icon: 'Timer' }
+                          { label: 'Duration', value: `${formatTime(selectedBooking?.duration)} hours`, icon: 'Timer' }
                         ].map((item, index) => (
                           <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                             <Icon name={item.icon} size={16} className="text-gray-400" />
@@ -753,7 +762,7 @@ const MyBookings = () => {
                           </div>
                         </div>
 
-                        <div className="p-4 bg-gray-50 rounded-lg">
+                        {/* <div className="p-4 bg-gray-50 rounded-lg">
                           <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Available Amenities</p>
                           <div className="flex flex-wrap gap-2">
                             {selectedBooking.amenities.map((amenity, index) => (
@@ -765,7 +774,7 @@ const MyBookings = () => {
                               </span>
                             ))}
                           </div>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>
@@ -780,10 +789,10 @@ const MyBookings = () => {
                       
                       <div className="space-y-4">
                         {[
-                          { label: 'Amount', value: `$${selectedBooking.amount.toFixed(2)}`, icon: 'DollarSign', highlight: true },
-                          { label: 'Payment Method', value: selectedBooking.paymentMethod, icon: 'CreditCard' },
-                          { label: 'Payment ID', value: selectedBooking.paymentId, icon: 'Hash' },
-                          { label: 'Booking Date', value: new Date(selectedBooking.bookingDate).toLocaleString(), icon: 'Clock' }
+                          { label: 'Amount', value: `$${selectedBooking.totalPrice.toFixed(2)}`, icon: 'DollarSign', highlight: true },
+                          { label: 'Payment Method', value: selectedBooking?.paymentMethod, icon: 'CreditCard' },
+                          { label: 'Payment ID', value: selectedBooking?.paymentId, icon: 'Hash' },
+                          { label: 'Booking Date', value: new Date(selectedBooking?.createdAt).toLocaleString(), icon: 'Clock' }
                         ].map((item, index) => (
                           <div key={index} className={`flex items-center space-x-3 p-3 rounded-lg ${item.highlight ? 'bg-green-50 border border-green-200' : 'bg-gray-50'}`}>
                             <Icon name={item.icon} size={16} className={item.highlight ? 'text-green-500' : 'text-gray-400'} />
