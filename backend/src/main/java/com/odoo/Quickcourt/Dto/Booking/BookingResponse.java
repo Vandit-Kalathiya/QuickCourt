@@ -2,7 +2,7 @@ package com.odoo.Quickcourt.Dto.Booking;
 
 // dto/booking/BookingResponse.java
 
-import com.odoo.Quickcourt.Entities.Booking;
+import com.odoo.Quickcourt.Entities.Booking.Booking;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

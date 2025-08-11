@@ -7,7 +7,7 @@ import com.odoo.Quickcourt.Dto.Payment.CreateOrderRequest;
 import com.odoo.Quickcourt.Dto.Payment.CreateOrderResponse;
 import com.odoo.Quickcourt.Dto.Payment.PaymentResponse;
 import com.odoo.Quickcourt.Dto.Payment.PaymentVerificationRequest;
-import com.odoo.Quickcourt.Entities.Booking;
+import com.odoo.Quickcourt.Entities.Booking.Booking;
 import com.odoo.Quickcourt.Exception.BadRequestException;
 import com.odoo.Quickcourt.Exception.ResourceNotFoundException;
 import com.odoo.Quickcourt.Repository.BookingRepository;

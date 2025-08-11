@@ -1,7 +1,7 @@
 package com.odoo.Quickcourt.Repository;
 // repository/BookingRepository.java
 
-import com.odoo.Quickcourt.Entities.Booking;
+import com.odoo.Quickcourt.Entities.Booking.Booking;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

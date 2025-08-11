@@ -6,7 +6,7 @@ import com.odoo.Quickcourt.Auth.Entities.UserPrincipal;
 import com.odoo.Quickcourt.Dto.Booking.BookingRequest;
 import com.odoo.Quickcourt.Dto.Booking.BookingResponse;
 import com.odoo.Quickcourt.Dto.Payment.CreateOrderRequest;
-import com.odoo.Quickcourt.Entities.Booking;
+import com.odoo.Quickcourt.Entities.Booking.Booking;
 import com.odoo.Quickcourt.Entities.Court;
 import com.odoo.Quickcourt.Entities.Facility;
 import com.odoo.Quickcourt.Exception.ResourceNotFoundException;
@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
