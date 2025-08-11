@@ -88,7 +88,7 @@ const Input = ({ className = "", ...props }) => (
 );
 
 const Header = () => {
-  const { userProfile, user, logout, loading } = useAuth();
+  const { userProfile, user, signOut, loading } = useAuth();
   const navigate = useNavigate();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -233,7 +233,7 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      await logout();
+      await signOut();
       navigate("/");
     } catch (error) {
       console.error("Logout failed:", error);

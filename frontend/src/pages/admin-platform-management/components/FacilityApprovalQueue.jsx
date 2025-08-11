@@ -3,12 +3,19 @@ import Icon from "../../../components/AppIcon";
 import Button from "../../../components/ui/Button";
 import Image from "../../../components/AppImage";
 import { useAdmin } from "context/AdminContext";
+import axios from "axios";
 
 const FacilityApprovalQueue = () => {
   const { getFacilityRequests } = useAdmin();
   const [selectedFacility, setSelectedFacility] = useState(null);
   const [approvalComment, setApprovalComment] = useState("");
   const [pendingFacilities, setPendingFacilities] = useState([]);
+  
+  // New state for rejection popup
+  const [showRejectionPopup, setShowRejectionPopup] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [facilityToReject, setFacilityToReject] = useState(null);
+  const [isRejecting, setIsRejecting] = useState(false);
 
   // Fetch facilities
   const fetchPendingFacilities = useCallback(async () => {
@@ -27,8 +34,25 @@ const FacilityApprovalQueue = () => {
 
   const handleApprove = async (facilityId) => {
     try {
-      console.log(`Approving ${facilityId} with comment: ${approvalComment}`);
-      // await approveFacilityAPI(facilityId, approvalComment);
+      console.log(`Approving ${facilityId}`);
+      const token = localStorage.getItem("jwtToken");
+
+      // Check if token exists
+      if (!token) {
+        throw new Error("No authentication token found. Please log in.");
+      }
+      console.log(token);
+      const response = await axios.post(
+        `http://localhost:7000/admin/facility-requests/${facilityId}/approve`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
       await fetchPendingFacilities();
       resetSelection();
     } catch (err) {
@@ -36,15 +60,59 @@ const FacilityApprovalQueue = () => {
     }
   };
 
-  const handleReject = async (facilityId) => {
+  // Updated handleReject to show popup first
+  const handleReject = (facility) => {
+    setFacilityToReject(facility);
+    setShowRejectionPopup(true);
+    setRejectionReason("");
+  };
+
+  // New function to handle actual rejection
+  const confirmReject = async () => {
+    if (!rejectionReason.trim()) {
+      alert("Please provide a rejection reason.");
+      return;
+    }
+
     try {
-      console.log(`Rejecting ${facilityId} with comment: ${approvalComment}`);
-      // await rejectFacilityAPI(facilityId, approvalComment);
+      setIsRejecting(true);
+      console.log(`Rejecting ${facilityToReject?.id} with reason: ${rejectionReason}`);
+      
+      const token = localStorage.getItem("jwtToken");
+      if (!token) {
+        throw new Error("No authentication token found. Please log in.");
+      }
+
+      const reason = rejectionReason.trim();
+
+      const response = await axios.post(
+        `http://localhost:7000/admin/facility-requests/${facilityToReject?.id}/reject`,
+        reason,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      
+      console.log("Rejection response:", response.data);
       await fetchPendingFacilities();
+      closeRejectionPopup();
       resetSelection();
     } catch (err) {
       console.error("Rejection failed:", err);
+      alert("Failed to reject facility. Please try again.");
+    } finally {
+      setIsRejecting(false);
     }
+  };
+
+  // Function to close rejection popup
+  const closeRejectionPopup = () => {
+    setShowRejectionPopup(false);
+    setFacilityToReject(null);
+    setRejectionReason("");
   };
 
   const resetSelection = () => {
@@ -151,7 +219,7 @@ const FacilityApprovalQueue = () => {
                   variant="destructive"
                   size="sm"
                   iconName="X"
-                  onClick={() => handleReject(facility?.id)}
+                  onClick={() => handleReject(facility)}
                 >
                   Reject
                 </Button>
@@ -285,7 +353,7 @@ const FacilityApprovalQueue = () => {
                 </Button>
                 <Button
                   variant="destructive"
-                  onClick={() => handleReject(selectedFacility?.id)}
+                  onClick={() => handleReject(selectedFacility)}
                   iconName="X"
                 >
                   Reject
@@ -296,6 +364,66 @@ const FacilityApprovalQueue = () => {
                   iconName="Check"
                 >
                   Approve
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rejection Confirmation Popup */}
+      {showRejectionPopup && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-card rounded-lg max-w-md w-full">
+            <div className="p-6 border-b flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-foreground">
+                Reject Facility
+              </h3>
+              <Button variant="ghost" size="icon" onClick={closeRejectionPopup}>
+                <Icon name="X" size={20} />
+              </Button>
+            </div>
+
+            <div className="p-6">
+              <div className="mb-4">
+                <p className="text-text-secondary mb-2">
+                  You are about to reject "{facilityToReject?.name}". This action cannot be undone.
+                </p>
+                <p className="text-sm text-text-secondary">
+                  Please provide a reason for rejection:
+                </p>
+              </div>
+
+              <div className="mb-6">
+                <textarea
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  placeholder="Enter rejection reason..."
+                  className="w-full h-32 px-3 py-2 border border-border rounded-lg bg-background focus:ring-2 focus:ring-primary focus:border-primary resize-none"
+                  required
+                />
+                {rejectionReason.trim() === "" && (
+                  <p className="text-xs text-error mt-1">
+                    Rejection reason is required
+                  </p>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={closeRejectionPopup}
+                  disabled={isRejecting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={confirmReject}
+                  disabled={isRejecting || !rejectionReason.trim()}
+                  iconName={isRejecting ? "Loader" : "X"}
+                >
+                  {isRejecting ? "Rejecting..." : "Confirm Rejection"}
                 </Button>
               </div>
             </div>

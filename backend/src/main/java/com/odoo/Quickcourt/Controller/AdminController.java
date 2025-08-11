@@ -20,7 +20,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
+//@PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "Admin", description = "Admin management APIs")
 public class AdminController {
 
@@ -45,7 +45,7 @@ public class AdminController {
     @Operation(summary = "Reject facility")
     public ResponseEntity<String> rejectFacility(
             @PathVariable UUID id,
-            @RequestParam String reason) {
+            @RequestBody String reason) {
         adminService.rejectFacility(id, reason);
         return ResponseEntity.ok("Facility rejected successfully");
     }
