@@ -6,10 +6,8 @@ import com.odoo.Quickcourt.Auth.Payload.auth.LoginRequest;
 import com.odoo.Quickcourt.Auth.Payload.auth.OtpVerificationRequest;
 import com.odoo.Quickcourt.Auth.Payload.auth.SignupRequest;
 import com.odoo.Quickcourt.Auth.Services.AuthService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,18 +20,24 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    @Operation(summary = "User signup with OTP generation")
-    public ResponseEntity<String> signup(@Valid @RequestBody SignupRequest request) {
-        authService.signup(request);
-        return ResponseEntity.ok("OTP sent to your email. Please verify to complete signup.");
-    }
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest,
+                                          BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            List<String> errors = bindingResult.getFieldErrors()
+                    .stream()
+                    .map(error -> error.getDefaultMessage())
+                    .collect(Collectors.toList());
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, "Validation failed", errors));
+        }
 
-    @PostMapping("/verify-otp")
-    @Operation(summary = "Verify OTP to activate account")
-    public ResponseEntity<String> verifyOtp(@Valid @RequestBody OtpVerificationRequest
-                                                        request) {
-        authService.verifyOtp(request);
-        return ResponseEntity.ok("Account verified successfully");
+        try {
+            AuthResponse response = authService.signup(signUpRequest);
+            return ResponseEntity.ok(new ApiResponse(true, "User registered successfully", response));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(false, e.getMessage(), null));
+        }
     }
 
     @PostMapping("/login")

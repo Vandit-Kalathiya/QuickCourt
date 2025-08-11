@@ -1,6 +1,7 @@
 package com.odoo.Quickcourt.Auth.Services;
 // service/AuthService.java
 
+import com.odoo.Quickcourt.Auth.Entities.Otp;
 import com.odoo.Quickcourt.Auth.Entities.User;
 import com.odoo.Quickcourt.Auth.Payload.auth.AuthResponse;
 import com.odoo.Quickcourt.Auth.Payload.auth.LoginRequest;

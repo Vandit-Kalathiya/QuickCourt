@@ -1,6 +1,6 @@
 package com.odoo.Quickcourt.Auth.Payload.auth;
 
-import com.odoo.Quickcourt.Auth.Entities.UserRole;
+import com.odoo.Quickcourt.Auth.Entities.User;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -11,7 +11,7 @@ public class UserResponseDTO {
     private String username;
     private String email;
     private String displayName;
-    private UserRole role;
+    private User.Role role;
     private Boolean isActive;
     private Boolean isBanned;
     private String avatarUrl;
