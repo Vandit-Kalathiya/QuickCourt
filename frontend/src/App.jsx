@@ -6,6 +6,7 @@ import { CourtProvider } from "context/CourtContext";
 import { OwnerProvider } from "context/OwnerContext";
 import { AdminProvider } from "context/AdminContext";
 import { VenueProvider } from "context/VenueContext";
+import { BookingProvider } from "context/BookingContext";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <OwnerProvider>
           <AdminProvider>
             <VenueProvider>
+              <BookingProvider>
               <Routes />
               <Toaster
                 position="bottom-right"
@@ -74,6 +76,7 @@ function App() {
                   },
                 }}
               />
+              </BookingProvider>
             </VenueProvider>
           </AdminProvider>
         </OwnerProvider>

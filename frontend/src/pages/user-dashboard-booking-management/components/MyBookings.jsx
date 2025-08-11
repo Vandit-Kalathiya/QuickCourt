@@ -5,6 +5,7 @@ import Icon from 'components/AppIcon';
 import Input from 'components/ui/Input';
 import Select from 'components/ui/Select';
 import Button from 'components/ui/Button';
+import { useBooking } from 'context/BookingContext';
 
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -22,8 +23,8 @@ const MyBookings = () => {
     completed: 0,
     totalAmount: 0
   });
-
-  const { user } = useAuth();
+  
+  const {createBooking, getUserBookings} = useBooking();
 
   // Mock data with enhanced information
   const mockBookings = [
@@ -149,10 +150,9 @@ const MyBookings = () => {
   const fetchBookings = async () => {
     setIsLoading(true);
     try {
-      setTimeout(() => {
-        setBookings(mockBookings);
-        setIsLoading(false);
-      }, 1000);
+      const response = await getUserBookings();
+      console.log(response)
+      setBookings(response)
     } catch (error) {
       console.error('Error fetching bookings:', error);
       setIsLoading(false);

@@ -308,7 +308,7 @@ const AuthPage = () => {
             className="absolute inset-0 bg-cover bg-center opacity-30"
             style={{
               backgroundImage:
-                "url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')",
+                "url('https://plus.unsplash.com/premium_photo-1685366454253-cb705836c5a8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
             }}
           ></div>
           <div className="relative z-10 bg-gray-600/80 backdrop-blur-sm p-8 rounded-xl text-center text-white max-w-sm">
