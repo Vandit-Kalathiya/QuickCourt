@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/owner")
+@RequestMapping("/owner")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('OWNER')")
 @Tag(name = "Owner", description = "Owner management APIs")

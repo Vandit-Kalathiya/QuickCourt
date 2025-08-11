@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/venues")
+@RequestMapping("/venues")
 @RequiredArgsConstructor
 @Tag(name = "Venues", description = "Public venue APIs")
 public class VenueController {
