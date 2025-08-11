@@ -48,7 +48,6 @@ public class SignupRequest {
     private String email;
 
     @NotBlank
-    @Size(min = 6, max = 20)
     private String password;
 
     private User.Role role = User.Role.USER;

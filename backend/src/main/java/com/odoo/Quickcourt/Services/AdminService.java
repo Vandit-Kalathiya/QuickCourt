@@ -139,7 +139,7 @@ public class AdminService {
                 .name(user.getName())
                 .email(user.getEmail())
                 .role(user.getRole())
-                .verified(user.getVerified())
+//                .verified(user.getVerified())
                 .banned(user.getBanned())
                 .createdAt(user.getCreatedAt())
                 .build();
