@@ -67,7 +67,7 @@ public class Facility extends BaseEntity {
     private Boolean active = true;
 
     public enum Sport {
-        FOOTBALL, BASKETBALL, TENNIS, BADMINTON, VOLLEYBALL, CRICKET, SWIMMING
+        FOOTBALL, BASKETBALL, TENNIS, BADMINTON, VOLLEYBALL, CRICKET, SWIMMING, SQUASH
     }
 
     public enum FacilityStatus {
