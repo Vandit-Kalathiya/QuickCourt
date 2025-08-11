@@ -13,7 +13,7 @@ const FacilityOwnerDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       <Header />
-      <main className="pt-nav">
+      <main className="">
         {/* Breadcrumb - Enhanced */}
         <div className="bg-gradient-to-r from-muted/60 to-muted/40 border-b border-border/50 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">

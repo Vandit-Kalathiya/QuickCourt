@@ -19,6 +19,7 @@ import AuthPage from "pages/auth/AuthPage";
 import Homepage from "pages/landingPage/HomePage";
 import { useAuth } from "context/AuthContext";
 import Header from "components/ui/Header";
+import MyBookings from "pages/user-dashboard-booking-management/components/MyBookings";
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center min-h-screen">
@@ -66,7 +67,14 @@ const PublicRoute = () => {
 
 // Public layout for routes that should be accessible regardless of auth status
 const PublicLayout = () => {
-  return <Outlet />;
+  return (
+    <>
+      <Header />
+      <div className="pt-16">
+        <Outlet />
+      </div>
+    </>
+  );
 };
 
 // Single dashboard component that renders based on role
@@ -100,17 +108,19 @@ const Routes = () => {
       <ErrorBoundary>
         <ScrollToTop />
         <RouterRoutes>
+          <Route
+            path="/venue-search-listings"
+            element={<VenueSearchListings />}
+          />
+          <Route
+            path="/venue-details-booking"
+            element={<VenueDetailsBooking />}
+          />
           {/* Public routes */}
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Homepage />} />
-            <Route
-              path="/venue-search-listings"
-              element={<VenueSearchListings />}
-            />
-            <Route
-              path="/venue-details-booking"
-              element={<VenueDetailsBooking />}
-            />
+
+            <Route path="/my-bookings" element={<MyBookings />} />
           </Route>
 
           {/* Auth routes (redirect to dashboard if already logged in) */}

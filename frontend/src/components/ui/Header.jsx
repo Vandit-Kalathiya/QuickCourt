@@ -17,7 +17,7 @@ const Header = () => {
     { id: 3, type: 'update', message: 'New facility added near you', time: '3 hours ago', unread: false }
   ]);
 
-  const { userProfile, user } = useAuth();
+  const { userProfile } = useAuth();
   
   // Set current role based on user profile, default to 'user' if not available
   const [currentRole, setCurrentRole] = useState(userProfile?.role?.toLowerCase() || 'user');
@@ -29,38 +29,27 @@ const Header = () => {
     }
   }, [userProfile]);
 
-  console.log(userProfile.role, user);
-
-  // Role options - only show if user has multiple roles or is admin
-  const getAllRoleOptions = () => [
-    { value: 'user', label: 'Sports Enthusiast' },
-    { value: 'owner', label: 'Facility Owner' },
-    { value: 'admin', label: 'Administrator' }
-  ];
-
-  // Determine if role switching should be allowed
-  const canSwitchRoles = userProfile?.role?.toLowerCase() !== 'user';
-  
-  // Get available role options based on user's actual role
-  const getRoleOptions = () => {
-    if (!canSwitchRoles) {
-      // If user is 'USER', only show their current role (no switching allowed)
-      return [{ value: 'user', label: 'Sports Enthusiast' }];
-    }
-    
-    // For owners/admins, show all available roles
-    return getAllRoleOptions();
+  // Get role label based on role value
+  const getRoleLabel = (role) => {
+    const roleLabels = {
+      'user': 'Sports Enthusiast',
+      'owner': 'Facility Owner',
+      'admin': 'Administrator'
+    };
+    return roleLabels[role] || 'Sports Enthusiast';
   };
 
-  const roleOptions = getRoleOptions();
+  // For this updated requirement, no role switching is allowed for any user
+  // Each user sees only their current role as a read-only display
+  const canSwitchRoles = false; // Disabled role switching completely
 
   const navigationItems = {
     user: [
       { label: 'Find Venues', path: '/venue-search-listings', icon: 'Search' },
-      { label: 'My Bookings', path: '/user-dashboard', icon: 'Calendar' }
+      { label: 'My Bookings', path: '/my-bookings', icon: 'Calendar' }
     ],
     owner: [
-      { label: 'Dashboard', path: '/facility-owner-dashboard', icon: 'BarChart3' },
+      { label: 'Dashboard', path: '/dashboard', icon: 'BarChart3' },
       { label: 'Manage Courts', path: '/facility-court-management', icon: 'Settings' }
     ],
     admin: [
@@ -87,14 +76,6 @@ const Header = () => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  const handleRoleChange = (newRole) => {
-    // Only allow role change if user has permission
-    if (canSwitchRoles) {
-      setCurrentRole(newRole);
-      setIsMobileMenuOpen(false);
-    }
-  };
-
   const handleSearchSubmit = (e) => {
     e?.preventDefault();
     if (searchQuery?.trim()) {
@@ -105,7 +86,7 @@ const Header = () => {
   const handleNotificationClick = (notification) => {
     // Mark as read and navigate based on type
     if (notification?.type === 'booking') {
-      window.location.href = '/user-dashboard';
+      window.location.href = '/dashboard';
     }
   };
 
@@ -158,21 +139,11 @@ const Header = () => {
 
         {/* Right Side Controls */}
         <div className="flex items-center space-x-4">
-          {/* Role Indicator (Desktop) */}
+          {/* Role Indicator (Desktop) - Always show as read-only */}
           <div className="hidden md:block">
-            {canSwitchRoles ? (
-              <Select
-                options={roleOptions}
-                value={currentRole}
-                onChange={handleRoleChange}
-                className="min-w-[140px]"
-              />
-            ) : (
-              // Show current role as read-only for regular users
-              <div className="min-w-[140px] px-3 py-2 text-sm bg-muted border border-border rounded-md text-foreground">
-                {roleOptions.find(option => option.value === currentRole)?.label || 'Sports Enthusiast'}
-              </div>
-            )}
+            <div className="min-w-[140px] px-3 py-2 text-sm bg-muted border border-border rounded-md text-foreground">
+              {getRoleLabel(currentRole)}
+            </div>
           </div>
 
           {/* Notifications */}
@@ -282,22 +253,12 @@ const Header = () => {
               </form>
             )}
 
-            {/* Mobile Role Selector */}
+            {/* Mobile Role Display - Always read-only */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">Current Role</label>
-              {canSwitchRoles ? (
-                <Select
-                  options={roleOptions}
-                  value={currentRole}
-                  onChange={handleRoleChange}
-                  className="w-full"
-                />
-              ) : (
-                // Show current role as read-only for regular users
-                <div className="w-full px-3 py-2 text-sm bg-muted border border-border rounded-md text-foreground">
-                  {roleOptions.find(option => option.value === currentRole)?.label || 'Sports Enthusiast'}
-                </div>
-              )}
+              <div className="w-full px-3 py-2 text-sm bg-muted border border-border rounded-md text-foreground">
+                {getRoleLabel(currentRole)}
+              </div>
             </div>
 
             {/* Mobile Navigation */}
