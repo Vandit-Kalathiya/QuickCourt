@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const CreateFacilityForm = ({ onSubmit, onCancel, apiEndpoint = 'http://localhost:7000/owner/facilities' }) => {
   const [formData, setFormData] = useState({
@@ -17,6 +19,7 @@ const CreateFacilityForm = ({ onSubmit, onCancel, apiEndpoint = 'http://localhos
   const [selectedPhoto, setSelectedPhoto] = useState(null); // Single photo to match backend MultipartFile
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const availableAmenities = [
     'Parking',
