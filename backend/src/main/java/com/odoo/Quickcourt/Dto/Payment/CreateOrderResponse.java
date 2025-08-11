@@ -13,8 +13,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateOrderResponse {
-    private String orderId;
-    private BigDecimal amount;
+    private String razorpayOrderId;
+    private Long amount;
     private String currency;
     private String keyId;
     private String customerName;

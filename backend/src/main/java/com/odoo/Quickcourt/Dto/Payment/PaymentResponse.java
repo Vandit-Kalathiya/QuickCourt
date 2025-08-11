@@ -21,6 +21,7 @@ public class PaymentResponse {
     private BigDecimal amount;
     private Payment.PaymentStatus status;
     private String razorpayOrderId;
+    private String razorpaySignature;
     private String razorpayPaymentId;
     private String paymentMethod;
     private LocalDateTime paidAt;
