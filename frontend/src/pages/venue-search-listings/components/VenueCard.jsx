@@ -14,12 +14,12 @@ const VenueCard = ({ venue }) => {
   };
 
   const handleCardClick = () => {
-    navigate(`/venue-details-booking?id=${venue?.id}`);
+    navigate(`/venue-booking?id=${venue?.id}`);
   };
 
   const handleQuickBook = (e) => {
     e?.stopPropagation();
-    navigate(`/venue-details-booking?id=${venue?.id}&quickbook=true`);
+    navigate(`/venue-booking?id=${venue?.id}&quickbook=true`);
   };
 
   const renderStars = (rating) => {

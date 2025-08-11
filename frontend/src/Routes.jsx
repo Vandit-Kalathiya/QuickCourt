@@ -48,20 +48,20 @@ const ProtectedRoute = () => {
   );
 };
 
-// Public route component (redirects to dashboard if already logged in)
-const PublicRoute = () => {
+// Auth route component (only redirects from /auth page if already logged in)
+const AuthRoute = () => {
   const { user, loading } = useAuth();
 
   if (loading) {
     return <LoadingSpinner />;
   }
 
-  // If user is authenticated, redirect to dashboard
+  // Only redirect to dashboard if user is on the auth page and already logged in
   if (user) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  return <Outlet />;
+  return <AuthPage />;
 };
 
 // Public layout for routes that should be accessible regardless of auth status
@@ -90,7 +90,7 @@ const Dashboard = () => {
     case "OWNER":
       return <FacilityOwnerDashboard />;
     default:
-      return <UserDashboardBookingManagement />; // Default fallback
+      return <NotFound />; // Default fallback
   }
 };
 
@@ -104,19 +104,17 @@ const Routes = () => {
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Homepage />} />
             <Route
-              path="/venue-search-listings"
+              path="/listings"
               element={<VenueSearchListings />}
             />
             <Route
-              path="/venue-details-booking"
+              path="/venue-booking"
               element={<VenueDetailsBooking />}
             />
           </Route>
 
-          {/* Auth routes (redirect to dashboard if already logged in) */}
-          <Route element={<PublicRoute />}>
-            <Route path="/auth" element={<AuthPage />} />
-          </Route>
+          {/* Auth route (redirects to dashboard if already logged in) */}
+          <Route path="/auth" element={<AuthRoute />} />
 
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
@@ -124,11 +122,11 @@ const Routes = () => {
             <Route path="/dashboard" element={<Dashboard />} />
 
             {/* Other protected routes */}
-            <Route
-              path="/facility-court-management"
-              element={<FacilityCourtManagement />}
-            />
           </Route>
+          <Route
+            path="/facility-court-management"
+            element={<FacilityCourtManagement />}
+          />
 
           {/* Fallback route */}
           <Route path="*" element={<NotFound />} />

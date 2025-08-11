@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Icon from '../AppIcon';
 import Button from './Button';
 import Input from './Input';
-import Select from './Select';
 import { useAuth } from 'context/AuthContext';
+import Select from './Select';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -29,7 +29,7 @@ const Header = () => {
     }
   }, [userProfile]);
 
-  console.log(userProfile.role, user);
+  // console.log(userProfile.role, user);
 
   // Role options - only show if user has multiple roles or is admin
   const getAllRoleOptions = () => [

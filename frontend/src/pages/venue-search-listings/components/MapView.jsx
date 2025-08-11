@@ -109,7 +109,7 @@ const MapView = ({ venues, onVenueSelect, selectedVenue }) => {
                 <span className="text-lg font-bold text-primary">${selectedVenue?.startingPrice}/hr</span>
                 <Button
                   size="sm"
-                  onClick={() => window.location.href = `/venue-details-booking?id=${selectedVenue?.id}`}
+                  onClick={() => window.location.href = `/venue-booking?id=${selectedVenue?.id}`}
                 >
                   View Details
                 </Button>
