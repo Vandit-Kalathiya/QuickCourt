@@ -20,7 +20,7 @@ public class UserPrincipal implements UserDetails {
     private String email;
     private String password;
     private User.Role role;
-    private Boolean verified;
+//    private Boolean verified;
     private Boolean banned;
 
     public static UserPrincipal create(User user) {
@@ -30,7 +30,7 @@ public class UserPrincipal implements UserDetails {
                 user.getEmail(),
                 user.getPasswordHash(),
                 user.getRole(),
-                user.getVerified(),
+//                user.getVerified(),
                 user.getBanned()
         );
     }
@@ -62,8 +62,8 @@ public class UserPrincipal implements UserDetails {
         return true;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return verified;
-    }
+//    @Override
+//    public boolean isEnabled() {
+//        return verified;
+//    }
 }
