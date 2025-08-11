@@ -10,21 +10,49 @@ const Header = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [currentRole, setCurrentRole] = useState('user');
   const [searchQuery, setSearchQuery] = useState('');
   const [notifications] = useState([
     { id: 1, type: 'booking', message: 'Booking confirmed for Tennis Court A', time: '2 min ago', unread: true },
     { id: 2, type: 'reminder', message: 'Upcoming booking tomorrow at 3 PM', time: '1 hour ago', unread: true },
     { id: 3, type: 'update', message: 'New facility added near you', time: '3 hours ago', unread: false }
   ]);
-  const {userProfile, user} = useAuth();
-  console.log(userProfile, user)
 
-  const roleOptions = [
+  const { userProfile, user } = useAuth();
+  
+  // Set current role based on user profile, default to 'user' if not available
+  const [currentRole, setCurrentRole] = useState(userProfile?.role?.toLowerCase() || 'user');
+
+  // Update currentRole when userProfile changes
+  useEffect(() => {
+    if (userProfile?.role) {
+      setCurrentRole(userProfile.role.toLowerCase());
+    }
+  }, [userProfile]);
+
+  console.log(userProfile.role, user);
+
+  // Role options - only show if user has multiple roles or is admin
+  const getAllRoleOptions = () => [
     { value: 'user', label: 'Sports Enthusiast' },
     { value: 'owner', label: 'Facility Owner' },
     { value: 'admin', label: 'Administrator' }
   ];
+
+  // Determine if role switching should be allowed
+  const canSwitchRoles = userProfile?.role?.toLowerCase() !== 'user';
+  
+  // Get available role options based on user's actual role
+  const getRoleOptions = () => {
+    if (!canSwitchRoles) {
+      // If user is 'USER', only show their current role (no switching allowed)
+      return [{ value: 'user', label: 'Sports Enthusiast' }];
+    }
+    
+    // For owners/admins, show all available roles
+    return getAllRoleOptions();
+  };
+
+  const roleOptions = getRoleOptions();
 
   const navigationItems = {
     user: [
@@ -60,8 +88,11 @@ const Header = () => {
   }, []);
 
   const handleRoleChange = (newRole) => {
-    setCurrentRole(newRole);
-    setIsMobileMenuOpen(false);
+    // Only allow role change if user has permission
+    if (canSwitchRoles) {
+      setCurrentRole(newRole);
+      setIsMobileMenuOpen(false);
+    }
   };
 
   const handleSearchSubmit = (e) => {
@@ -129,12 +160,19 @@ const Header = () => {
         <div className="flex items-center space-x-4">
           {/* Role Indicator (Desktop) */}
           <div className="hidden md:block">
-            <Select
-              options={roleOptions}
-              value={currentRole}
-              onChange={handleRoleChange}
-              className="min-w-[140px]"
-            />
+            {canSwitchRoles ? (
+              <Select
+                options={roleOptions}
+                value={currentRole}
+                onChange={handleRoleChange}
+                className="min-w-[140px]"
+              />
+            ) : (
+              // Show current role as read-only for regular users
+              <div className="min-w-[140px] px-3 py-2 text-sm bg-muted border border-border rounded-md text-foreground">
+                {roleOptions.find(option => option.value === currentRole)?.label || 'Sports Enthusiast'}
+              </div>
+            )}
           </div>
 
           {/* Notifications */}
@@ -226,6 +264,7 @@ const Header = () => {
           </Button>
         </div>
       </div>
+
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 top-nav bg-background z-mobile-nav md:hidden animate-slide-in">
@@ -246,12 +285,19 @@ const Header = () => {
             {/* Mobile Role Selector */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">Current Role</label>
-              <Select
-                options={roleOptions}
-                value={currentRole}
-                onChange={handleRoleChange}
-                className="w-full"
-              />
+              {canSwitchRoles ? (
+                <Select
+                  options={roleOptions}
+                  value={currentRole}
+                  onChange={handleRoleChange}
+                  className="w-full"
+                />
+              ) : (
+                // Show current role as read-only for regular users
+                <div className="w-full px-3 py-2 text-sm bg-muted border border-border rounded-md text-foreground">
+                  {roleOptions.find(option => option.value === currentRole)?.label || 'Sports Enthusiast'}
+                </div>
+              )}
             </div>
 
             {/* Mobile Navigation */}
