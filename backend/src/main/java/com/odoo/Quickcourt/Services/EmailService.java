@@ -10,6 +10,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -20,9 +22,14 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    @Async
-    public void sendOtpEmail(String toEmail, String otp) {
+//    @Async
+    public String sendOtpEmail(String toEmail) {
         try {
+            SecureRandom random = new SecureRandom();
+            StringBuilder otp = new StringBuilder();
+            for (int i = 0; i < 6; i++) {
+                otp.append(random.nextInt(10));
+            }
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(toEmail);
@@ -36,6 +43,7 @@ public class EmailService {
         } catch (Exception e) {
             log.error("Failed to send OTP email to {}", toEmail, e);
         }
+        return toEmail;
     }
 
     @Async

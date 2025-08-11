@@ -3,6 +3,8 @@ package com.odoo.Quickcourt.Auth.Controllers;
 
 import com.odoo.Quickcourt.Auth.Payload.auth.*;
 import com.odoo.Quickcourt.Auth.Services.AuthService;
+import com.odoo.Quickcourt.Auth.Services.OtpService;
+import com.odoo.Quickcourt.Services.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 public class AuthController {
 
     private final AuthService authService;
+    private final EmailService emailService;
+    private final OtpService otpService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest,
@@ -51,6 +55,31 @@ public class AuthController {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
+    @PostMapping("/email/send")
+    public String sendEmailOtp(@RequestParam String email) {
+        String otp = otpService.sendEmailOtp(email);
+        return "OTP sent successfully to " + email + ". Please check your SMS.";
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<ApiResponse> verifyOtp(@RequestBody OtpVerificationRequest request) throws BadRequestException {
+        if(!otpService.verifyOtp(request.getEmail(),  request.getOtp()))
+        {
+            return ResponseEntity.ok(
+                    ApiResponse.builder()
+                            .success(false)
+                            .message("Invalid OTP.")
+                            .build()
+            );
+        }
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .success(true)
+                        .message("OTP verified successfully.")
+                        .build()
+        );
+    }
+
 }
 
 //
