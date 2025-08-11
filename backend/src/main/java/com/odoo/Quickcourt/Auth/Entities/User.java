@@ -36,7 +36,11 @@ public class User extends BaseEntity {
     private String avatar;
 
     @Builder.Default
-    private Boolean verified = false;
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
+
+//    @Builder.Default
+//    private Boolean verified = false;
 
     @Builder.Default
     private Boolean banned = false;

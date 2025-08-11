@@ -1,6 +1,7 @@
 package com.odoo.Quickcourt.Auth.Services;
 // service/AuthService.java
 
+import com.odoo.Quickcourt.Auth.Entities.Otp;
 import com.odoo.Quickcourt.Auth.Entities.User;
 import com.odoo.Quickcourt.Auth.Payload.auth.AuthResponse;
 import com.odoo.Quickcourt.Auth.Payload.auth.LoginRequest;
@@ -20,6 +21,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -45,42 +48,26 @@ public class AuthService {
                 .email(request.getEmail())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
-                .verified(false)
+//                .verified(false)
                 .banned(false)
                 .build();
 
         user = userRepository.save(user);
 
-        // Generate and send OTP
-        generateAndSendOtp(user);
+//        // Generate and send OTP
+//        generateAndSendOtp(user);
         return null;
     }
 
-    public void verifyOtp(OtpVerificationRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-//        Otp otp = otpRepository.findByUserIdAndCodeAndUsedFalseAndExpiresAtAfter(
-//                        user.getId(), request.getOtp(), LocalDateTime.now())
-//                .orElseThrow(() -> new BadRequestException("Invalid or expired OTP"));
-//
-//        otp.setUsed(true);
-//        user.setVerified(true);
-//
-//        otpRepository.save(otp);
-//        userRepository.save(user);
-//
-//        // Clean up expired OTPs
-//        otpRepository.deleteByUserId(user.getId());
-    }
 
     public AuthResponse login(LoginRequest request) throws BadRequestException {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BadRequestException("Invalid credentials"));
 
-        if (!user.getVerified()) {
-            throw new BadRequestException("Account not verified");
-        }
+//        if (!user.getVerified()) {
+//            throw new BadRequestException("Account not verified");
+//        }
 
         if (user.getBanned()) {
             throw new BadRequestException("Account is banned");
@@ -102,12 +89,17 @@ public class AuthService {
                 .name(user.getName())
                 .email(user.getEmail())
                 .role(user.getRole())
-                .verified(user.getVerified())
+//                .verified(user.getVerified())
                 .build();
     }
 
-    private void generateAndSendOtp(User user) {
-        // Delete existing OTPs
+
+
+
+
+
+//    private void generateAndSendOtp(User user) {
+////         Delete existing OTPs
 //        otpRepository.deleteByUserId(user.getId());
 //
 //        // Generate new OTP
@@ -124,7 +116,7 @@ public class AuthService {
 //
 //        // Send OTP via email
 //        emailService.sendOtpEmail(user.getEmail(), code);
-    }
+//    }
 }
 
 //
