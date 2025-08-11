@@ -20,7 +20,7 @@ const AuthPage = () => {
   const [isEmailOtpSent, setIsEmailOtpSent] = useState(false);
   const [emailOtp, setEmailOtp] = useState(["", "", "", ""]);
   const [formData, setFormData] = useState({
-    userType: "player",
+    userType: "user",
     fullName: "",
     email: "",
     password: "",
@@ -221,14 +221,15 @@ const AuthPage = () => {
       if (isLogin) {
         // Login using AuthContext
         console.log(formData);
-        await signIn(formData.email, formData.password);
+        const loginRes = await signIn(formData.email, formData.password);
+        console.log("Login response:", loginRes);
         toast.success("Login successful!");
       } else {
         const signUpData = {
           email: formData.email,
-          passwordHash: formData.password,
+          password: formData.password,
           name: formData.fullName,
-          role: formData.userType.toUpperCase(), // Convert 'player' to 'PLAYER', 'facility' to 'FACILITY'
+          role: formData.userType, // Keep userType as is
           // Add any other fields your API expects
         };
 
@@ -272,7 +273,7 @@ const AuthPage = () => {
   // Reset form
   const resetForm = () => {
     setFormData({
-      userType: "player",
+      userType: "user",
       fullName: "",
       email: "",
       password: "",
@@ -339,28 +340,28 @@ const AuthPage = () => {
                   <div className="grid grid-cols-2 gap-2">
                     <div
                       className={`p-2 border-2 rounded-lg cursor-pointer transition-all duration-300 text-center hover:scale-105 ${
-                        formData.userType === "player"
+                        formData.userType === "user"
                           ? "border-blue-500 bg-blue-50 text-blue-600"
                           : "border-gray-200 hover:border-blue-300"
                       }`}
                       onClick={() =>
                         handleInputChange({
-                          target: { name: "userType", value: "player" },
+                          target: { name: "userType", value: "user" },
                         })
                       }
                     >
                       <div className="text-lg mb-1">🏃‍♂️</div>
-                      <div className="font-medium text-sm">Player</div>
+                      <div className="font-medium text-sm">User</div>
                     </div>
                     <div
                       className={`p-2 border-2 rounded-lg cursor-pointer transition-all duration-300 text-center hover:scale-105 ${
-                        formData.userType === "facility"
+                        formData.userType === "owner"
                           ? "border-blue-500 bg-blue-50 text-blue-600"
                           : "border-gray-200 hover:border-blue-300"
                       }`}
                       onClick={() =>
                         handleInputChange({
-                          target: { name: "userType", value: "facility" },
+                          target: { name: "userType", value: "owner" },
                         })
                       }
                     >

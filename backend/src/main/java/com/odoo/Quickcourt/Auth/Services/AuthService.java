@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -46,10 +47,8 @@ public class AuthService {
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
-                .passwordHash(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
-//                .verified(false)
-                .banned(false)
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Objects.equals(request.getRole(), "user") ? User.Role.USER : User.Role.OWNER)
                 .build();
 
         user = userRepository.save(user);

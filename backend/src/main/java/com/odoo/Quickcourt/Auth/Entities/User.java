@@ -27,7 +27,8 @@ public class User extends BaseEntity {
 
     @NotBlank
     @Column(nullable = false)
-    private String passwordHash;
+    private String password;
+
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -43,7 +44,9 @@ public class User extends BaseEntity {
 //    private Boolean verified = false;
 
     @Builder.Default
+    @Column(name = "is_banned", nullable = false)
     private Boolean banned = false;
+
 
     public enum Role {
         USER, OWNER, ADMIN
