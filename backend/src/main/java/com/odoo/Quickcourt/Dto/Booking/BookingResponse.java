@@ -32,6 +32,7 @@ public class BookingResponse {
     private String currency = "INR";
     private BigDecimal totalPrice;
     private Booking.BookingStatus status;
+    private String razorpayOrderId;
     private LocalDateTime createdAt;
     private List<String> amenities;
     private int duration;

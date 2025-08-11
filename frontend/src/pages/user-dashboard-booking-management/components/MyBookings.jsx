@@ -26,98 +26,6 @@ const MyBookings = () => {
   
   const {createBooking, getUserBookings} = useBooking();
 
-  // Mock data with enhanced information
-  const mockBookings = [
-    {
-      id: 'BK001',
-      facilityName: 'Sports Arena Complex',
-      courtName: 'Tennis Court A',
-      sport: 'TENNIS',
-      date: '2024-01-15',
-      startTime: '10:00',
-      endTime: '12:00',
-      duration: 2,
-      amount: 150.00,
-      status: 'CONFIRMED',
-      bookingDate: '2024-01-10T14:30:00',
-      facilityAddress: '123 Sports Street, City Center',
-      facilityPhone: '+1 (555) 123-4567',
-      facilityImage: '/api/placeholder/400/200',
-      paymentMethod: 'Credit Card',
-      paymentId: 'PAY123456',
-      notes: 'Bring your own rackets',
-      cancellationDeadline: '2024-01-14T10:00:00',
-      amenities: ['Changing Rooms', 'Parking', 'Equipment Rental'],
-      rating: 4.5
-    },
-    {
-      id: 'BK002',
-      facilityName: 'Downtown Basketball Hub',
-      courtName: 'Court B',
-      sport: 'BASKETBALL',
-      date: '2024-01-12',
-      startTime: '18:00',
-      endTime: '20:00',
-      duration: 2,
-      amount: 120.00,
-      status: 'COMPLETED',
-      bookingDate: '2024-01-08T09:15:00',
-      facilityAddress: '456 Downtown Ave, Business District',
-      facilityPhone: '+1 (555) 987-6543',
-      facilityImage: '/api/placeholder/400/200',
-      paymentMethod: 'PayPal',
-      paymentId: 'PAY789012',
-      notes: 'Team practice session',
-      cancellationDeadline: '2024-01-11T18:00:00',
-      amenities: ['Parking', 'Lockers', 'Sound System'],
-      rating: 4.8
-    },
-    {
-      id: 'BK003',
-      facilityName: 'Elite Badminton Center',
-      courtName: 'Court 1',
-      sport: 'BADMINTON',
-      date: '2024-01-20',
-      startTime: '16:00',
-      endTime: '17:30',
-      duration: 1.5,
-      amount: 80.00,
-      status: 'PENDING',
-      bookingDate: '2024-01-13T11:45:00',
-      facilityAddress: '789 Shuttle Lane, Sports Complex',
-      facilityPhone: '+1 (555) 456-7890',
-      facilityImage: '/api/placeholder/400/200',
-      paymentMethod: 'Credit Card',
-      paymentId: 'PAY345678',
-      notes: '',
-      cancellationDeadline: '2024-01-19T16:00:00',
-      amenities: ['Air Conditioning', 'Parking', 'Equipment Rental'],
-      rating: 4.2
-    },
-    {
-      id: 'BK004',
-      facilityName: 'City Football Ground',
-      courtName: 'Main Field',
-      sport: 'FOOTBALL',
-      date: '2024-01-08',
-      startTime: '14:00',
-      endTime: '16:00',
-      duration: 2,
-      amount: 200.00,
-      status: 'CANCELLED',
-      bookingDate: '2024-01-05T16:20:00',
-      facilityAddress: '321 Football Road, Sports District',
-      facilityPhone: '+1 (555) 654-3210',
-      facilityImage: '/api/placeholder/400/200',
-      paymentMethod: 'Credit Card',
-      paymentId: 'PAY901234',
-      notes: 'Cancelled due to weather',
-      cancellationDeadline: '2024-01-07T14:00:00',
-      amenities: ['Parking', 'Changing Rooms', 'First Aid'],
-      rating: 4.3
-    }
-  ];
-
   useEffect(() => {
     fetchBookings();
   }, []);
@@ -161,6 +69,11 @@ const MyBookings = () => {
       setIsLoading(false);
     }
   };
+
+  const totalSpent = bookings.reduce(
+    (acc, booking) => acc + booking.totalPrice,
+    0
+  );
 
   const filterAndSortBookings = () => {
     let filtered = [...bookings];
@@ -221,16 +134,16 @@ const MyBookings = () => {
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
-      case 'confirmed':
-        return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-      case 'completed':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'pending':
-        return 'bg-amber-100 text-amber-800 border-amber-200';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800 border-red-200';
+      case "CREATED":
+        return "bg-emerald-100 text-emerald-800 border-emerald-200";
+      case "COMPLETED":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "PENDING":
+        return "bg-amber-100 text-amber-800 border-amber-200";
+      case "CANCELLED":
+        return "bg-red-100 text-red-800 border-red-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
@@ -280,7 +193,7 @@ const MyBookings = () => {
   const canCancelBooking = (booking) => {
     const now = new Date();
     const cancellationDeadline = new Date(booking.cancellationDeadline);
-    return booking.status.toLowerCase() === 'confirmed' && now < cancellationDeadline;
+    return booking.status.toLowerCase() === 'created' && now < cancellationDeadline;
   };
 
   const handleCancelBooking = async (bookingId) => {
@@ -322,9 +235,11 @@ const MyBookings = () => {
     );
   };
 
+  console.log(filteredBookings);
+
   const statusOptions = [
     { value: 'all', label: 'All Status' },
-    { value: 'confirmed', label: 'Confirmed' },
+    { value: 'created', label: 'Created' },
     { value: 'completed', label: 'Completed' },
     { value: 'pending', label: 'Pending' },
     { value: 'cancelled', label: 'Cancelled' }
@@ -383,12 +298,13 @@ const sortOptions = [
                 My Bookings
               </h1>
               <p className="text-blue-100 text-lg max-w-2xl">
-                Track, manage, and explore all your sports facility reservations in one place
+                Track, manage, and explore all your sports facility reservations
+                in one place
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
-                onClick={() => window.location.href = '/listings'}
+                onClick={() => (window.location.href = "/listings")}
                 className="bg-white text-blue-600 hover:bg-blue-50 border-0 shadow-lg hover:shadow-xl transition-all duration-300"
                 iconName="Plus"
                 size="lg"
@@ -406,8 +322,12 @@ const sortOptions = [
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Total Bookings</p>
-                <p className="text-3xl font-bold text-gray-900">{bookingStats.total}</p>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  Total Bookings
+                </p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {bookingStats.total}
+                </p>
               </div>
               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
                 <Icon name="Calendar" size={24} className="text-white" />
@@ -418,8 +338,12 @@ const sortOptions = [
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Upcoming</p>
-                <p className="text-3xl font-bold text-emerald-600">{bookingStats.upcoming}</p>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  Upcoming
+                </p>
+                <p className="text-3xl font-bold text-emerald-600">
+                  {bookingStats.upcoming}
+                </p>
               </div>
               <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center">
                 <Icon name="Clock" size={24} className="text-white" />
@@ -430,8 +354,12 @@ const sortOptions = [
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Completed</p>
-                <p className="text-3xl font-bold text-blue-600">{bookingStats.completed}</p>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  Completed
+                </p>
+                <p className="text-3xl font-bold text-blue-600">
+                  {bookingStats.completed}
+                </p>
               </div>
               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
                 <Icon name="CheckCircle" size={24} className="text-white" />
@@ -442,8 +370,12 @@ const sortOptions = [
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Total Spent</p>
-                <p className="text-3xl font-bold text-purple-600">${bookingStats.totalAmount.toFixed(0)}</p>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  Total Spent
+                </p>
+                <p className="text-3xl font-bold text-purple-600">
+                  ₹ {totalSpent}
+                </p>
               </div>
               <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
                 <Icon name="DollarSign" size={24} className="text-white" />
@@ -456,9 +388,11 @@ const sortOptions = [
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-8">
           <div className="flex items-center mb-6">
             <Icon name="Filter" size={20} className="text-gray-400 mr-2" />
-            <h2 className="text-lg font-semibold text-gray-900">Filter & Search</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Filter & Search
+            </h2>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
             <div className="lg:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -481,7 +415,9 @@ const sortOptions = [
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">Status</label>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Status
+              </label>
               <Select
                 options={statusOptions}
                 value={statusFilter}
@@ -491,7 +427,9 @@ const sortOptions = [
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">Date Range</label>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Date Range
+              </label>
               <Select
                 options={dateOptions}
                 value={dateFilter}
@@ -501,7 +439,9 @@ const sortOptions = [
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">Sort By</label>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Sort By
+              </label>
               <Select
                 options={sortOptions}
                 value={sortBy}
@@ -512,8 +452,9 @@ const sortOptions = [
 
             <div className="flex items-end">
               <div className="text-sm text-gray-600 bg-gray-50 rounded-lg px-4 py-3 w-full">
-                <span className="font-medium">{filteredBookings.length}</span> of{' '}
-                <span className="font-medium">{bookings.length}</span> bookings
+                <span className="font-medium">{filteredBookings.length}</span>{" "}
+                of <span className="font-medium">{bookings.length}</span>{" "}
+                bookings
               </div>
             </div>
           </div>
@@ -525,15 +466,16 @@ const sortOptions = [
             <div className="w-24 h-24 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Icon name="Calendar" size={40} className="text-blue-500" />
             </div>
-            <h3 className="text-2xl font-semibold text-gray-900 mb-3">No Bookings Found</h3>
+            <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+              No Bookings Found
+            </h3>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              {bookings.length === 0 
+              {bookings.length === 0
                 ? "Start your sports journey by booking your first venue!"
-                : "No bookings match your current filters. Try adjusting your search criteria."
-              }
+                : "No bookings match your current filters. Try adjusting your search criteria."}
             </p>
-            <Button 
-              onClick={() => window.location.href = '/listings'}
+            <Button
+              onClick={() => (window.location.href = "/listings")}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0 shadow-lg px-8 py-3"
               iconName="Search"
               size="lg"
@@ -553,10 +495,14 @@ const sortOptions = [
                   <div className="flex flex-col lg:flex-row gap-6">
                     {/* Enhanced Sport Icon with Gradient */}
                     <div className="flex-shrink-0">
-                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${getSportGradient(booking.sport)} flex items-center justify-center shadow-lg`}>
-                        <Icon 
-                          name={getSportIcon(booking.sport)} 
-                          size={28} 
+                      <div
+                        className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${getSportGradient(
+                          booking.sport
+                        )} flex items-center justify-center shadow-lg`}
+                      >
+                        <Icon
+                          name={getSportIcon(booking.sport)}
+                          size={28}
                           className="text-white"
                         />
                       </div>
@@ -570,12 +516,17 @@ const sortOptions = [
                             <h3 className="text-xl font-bold text-gray-900">
                               {booking.facilityName}
                             </h3>
-                            <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(booking.status)}`}>
+                            <div
+                              className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
+                                booking.status
+                              )}`}
+                            >
                               {booking.status}
                             </div>
                           </div>
                           <p className="text-gray-600 mb-2">
-                            {booking.courtName} • {booking.courtName ? booking.courtName : 'N/A'}
+                            {booking.courtName} •{" "}
+                            {booking.courtName ? booking.courtName : "N/A"}
                           </p>
                           {booking.rating && renderStars(booking?.rating)}
                         </div>
@@ -585,36 +536,67 @@ const sortOptions = [
                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                         <div className="bg-gray-50 rounded-xl p-4">
                           <div className="flex items-center mb-2">
-                            <Icon name="Calendar" size={16} className="text-blue-500 mr-2" />
-                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Date</p>
-                          </div>
-                          <p className="font-semibold text-gray-900">{formatDate(booking.date)}</p>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-xl p-4">
-                          <div className="flex items-center mb-2">
-                            <Icon name="Clock" size={16} className="text-emerald-500 mr-2" />
-                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Time</p>
+                            <Icon
+                              name="Calendar"
+                              size={16}
+                              className="text-blue-500 mr-2"
+                            />
+                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                              Date
+                            </p>
                           </div>
                           <p className="font-semibold text-gray-900">
-                            {formatTime(booking.startTime)} - {formatTime(booking.endTime)}
+                            {formatDate(booking.date)}
                           </p>
-                        </div>
-              
-                        <div className="bg-gray-50 rounded-xl p-4">
-                          <div className="flex items-center mb-2">
-                            <Icon name="Timer" size={16} className="text-purple-500 mr-2" />
-                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Duration</p>
-                          </div>
-                          <p className="font-semibold text-gray-900">{booking.duration} hours</p>
                         </div>
 
                         <div className="bg-gray-50 rounded-xl p-4">
                           <div className="flex items-center mb-2">
-                            <Icon name="DollarSign" size={16} className="text-orange-500 mr-2" />
-                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Amount</p>
+                            <Icon
+                              name="Clock"
+                              size={16}
+                              className="text-emerald-500 mr-2"
+                            />
+                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                              Time
+                            </p>
                           </div>
-                          <p className="font-semibold text-gray-900 text-lg">${booking.totalPrice.toFixed(2)}</p>
+                          <p className="font-semibold text-gray-900">
+                            {formatTime(booking.startTime)} -{" "}
+                            {formatTime(booking.endTime)}
+                          </p>
+                        </div>
+
+                        <div className="bg-gray-50 rounded-xl p-4">
+                          <div className="flex items-center mb-2">
+                            <Icon
+                              name="Timer"
+                              size={16}
+                              className="text-purple-500 mr-2"
+                            />
+                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                              Duration
+                            </p>
+                          </div>
+                          <p className="font-semibold text-gray-900">
+                            {booking.duration} hours
+                          </p>
+                        </div>
+
+                        <div className="bg-gray-50 rounded-xl p-4">
+                          <div className="flex items-center mb-2">
+                            <Icon
+                              name="DollarSign"
+                              size={16}
+                              className="text-orange-500 mr-2"
+                            />
+                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                              Amount
+                            </p>
+                          </div>
+                          <p className="font-semibold text-gray-900 text-lg">
+                            ₹ {booking.totalPrice.toFixed(2)}
+                          </p>
                         </div>
                       </div>
 
@@ -628,7 +610,7 @@ const sortOptions = [
                         >
                           View Details
                         </Button>
-                        
+
                         {canCancelBooking(booking) && (
                           <Button
                             variant="outline"
@@ -640,7 +622,7 @@ const sortOptions = [
                           </Button>
                         )}
 
-                        {booking.status.toLowerCase() === 'completed' && (
+                        {booking.status.toLowerCase() === "completed" && (
                           <Button
                             variant="outline"
                             className="border-yellow-200 hover:border-yellow-300 hover:bg-yellow-50 text-yellow-600 hover:text-yellow-700"
@@ -674,20 +656,35 @@ const sortOptions = [
               <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className={`w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center`}>
-                      <Icon 
-                        name={getSportIcon(selectedBooking.sport)} 
-                        size={24} 
+                    <div
+                      className={`w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center`}
+                    >
+                      <Icon
+                        name={getSportIcon(selectedBooking.sport)}
+                        size={24}
                         className="text-white"
                       />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold mb-1">{selectedBooking.facilityName}</h2>
-                      <p className="text-blue-100">Booking ID: {selectedBooking.id}</p>
+                      <h2 className="text-2xl font-bold mb-1">
+                        {selectedBooking.facilityName}
+                      </h2>
+                      <p className="text-blue-100">
+                        Booking ID: {selectedBooking.id}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(selectedBooking.status).replace('text-', 'text-').replace('bg-', 'bg-white/20 text-white border-white/30')}`}>
+                    <div
+                      className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(
+                        selectedBooking.status
+                      )
+                        .replace("text-", "text-")
+                        .replace(
+                          "bg-",
+                          "bg-white/20 text-white border-white/30"
+                        )}`}
+                    >
                       {selectedBooking.status}
                     </div>
                     <Button
@@ -709,23 +706,60 @@ const sortOptions = [
                   <div className="space-y-6">
                     <div>
                       <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <Icon name="Calendar" size={20} className="mr-2 text-blue-500" />
+                        <Icon
+                          name="Calendar"
+                          size={20}
+                          className="mr-2 text-blue-500"
+                        />
                         Booking Information
                       </h4>
-                      
+
                       <div className="space-y-4">
                         {[
-                          { label: 'Court', value: selectedBooking.courtName, icon: 'MapPin' },
-                          { label: 'Sport', value: selectedBooking.sportType, icon: 'Activity' },
-                          { label: 'Date', value: formatDate(selectedBooking.date), icon: 'Calendar' },
-                          { label: 'Time', value: `${formatTime(selectedBooking.startTime)} - ${formatTime(selectedBooking.endTime)}`, icon: 'Clock' },
-                          { label: 'Duration', value: `${formatTime(selectedBooking?.duration)} hours`, icon: 'Timer' }
+                          {
+                            label: "Court",
+                            value: selectedBooking.courtName,
+                            icon: "MapPin",
+                          },
+                          {
+                            label: "Sport",
+                            value: selectedBooking.sportType,
+                            icon: "Activity",
+                          },
+                          {
+                            label: "Date",
+                            value: formatDate(selectedBooking.date),
+                            icon: "Calendar",
+                          },
+                          {
+                            label: "Time",
+                            value: `${formatTime(
+                              selectedBooking.startTime
+                            )} - ${formatTime(selectedBooking.endTime)}`,
+                            icon: "Clock",
+                          },
+                          {
+                            label: "Duration",
+                            value: `${selectedBooking?.duration} hours`,
+                            icon: "Timer",
+                          },
                         ].map((item, index) => (
-                          <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                            <Icon name={item.icon} size={16} className="text-gray-400" />
+                          <div
+                            key={index}
+                            className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
+                          >
+                            <Icon
+                              name={item.icon}
+                              size={16}
+                              className="text-gray-400"
+                            />
                             <div>
-                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{item.label}</p>
-                              <p className="font-semibold text-gray-900">{item.value}</p>
+                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                                {item.label}
+                              </p>
+                              <p className="font-semibold text-gray-900">
+                                {item.value}
+                              </p>
                             </div>
                           </div>
                         ))}
@@ -737,27 +771,47 @@ const sortOptions = [
                   <div className="space-y-6">
                     <div>
                       <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <Icon name="Building" size={20} className="mr-2 text-emerald-500" />
+                        <Icon
+                          name="Building"
+                          size={20}
+                          className="mr-2 text-emerald-500"
+                        />
                         Facility Information
                       </h4>
-                      
+
                       <div className="space-y-4">
                         <div className="p-4 bg-gray-50 rounded-lg">
                           <div className="flex items-start space-x-3">
-                            <Icon name="MapPin" size={16} className="text-gray-400 mt-1" />
+                            <Icon
+                              name="MapPin"
+                              size={16}
+                              className="text-gray-400 mt-1"
+                            />
                             <div>
-                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Address</p>
-                              <p className="font-medium text-gray-900">{selectedBooking.facilityAddress}</p>
+                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                                Address
+                              </p>
+                              <p className="font-medium text-gray-900">
+                                {selectedBooking.facilityAddress}
+                              </p>
                             </div>
                           </div>
                         </div>
 
                         <div className="p-4 bg-gray-50 rounded-lg">
                           <div className="flex items-start space-x-3">
-                            <Icon name="Phone" size={16} className="text-gray-400 mt-1" />
+                            <Icon
+                              name="Phone"
+                              size={16}
+                              className="text-gray-400 mt-1"
+                            />
                             <div>
-                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Phone</p>
-                              <p className="font-medium text-gray-900">{selectedBooking.facilityPhone}</p>
+                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+                                Phone
+                              </p>
+                              <p className="font-medium text-gray-900">
+                                {selectedBooking.facilityPhone}
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -783,22 +837,70 @@ const sortOptions = [
                   <div className="space-y-6">
                     <div>
                       <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <Icon name="CreditCard" size={20} className="mr-2 text-purple-500" />
+                        <Icon
+                          name="CreditCard"
+                          size={20}
+                          className="mr-2 text-purple-500"
+                        />
                         Payment Information
                       </h4>
-                      
+
                       <div className="space-y-4">
                         {[
-                          { label: 'Amount', value: `$${selectedBooking.totalPrice.toFixed(2)}`, icon: 'DollarSign', highlight: true },
-                          { label: 'Payment Method', value: selectedBooking?.paymentMethod, icon: 'CreditCard' },
-                          { label: 'Payment ID', value: selectedBooking?.paymentId, icon: 'Hash' },
-                          { label: 'Booking Date', value: new Date(selectedBooking?.createdAt).toLocaleString(), icon: 'Clock' }
+                          {
+                            label: "Amount",
+                            value: `₹ ${selectedBooking.totalPrice.toFixed(2)}`,
+                            icon: "DollarSign",
+                            highlight: true,
+                          },
+                          {
+                            label: "Payment Method",
+                            value: "Razorpay",
+                            icon: "CreditCard",
+                          },
+                          {
+                            label: "Payment Order ID",
+                            value: selectedBooking?.razorpayOrderId,
+                            icon: "Hash",
+                          },
+                          {
+                            label: "Booking Date",
+                            value: new Date(
+                              selectedBooking?.createdAt
+                            ).toLocaleString(),
+                            icon: "Clock",
+                          },
                         ].map((item, index) => (
-                          <div key={index} className={`flex items-center space-x-3 p-3 rounded-lg ${item.highlight ? 'bg-green-50 border border-green-200' : 'bg-gray-50'}`}>
-                            <Icon name={item.icon} size={16} className={item.highlight ? 'text-green-500' : 'text-gray-400'} />
+                          <div
+                            key={index}
+                            className={`flex items-center space-x-3 p-3 rounded-lg ${
+                              item.highlight
+                                ? "bg-green-50 border border-green-200"
+                                : "bg-gray-50"
+                            }`}
+                          >
+                            <Icon
+                              name={item.icon}
+                              size={16}
+                              className={
+                                item.highlight
+                                  ? "text-green-500"
+                                  : "text-gray-400"
+                              }
+                            />
                             <div>
-                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{item.label}</p>
-                              <p className={`font-semibold ${item.highlight ? 'text-green-900 text-lg' : 'text-gray-900'}`}>{item.value}</p>
+                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                                {item.label}
+                              </p>
+                              <p
+                                className={`font-semibold ${
+                                  item.highlight
+                                    ? "text-green-900 text-lg"
+                                    : "text-gray-900"
+                                }`}
+                              >
+                                {item.value}
+                              </p>
                             </div>
                           </div>
                         ))}
@@ -807,34 +909,54 @@ const sortOptions = [
                   </div>
 
                   {/* Additional Information */}
-                  <div className="space-y-6">
+                  {/* <div className="space-y-6">
                     <div>
                       <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <Icon name="Info" size={20} className="mr-2 text-orange-500" />
+                        <Icon
+                          name="Info"
+                          size={20}
+                          className="mr-2 text-orange-500"
+                        />
                         Additional Information
                       </h4>
-                      
+
                       <div className="space-y-4">
                         {selectedBooking.notes && (
                           <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                             <div className="flex items-start space-x-3">
-                              <Icon name="MessageSquare" size={16} className="text-yellow-500 mt-1" />
+                              <Icon
+                                name="MessageSquare"
+                                size={16}
+                                className="text-yellow-500 mt-1"
+                              />
                               <div>
-                                <p className="text-xs font-medium text-yellow-700 uppercase tracking-wide mb-1">Notes</p>
-                                <p className="font-medium text-yellow-900">{selectedBooking.notes}</p>
+                                <p className="text-xs font-medium text-yellow-700 uppercase tracking-wide mb-1">
+                                  Notes
+                                </p>
+                                <p className="font-medium text-yellow-900">
+                                  {selectedBooking.notes}
+                                </p>
                               </div>
                             </div>
                           </div>
                         )}
-                        
+
                         {canCancelBooking(selectedBooking) && (
                           <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
                             <div className="flex items-start space-x-3">
-                              <Icon name="AlertTriangle" size={16} className="text-orange-500 mt-1" />
+                              <Icon
+                                name="AlertTriangle"
+                                size={16}
+                                className="text-orange-500 mt-1"
+                              />
                               <div>
-                                <p className="text-xs font-medium text-orange-700 uppercase tracking-wide mb-1">Cancellation Deadline</p>
+                                <p className="text-xs font-medium text-orange-700 uppercase tracking-wide mb-1">
+                                  Cancellation Deadline
+                                </p>
                                 <p className="font-medium text-orange-900">
-                                  {new Date(selectedBooking.cancellationDeadline).toLocaleString()}
+                                  {new Date(
+                                    selectedBooking.cancellationDeadline
+                                  ).toLocaleString()}
                                 </p>
                               </div>
                             </div>
@@ -842,7 +964,7 @@ const sortOptions = [
                         )}
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Enhanced Action Buttons */}
@@ -860,8 +982,8 @@ const sortOptions = [
                       Cancel Booking
                     </Button>
                   )}
-                  
-                  {selectedBooking.status.toLowerCase() === 'completed' && (
+
+                  {selectedBooking.status.toLowerCase() === "completed" && (
                     <Button
                       variant="outline"
                       className="border-yellow-200 hover:border-yellow-300 hover:bg-yellow-50 text-yellow-600 hover:text-yellow-700"
@@ -870,7 +992,7 @@ const sortOptions = [
                       Write Review
                     </Button>
                   )}
-                  
+
                   <Button
                     variant="outline"
                     className="border-gray-200 hover:border-gray-300 hover:bg-gray-50"
@@ -878,9 +1000,9 @@ const sortOptions = [
                   >
                     Download Receipt
                   </Button>
-                  
+
                   <div className="flex-1"></div>
-                  
+
                   <Button
                     onClick={() => setIsDetailModalOpen(false)}
                     className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0"
@@ -896,25 +1018,29 @@ const sortOptions = [
 
       <style jsx>{`
         @keyframes fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
-        
+
         @keyframes slide-up {
-          from { 
-            opacity: 0; 
-            transform: translateY(20px); 
+          from {
+            opacity: 0;
+            transform: translateY(20px);
           }
-          to { 
-            opacity: 1; 
-            transform: translateY(0); 
+          to {
+            opacity: 1;
+            transform: translateY(0);
           }
         }
-        
+
         .animate-fade-in {
           animation: fade-in 0.3s ease-out;
         }
-        
+
         .animate-slide-up {
           animation: slide-up 0.4s ease-out;
         }

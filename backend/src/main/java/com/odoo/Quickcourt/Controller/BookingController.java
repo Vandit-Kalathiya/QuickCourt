@@ -154,4 +154,6 @@ public class BookingController {
         bookingService.cancelBooking(id);
         return ResponseEntity.ok("Booking cancelled successfully");
     }
+
+
 }

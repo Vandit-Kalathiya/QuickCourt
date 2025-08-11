@@ -185,6 +185,7 @@ public class BookingService {
                 .startTime(booking.getStartTime())
                 .endTime(booking.getEndTime())
                 .totalPrice(booking.getTotalPrice())
+                .razorpayOrderId(booking.getRazorpayOrderId())
                 .status(booking.getStatus())
                 .createdAt(booking.getCreatedAt())
                 .facilityAddress(facility.getAddress() != null ? facility.getAddress() : null)
