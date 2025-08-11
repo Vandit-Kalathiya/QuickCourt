@@ -38,7 +38,7 @@ public class BookingService {
     private final CourtAvailabilityRepository availabilityRepository;
     private final PaymentService paymentService;
 
-    public BookingResponse createBooking(BookingRequest request) {
+    public BookingResponse createBooking(BookingRequest request) throws BadRequestException {
         UserPrincipal userPrincipal = getCurrentUser();
 
         Court court = courtRepository.findById(request.getCourtId())
@@ -101,7 +101,7 @@ public class BookingService {
                 .map(this::mapToResponse);
     }
 
-    public void cancelBooking(UUID bookingId) {
+    public void cancelBooking(UUID bookingId) throws BadRequestException {
         UserPrincipal userPrincipal = getCurrentUser();
 
         Booking booking = bookingRepository.findById(bookingId)
@@ -128,7 +128,7 @@ public class BookingService {
         paymentService.processRefund(booking.getId());
     }
 
-    private void validateBookingTime(Court court, BookingRequest request) {
+    private void validateBookingTime(Court court, BookingRequest request) throws BadRequestException {
         if (request.getStartTime().isBefore(court.getOpeningTime()) ||
                 request.getEndTime().isAfter(court.getClosingTime())) {
             throw new BadRequestException("Booking time is outside court operating hours");
