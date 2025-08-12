@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import Icon from "../../components/AppIcon";
 import Button from "../../components/ui/Button";
@@ -343,6 +343,110 @@ const VenueSearchListings = () => {
     );
   };
 
+  const calculatePriceRange = () => {
+    if (!venues || venues.length === 0) {
+      return { min: 0, max: 200 }; // Default fallback
+    }
+
+    const prices = venues
+      .map((venue) => venue.basePrice || venue.startingPrice || 0)
+      .filter((price) => price > 0); // Filter out zero or null prices
+
+    if (prices.length === 0) {
+      return { min: 0, max: 200 }; // Fallback if no valid prices
+    }
+
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+
+    // Round to nearest 10 for cleaner UI
+    return {
+      min: Math.floor(minPrice / 10) * 10,
+      max: Math.ceil(maxPrice / 10) * 10,
+    };
+  };
+
+  const priceRange = useMemo(() => {
+  return calculatePriceRange();
+}, [venues]);
+
+  const calculateSportCounts = () => {
+    const sportCounts = {};
+
+    // Initialize all sports with 0 count
+    const allSports = [
+      "tennis",
+      "badminton",
+      "basketball",
+      "football",
+      "cricket",
+      "swimming",
+      "squash",
+      "volleyball",
+    ];
+    allSports.forEach((sport) => {
+      sportCounts[sport] = 0;
+    });
+
+    // Count occurrences of each sport in venues
+    venues?.forEach((venue) => {
+      venue?.sports?.forEach((sport) => {
+        const sportKey = sport.toLowerCase();
+        if (sportCounts.hasOwnProperty(sportKey)) {
+          sportCounts[sportKey]++;
+        }
+      });
+    });
+
+    return sportCounts;
+  };
+
+  const calculateAmenityCounts = () => {
+    const amenityCounts = {};
+
+    // Initialize all amenities with 0 count
+    const amenityMap = {
+      parking: "Parking",
+      locker: ["Changing Rooms", "Lockers"],
+      shower: "Showers",
+      equipment: "Equipment Rental",
+      cafeteria: "Cafeteria",
+      "pro-shop": "Pro Shop",
+      coaching: "Coaching",
+      wifi: "WiFi",
+    };
+
+    Object.keys(amenityMap).forEach((key) => {
+      amenityCounts[key] = 0;
+    });
+
+    // Count occurrences of each amenity in venues
+    venues?.forEach((venue) => {
+      venue?.amenities?.forEach((amenity) => {
+        const amenityName = amenity.toLowerCase();
+
+        // Check each amenity mapping
+        Object.entries(amenityMap).forEach(([key, mappedNames]) => {
+          const namesToCheck = Array.isArray(mappedNames)
+            ? mappedNames
+            : [mappedNames];
+
+          if (
+            namesToCheck.some(
+              (name) =>
+                amenityName.includes(name.toLowerCase()) ||
+                name.toLowerCase().includes(amenityName)
+            )
+          ) {
+            amenityCounts[key]++;
+          }
+        });
+      });
+    });
+
+    return amenityCounts;
+  };
+
   const activeFilterCount = getActiveFilters()?.length;
 
   return (
@@ -367,6 +471,9 @@ const VenueSearchListings = () => {
               isOpen={true}
               onClose={() => {}}
               isMobile={false}
+              sportCounts={calculateSportCounts()}
+              amenityCounts={calculateAmenityCounts()}
+              priceRange={priceRange}
             />
           </div>
 
@@ -502,6 +609,9 @@ const VenueSearchListings = () => {
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
         isMobile={true}
+        sportCounts={calculateSportCounts()}
+        amenityCounts={calculateAmenityCounts()}
+        priceRange={priceRange}
       />
     </div>
   );
