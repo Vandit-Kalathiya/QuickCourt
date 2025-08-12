@@ -37,6 +37,7 @@ public class FacilityService {
     private final ReviewRepository reviewRepository;
     private final FileStorageService fileStorageService;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     public FacilityResponse createFacility(FacilityRequest request, MultipartFile photo) {
         UserPrincipal userPrincipal = getCurrentUser();
@@ -59,6 +60,22 @@ public class FacilityService {
         // Save photos if provided
         if (photo != null && !photo.isEmpty()) {
             savePhotos(facility.getId(), photo);
+        }
+
+        // Send email notification to admins
+        try {
+            User owner = userRepository.findById(userPrincipal.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+            
+            emailService.sendFacilityCreationNotificationToAdmins(
+                facility.getName(),
+                owner.getName(),
+                owner.getEmail(),
+                facility.getAddress()
+            );
+        } catch (Exception e) {
+            // Log error but don't fail the facility creation
+            System.err.println("Failed to send admin notification email: " + e.getMessage());
         }
 
         return mapToResponse(facility);

@@ -56,6 +56,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -69,4 +70,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.role = :role")
     Long countByRole(User.Role role);
+
+    @Query("SELECT u FROM User u WHERE u.role = 'ADMIN' AND u.isActive = true")
+    List<User> findAllActiveAdmins();
 }
