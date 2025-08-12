@@ -5,6 +5,7 @@ import Button from '../../../components/ui/Button';
 
 const BookingCard = ({ booking, onCancel, onViewDetails, onRebook, onReview, type = 'upcoming' }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  console.log(booking);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -50,8 +51,8 @@ const BookingCard = ({ booking, onCancel, onViewDetails, onRebook, onReview, typ
           {/* Venue Image - Enhanced */}
           <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 shadow-sm ring-1 ring-border/50">
             <Image
-              src={booking?.venue?.image}
-              alt={booking?.venue?.name}
+              src={booking?.userId}
+              alt={booking?.userId}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
           </div>
@@ -61,14 +62,18 @@ const BookingCard = ({ booking, onCancel, onViewDetails, onRebook, onReview, typ
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1 min-w-0">
                 <h3 className="text-lg font-semibold text-foreground truncate mb-1">
-                  {booking?.venue?.name}
+                  {booking?.courtName}
                 </h3>
                 <div className="flex items-center space-x-2 text-sm text-text-secondary">
                   <Icon name="MapPin" size={14} />
-                  <span className="truncate">{booking?.venue?.location}</span>
+                  <span className="truncate">{booking?.facilityAddress}</span>
                 </div>
               </div>
-              <span className={`px-3 py-1.5 rounded-full text-xs font-medium border ${getStatusColor(booking?.status)} whitespace-nowrap ml-3`}>
+              <span
+                className={`px-3 py-1.5 rounded-full text-xs font-medium border ${getStatusColor(
+                  booking?.status
+                )} whitespace-nowrap ml-3`}
+              >
                 {booking?.status}
               </span>
             </div>
@@ -79,27 +84,34 @@ const BookingCard = ({ booking, onCancel, onViewDetails, onRebook, onReview, typ
                 <div className="w-6 h-6 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Icon name="Calendar" size={14} className="text-primary" />
                 </div>
-                <span className="text-sm text-foreground font-medium">{formatDate(booking?.date)}</span>
+                <span className="text-sm text-foreground font-medium">
+                  {formatDate(booking?.date)}
+                </span>
               </div>
               <div className="flex items-center space-x-2.5">
                 <div className="w-6 h-6 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Icon name="Clock" size={14} className="text-accent" />
                 </div>
                 <span className="text-sm text-foreground">
-                  {formatTime(booking?.startTime)} - {formatTime(booking?.endTime)}
+                  {formatTime(booking?.startTime)} -{" "}
+                  {formatTime(booking?.endTime)}
                 </span>
               </div>
-              <div className="flex items-center space-x-2.5">
+              {/* <div className="flex items-center space-x-2.5">
                 <div className="w-6 h-6 bg-warning/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Icon name="MapPin" size={14} className="text-warning" />
                 </div>
-                <span className="text-sm text-foreground">{booking?.court}</span>
-              </div>
+                <span className="text-sm text-foreground">
+                  {booking?.court}
+                </span>
+              </div> */}
               <div className="flex items-center space-x-2.5">
                 <div className="w-6 h-6 bg-success/10 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Icon name="DollarSign" size={14} className="text-success" />
                 </div>
-                <span className="text-sm font-semibold text-foreground">${booking?.totalAmount}</span>
+                <span className="text-sm font-semibold text-foreground">
+                  ₹ {booking?.totalPrice}
+                </span>
               </div>
             </div>
 
@@ -108,27 +120,47 @@ const BookingCard = ({ booking, onCancel, onViewDetails, onRebook, onReview, typ
               <div className="border-t border-border pt-4 mt-4 animate-in slide-in-from-top-2 duration-200">
                 <div className="bg-gradient-to-r from-muted/30 to-transparent p-4 rounded-lg">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div className="flex justify-between">
-                      <span className="font-medium text-foreground">Booking ID:</span>
-                      <span className="text-text-secondary font-mono">{booking?.id}</span>
+                    <div className="flex justify-center">
+                      <span className="font-medium text-foreground">
+                        Booking ID:
+                      </span>
+                      <span className="text-text-secondary font-mono">
+                        {booking?.id}
+                      </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium text-foreground">Sport:</span>
-                      <span className="text-text-secondary">{booking?.sport}</span>
+                    <div className="flex justify-around">
+                      <span className="font-medium text-foreground">
+                        Sport:
+                      </span>
+                      <span className="text-text-secondary">
+                        {booking?.sportType}
+                      </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium text-foreground">Duration:</span>
-                      <span className="text-text-secondary">{booking?.duration} hours</span>
+                    <div className="flex justify-around">
+                      <span className="font-medium text-foreground">
+                        Duration:
+                      </span>
+                      <span className="text-text-secondary">
+                        {booking?.duration} hours
+                      </span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-medium text-foreground">Payment:</span>
-                      <span className="text-text-secondary">{booking?.paymentStatus}</span>
+                    <div className="flex justify-around">
+                      <span className="font-medium text-foreground">
+                        Payment:
+                      </span>
+                      <span className="text-text-secondary">
+                        {booking?.status}
+                      </span>
                     </div>
                   </div>
                   {booking?.notes && (
                     <div className="mt-4 pt-3 border-t border-border/50">
-                      <span className="font-medium text-foreground text-sm">Notes:</span>
-                      <p className="text-text-secondary mt-1 text-sm leading-relaxed">{booking?.notes}</p>
+                      <span className="font-medium text-foreground text-sm">
+                        Notes:
+                      </span>
+                      <p className="text-text-secondary mt-1 text-sm leading-relaxed">
+                        {booking?.notes}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -145,11 +177,11 @@ const BookingCard = ({ booking, onCancel, onViewDetails, onRebook, onReview, typ
                 iconPosition="right"
                 className="text-text-secondary hover:text-foreground hover:bg-muted/50"
               >
-                {isExpanded ? 'Less Details' : 'More Details'}
+                {isExpanded ? "Less Details" : "More Details"}
               </Button>
 
               <div className="flex items-center space-x-2">
-                {type === 'upcoming' && (
+                {type === "upcoming" && (
                   <>
                     <Button
                       variant="outline"
@@ -174,7 +206,7 @@ const BookingCard = ({ booking, onCancel, onViewDetails, onRebook, onReview, typ
                   </>
                 )}
 
-                {type === 'history' && (
+                {type === "history" && (
                   <>
                     <Button
                       variant="outline"
@@ -185,7 +217,7 @@ const BookingCard = ({ booking, onCancel, onViewDetails, onRebook, onReview, typ
                     >
                       Rebook
                     </Button>
-                    {booking?.status === 'COMPLETED' && !booking?.hasReview && (
+                    {booking?.status === "COMPLETED" && !booking?.hasReview && (
                       <Button
                         variant="default"
                         size="sm"
