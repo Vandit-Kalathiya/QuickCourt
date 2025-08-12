@@ -18,7 +18,6 @@ const FacilityCourtManagement = () => {
   const [facilities, setFacilities] = useState([]);
   const [courts, setCourts] = useState([]);
   const [availability, setAvailability] = useState({});
-  const [pricingRules, setPricingRules] = useState([]);
 
   // Get currently selected facility
   const selectedFacility = facilities[selectedFacilityIndex];
@@ -84,24 +83,7 @@ const FacilityCourtManagement = () => {
       "3-2025-01-11-20:00": "maintenance",
     });
 
-    // Mock pricing rules
-    setPricingRules([
-      {
-        id: 1,
-        facilityId: facility.id,
-        courtId: 1,
-        name: "Evening Peak Hours",
-        type: "peak_hours",
-        conditions: {
-          days: ["monday", "tuesday", "wednesday", "thursday", "friday"],
-          timeStart: "18:00",
-          timeEnd: "22:00",
-        },
-        adjustment: { type: "percentage", value: 25 },
-        active: true,
-        createdAt: "2025-01-01T00:00:00Z",
-      },
-    ]);
+
   };
 
   const tabs = [
@@ -171,9 +153,7 @@ const FacilityCourtManagement = () => {
     setAvailability((prev) => ({ ...prev, ...updates }));
   };
 
-  const handlePricingUpdate = (updatedRules) => {
-    setPricingRules(updatedRules);
-  };
+
 
   const renderTabContent = () => {
     if (!selectedFacility) {
@@ -222,9 +202,7 @@ const FacilityCourtManagement = () => {
         return (
           <PricingTab
             courts={courts}
-            pricingRules={pricingRules}
             facilityId={selectedFacility.id}
-            onPricingUpdate={handlePricingUpdate}
           />
         );
       default:
