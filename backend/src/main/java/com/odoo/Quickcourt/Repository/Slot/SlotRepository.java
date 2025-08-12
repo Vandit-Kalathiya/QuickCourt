@@ -70,5 +70,19 @@ public interface SlotRepository extends JpaRepository<Court, UUID> {
         )
         List<Object[]> findAvailableSlots(@Param("courtId") UUID courtId,
                                           @Param("bookingDate") LocalDate bookingDate);
+
+        @Query(
+                value = """
+            SELECT ca.start_time, ca.end_time
+            FROM court_availability ca
+            WHERE ca.court_id = :courtId
+              AND ca.date = :blockingDate
+              AND ca.is_blocked = TRUE
+            ORDER BY ca.start_time;
+        """,
+                nativeQuery = true
+        )
+        List<Object[]> findBlockedSlots(@Param("courtId") UUID courtId,
+                                       @Param("blockingDate") LocalDate blockingDate);
     }
 

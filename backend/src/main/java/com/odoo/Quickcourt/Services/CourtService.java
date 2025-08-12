@@ -112,7 +112,7 @@ public class CourtService {
         availabilityRepository.save(availability);
     }
 
-    public void unblockTimeSlot(UUID courtId, LocalDate date) {
+    public void unblockTimeSlot(UUID courtId, LocalDate date, LocalTime startTime, LocalTime endTime) {
         UserPrincipal userPrincipal = getCurrentUser();
 
         Court court = courtRepository.findById(courtId)
@@ -125,7 +125,7 @@ public class CourtService {
             throw new BadRequestException("Not authorized to manage this court");
         }
 
-        availabilityRepository.deleteByCourtIdAndDate(courtId, date);
+        availabilityRepository.deleteByCourtIdAndDateAndStartTimeAndEndTime(courtId, date, startTime, endTime);
     }
 
     private CourtResponse mapToResponse(Court court) {

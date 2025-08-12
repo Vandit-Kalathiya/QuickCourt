@@ -110,8 +110,10 @@ public class OwnerController {
     @Operation(summary = "Unblock time slot")
     public ResponseEntity<String> unblockTimeSlot(
             @PathVariable UUID courtId,
-            @RequestParam LocalDate date) {
-        courtService.unblockTimeSlot(courtId, date);
+            @RequestParam LocalDate date,
+            @RequestParam LocalTime startTime,
+            @RequestParam LocalTime endTime) {
+        courtService.unblockTimeSlot(courtId, date, startTime, endTime);
         return ResponseEntity.ok("Time slot unblocked successfully");
     }
 
