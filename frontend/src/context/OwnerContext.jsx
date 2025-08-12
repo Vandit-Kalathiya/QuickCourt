@@ -430,6 +430,172 @@ export const OwnerProvider = ({ children }) => {
     dispatch({ type: "CLEAR_ERROR" });
   };
 
+  // Pricing Rules Functions
+  const createPricingRule = async (ruleData) => {
+    if (!user || !isOwner()) {
+      throw new Error("Unauthorized");
+    }
+
+    try {
+      const response = await axios.post(
+        `http://localhost:7000/owner/pricing-rules`,
+        ruleData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      toast.success("Pricing rule created successfully!");
+      return response.data;
+    } catch (error) {
+      console.error('Create pricing rule error:', error.response?.data || error.message);
+      const errorMessage =
+        error.response?.data?.message || error.response?.data || "Failed to create pricing rule";
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const updatePricingRule = async (ruleId, ruleData) => {
+    if (!user || !isOwner()) {
+      throw new Error("Unauthorized");
+    }
+
+    try {
+      const response = await axios.put(
+        `http://localhost:7000/owner/pricing-rules/${ruleId}`,
+        ruleData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      toast.success("Pricing rule updated successfully!");
+      return response.data;
+    } catch (error) {
+      console.error('Update pricing rule error:', error.response?.data || error.message);
+      const errorMessage =
+        error.response?.data?.message || error.response?.data || "Failed to update pricing rule";
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const deletePricingRule = async (ruleId) => {
+    if (!user || !isOwner()) {
+      throw new Error("Unauthorized");
+    }
+
+    try {
+      const response = await axios.delete(
+        `http://localhost:7000/owner/pricing-rules/${ruleId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
+        }
+      );
+      toast.success("Pricing rule deleted successfully!");
+      return response.data;
+    } catch (error) {
+      console.error('Delete pricing rule error:', error.response?.data || error.message);
+      const errorMessage =
+        error.response?.data?.message || error.response?.data || "Failed to delete pricing rule";
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const togglePricingRule = async (ruleId) => {
+    if (!user || !isOwner()) {
+      throw new Error("Unauthorized");
+    }
+
+    try {
+      const response = await axios.post(
+        `http://localhost:7000/owner/pricing-rules/${ruleId}/toggle`,
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
+        }
+      );
+      toast.success("Pricing rule status updated successfully!");
+      return response.data;
+    } catch (error) {
+      console.error('Toggle pricing rule error:', error.response?.data || error.message);
+      const errorMessage =
+        error.response?.data?.message || error.response?.data || "Failed to toggle pricing rule";
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const getFacilityPricingRules = async (facilityId) => {
+    if (!user || !isOwner()) {
+      throw new Error("Unauthorized");
+    }
+
+    try {
+      const response = await axios.get(
+        `http://localhost:7000/owner/pricing-rules/facility/${facilityId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Get facility pricing rules error:', error.response?.data || error.message);
+      return [];
+    }
+  };
+
+  const getCourtPricingRules = async (courtId) => {
+    if (!user || !isOwner()) {
+      throw new Error("Unauthorized");
+    }
+
+    try {
+      const response = await axios.get(
+        `http://localhost:7000/owner/pricing-rules/court/${courtId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Get court pricing rules error:', error.response?.data || error.message);
+      return [];
+    }
+  };
+
+  const calculatePrice = async (courtId, date, time, durationHours) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:7000/owner/pricing-rules/calculate-price`,
+        {
+          params: { courtId, date, time, durationHours },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Calculate price error:', error.response?.data || error.message);
+      return null;
+    }
+  };
+
   const value = {
     ...state,
     createFacility,
@@ -446,6 +612,14 @@ export const OwnerProvider = ({ children }) => {
     getApprovedFacilities,
     getOwnerDashboard,
     clearError,
+    // Pricing Rules
+    createPricingRule,
+    updatePricingRule,
+    deletePricingRule,
+    togglePricingRule,
+    getFacilityPricingRules,
+    getCourtPricingRules,
+    calculatePrice,
   };
 
   return (
