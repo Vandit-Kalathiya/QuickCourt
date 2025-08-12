@@ -154,6 +154,7 @@ public class FacilityService {
                 .status(facility.getStatus())
                 .latitude(facility.getLatitude())
                 .longitude(facility.getLongitude())
+                .rating(facility.getRating())
                 .phone(facility.getPhone())
                 .ownerName(owner.getName())
                 .ownerEmail(facility.getEmail())
