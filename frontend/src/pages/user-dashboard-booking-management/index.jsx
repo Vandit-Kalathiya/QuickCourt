@@ -57,7 +57,7 @@ const UserDashboardBookingManagement = () => {
     };
 
     fetchBookings();
-  }, [getUserBookings]);
+  }, []);
 
   const user = userProfile;
 
@@ -68,7 +68,7 @@ const UserDashboardBookingManagement = () => {
     favoriteVenues: 3,
     totalSpent: [...upcomingBookings, ...bookingHistory]
       ?.filter((b) => b?.status !== "CANCELLED")
-      ?.reduce((sum, b) => sum + b?.totalAmount, 0),
+      ?.reduce((sum, b) => sum + b?.totalPrice, 0),
   };
 
   const tabs = [
@@ -245,7 +245,7 @@ const UserDashboardBookingManagement = () => {
           booking?.sport,
           booking?.court,
           booking?.status,
-          `$${booking?.totalAmount}`,
+          `₹ ${booking?.totalPrice}`,
         ]?.join(",")
       ),
     ]?.join("\n");
@@ -379,7 +379,7 @@ const UserDashboardBookingManagement = () => {
               </button>
               <button
                 onClick={() =>
-                  (window.location.href = "/venue-search-listings")
+                  (window.location.href = "/listings")
                 }
                 className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-8 py-3 rounded-2xl font-bold shadow-xl shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300 flex items-center space-x-2"
               >
@@ -468,7 +468,7 @@ const UserDashboardBookingManagement = () => {
                       Total Spent
                     </p>
                     <p className="text-2xl font-bold text-gray-900">
-                      ${quickStats?.totalSpent?.toFixed(2)}
+                      ₹ {quickStats?.totalSpent?.toFixed(2)}
                     </p>
                   </div>
                 </div>

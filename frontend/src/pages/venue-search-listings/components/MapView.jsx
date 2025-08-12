@@ -3,7 +3,7 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
 const MapView = ({ venues, onVenueSelect, selectedVenue }) => {
-  const [mapCenter] = useState({ lat: 40.7128, lng: -74.0060 }); // New York coordinates
+  const [mapCenter] = useState({ lat: 40.7128, lng: -74.0060 });
 
   const handleMarkerClick = (venue) => {
     onVenueSelect(venue);

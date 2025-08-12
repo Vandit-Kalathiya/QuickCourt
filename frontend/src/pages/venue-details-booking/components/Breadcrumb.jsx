@@ -4,7 +4,7 @@ import Icon from '../../../components/AppIcon';
 const Breadcrumb = ({ venueName }) => {
   const breadcrumbItems = [
     { label: 'Home', href: '/' },
-    { label: 'Search', href: '/venue-search-listings' },
+    { label: 'Search', href: '/listings' },
     { label: venueName, href: null, current: true }
   ];
 

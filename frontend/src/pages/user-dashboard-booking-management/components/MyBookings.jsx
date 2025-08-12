@@ -1,30 +1,32 @@
-// components/MyBookings.jsx
-import React, { useState, useEffect } from 'react';
-import { useAuth } from 'context/AuthContext';
-import Icon from 'components/AppIcon';
-import Input from 'components/ui/Input';
-import Select from 'components/ui/Select';
-import Button from 'components/ui/Button';
-import { useBooking } from 'context/BookingContext';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "context/AuthContext";
+import Icon from "components/AppIcon";
+import Input from "components/ui/Input";
+import Select from "components/ui/Select";
+import Button from "components/ui/Button";
+import { useBooking } from "context/BookingContext";
 
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [filteredBookings, setFilteredBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [dateFilter, setDateFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('newest');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const bookingsPerPage = 5;
+
+  const { createBooking, getUserBookings } = useBooking();
+
   const [bookingStats, setBookingStats] = useState({
     total: 0,
     upcoming: 0,
     completed: 0,
-    totalAmount: 0
+    totalAmount: 0,
   });
-  
-  const {createBooking, getUserBookings} = useBooking();
 
   useEffect(() => {
     fetchBookings();
@@ -33,25 +35,31 @@ const MyBookings = () => {
   useEffect(() => {
     filterAndSortBookings();
     calculateStats();
-  }, [bookings, searchQuery, statusFilter, dateFilter, sortBy]);
+  }, [bookings, searchQuery, statusFilter, dateFilter, sortBy, currentPage]);
 
   const calculateStats = () => {
     const now = new Date();
-    const stats = bookings.reduce((acc, booking) => {
-      acc.total += 1;
-      acc.totalAmount += booking.amount;
-      
-      const bookingDate = new Date(booking.date);
-      if (bookingDate >= now && booking.status.toLowerCase() !== 'cancelled') {
-        acc.upcoming += 1;
-      }
-      if (booking.status.toLowerCase() === 'completed') {
-        acc.completed += 1;
-      }
-      
-      return acc;
-    }, { total: 0, upcoming: 0, completed: 0, totalAmount: 0 });
-    
+    const stats = bookings.reduce(
+      (acc, booking) => {
+        acc.total += 1;
+        acc.totalAmount += booking.amount;
+
+        const bookingDate = new Date(booking.date);
+        if (
+          bookingDate >= now &&
+          booking.status.toLowerCase() !== "cancelled"
+        ) {
+          acc.upcoming += 1;
+        }
+        if (booking.status.toLowerCase() === "completed") {
+          acc.completed += 1;
+        }
+
+        return acc;
+      },
+      { total: 0, upcoming: 0, completed: 0, totalAmount: 0 }
+    );
+
     setBookingStats(stats);
   };
 
@@ -59,13 +67,11 @@ const MyBookings = () => {
     setIsLoading(true);
     try {
       const response = await getUserBookings();
-      console.log(response.content)
+      console.log(response.content);
       setBookings(response.content || response); // Adjust based on API response structure
-            setIsLoading(false);
-
-      // setBookings(response)
+      setIsLoading(false);
     } catch (error) {
-      console.error('Error fetching bookings:', error);
+      console.error("Error fetching bookings:", error);
       setIsLoading(false);
     }
   };
@@ -79,32 +85,37 @@ const MyBookings = () => {
     let filtered = [...bookings];
 
     if (searchQuery.trim()) {
-      filtered = filtered.filter(booking => 
-        booking.facilityName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        booking.courtName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        booking.sport.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        booking.id.toLowerCase().includes(searchQuery.toLowerCase())
+      filtered = filtered.filter(
+        (booking) =>
+          booking.facilityName
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          booking.courtName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          booking.sport.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          booking.id.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(booking => booking.status.toLowerCase() === statusFilter);
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(
+        (booking) => booking.status.toLowerCase() === statusFilter
+      );
     }
 
     const now = new Date();
-    if (dateFilter !== 'all') {
-      filtered = filtered.filter(booking => {
+    if (dateFilter !== "all") {
+      filtered = filtered.filter((booking) => {
         const bookingDate = new Date(booking.date);
         const diffDays = Math.ceil((bookingDate - now) / (1000 * 60 * 60 * 24));
-        
+
         switch (dateFilter) {
-          case 'upcoming':
+          case "upcoming":
             return diffDays >= 0;
-          case 'past':
+          case "past":
             return diffDays < 0;
-          case 'thisWeek':
+          case "thisWeek":
             return diffDays >= 0 && diffDays <= 7;
-          case 'thisMonth':
+          case "thisMonth":
             return diffDays >= 0 && diffDays <= 30;
           default:
             return true;
@@ -114,15 +125,15 @@ const MyBookings = () => {
 
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'newest':
+        case "newest":
           return new Date(b.bookingDate) - new Date(a.bookingDate);
-        case 'oldest':
+        case "oldest":
           return new Date(a.bookingDate) - new Date(b.bookingDate);
-        case 'dateAsc':
+        case "dateAsc":
           return new Date(a.date) - new Date(b.date);
-        case 'dateDesc':
+        case "dateDesc":
           return new Date(b.date) - new Date(a.date);
-        case 'amount':
+        case "amount":
           return b.amount - a.amount;
         default:
           return 0;
@@ -131,6 +142,16 @@ const MyBookings = () => {
 
     setFilteredBookings(filtered);
   };
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredBookings.length / bookingsPerPage);
+  const getPaginatedBookings = () => {
+    const startIndex = (currentPage - 1) * bookingsPerPage;
+    const endIndex = startIndex + bookingsPerPage;
+    return filteredBookings.slice(startIndex, endIndex);
+  };
+
+  const paginatedBookings = getPaginatedBookings();
 
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
@@ -149,67 +170,70 @@ const MyBookings = () => {
 
   const getSportIcon = (sport) => {
     const icons = {
-      'TENNIS': 'Circle',
-      'BASKETBALL': 'Circle',
-      'FOOTBALL': 'Circle',
-      'BADMINTON': 'Zap',
-      'VOLLEYBALL': 'Circle',
-      'CRICKET': 'Target',
-      'SWIMMING': 'Waves'
+      TENNIS: "Circle",
+      BASKETBALL: "Circle",
+      FOOTBALL: "Circle",
+      BADMINTON: "Zap",
+      VOLLEYBALL: "Circle",
+      CRICKET: "Target",
+      SWIMMING: "Waves",
     };
-    return icons[sport] || 'Circle';
+    return icons[sport] || "Circle";
   };
 
   const getSportGradient = (sport) => {
     const gradients = {
-      'TENNIS': 'from-green-400 to-green-600',
-      'BASKETBALL': 'from-orange-400 to-orange-600',
-      'FOOTBALL': 'from-blue-400 to-blue-600',
-      'BADMINTON': 'from-purple-400 to-purple-600',
-      'VOLLEYBALL': 'from-pink-400 to-pink-600',
-      'CRICKET': 'from-yellow-400 to-yellow-600',
-      'SWIMMING': 'from-cyan-400 to-cyan-600'
+      TENNIS: "from-green-400 to-green-600",
+      BASKETBALL: "from-orange-400 to-orange-600",
+      FOOTBALL: "from-blue-400 to-blue-600",
+      BADMINTON: "from-purple-400 to-purple-600",
+      VOLLEYBALL: "from-pink-400 to-pink-600",
+      CRICKET: "from-yellow-400 to-yellow-600",
+      SWIMMING: "from-cyan-400 to-cyan-600",
     };
-    return gradients[sport] || 'from-gray-400 to-gray-600';
+    return gradients[sport] || "from-gray-400 to-gray-600";
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'short',
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   const formatTime = (timeString) => {
-    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
+    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
     });
   };
 
   const canCancelBooking = (booking) => {
     const now = new Date();
     const cancellationDeadline = new Date(booking.cancellationDeadline);
-    return booking.status.toLowerCase() === 'created' && now < cancellationDeadline;
+    return (
+      booking.status.toLowerCase() === "created" && now < cancellationDeadline
+    );
   };
 
   const handleCancelBooking = async (bookingId) => {
-    if (window.confirm('Are you sure you want to cancel this booking?')) {
+    if (window.confirm("Are you sure you want to cancel this booking?")) {
       try {
-        setBookings(prev => 
-          prev.map(booking => 
-            booking.id === bookingId 
-              ? { ...booking, status: 'CANCELLED' }
+        setBookings((prev) =>
+          prev.map((booking) =>
+            booking.id === bookingId
+              ? { ...booking, status: "CANCELLED" }
               : booking
           )
         );
-        alert('Booking cancelled successfully');
+        alert("Booking cancelled successfully");
+        setCurrentPage(1); // Reset to first page after cancellation
       } catch (error) {
-        console.error('Error cancelling booking:', error);
-        alert('Failed to cancel booking');
+        console.error("Error cancelling booking:", error);
+        alert("Failed to cancel booking");
       }
     }
   };
@@ -227,7 +251,11 @@ const MyBookings = () => {
             key={i}
             name="Star"
             size={12}
-            className={i < Math.floor(rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}
+            className={
+              i < Math.floor(rating)
+                ? "text-yellow-400 fill-current"
+                : "text-gray-300"
+            }
           />
         ))}
         <span className="text-xs text-text-secondary ml-1">{rating}</span>
@@ -235,37 +263,73 @@ const MyBookings = () => {
     );
   };
 
-  console.log(filteredBookings);
-
   const statusOptions = [
-    { value: 'all', label: 'All Status' },
-    { value: 'created', label: 'Created' },
-    { value: 'completed', label: 'Completed' },
-    { value: 'pending', label: 'Pending' },
-    { value: 'cancelled', label: 'Cancelled' }
+    { value: "all", label: "All Status" },
+    { value: "created", label: "Created" },
+    { value: "completed", label: "Completed" },
+    { value: "pending", label: "Pending" },
+    { value: "cancelled", label: "Cancelled" },
   ];
 
   const dateOptions = [
-    { value: 'all', label: 'All Time' },
-    { value: 'upcoming', label: 'Upcoming' },
-    { value: 'past', label: 'Past' },
-    { value: 'thisWeek', label: 'This Week' },
-    { value: 'thisMonth', label: 'This Month' }
+    { value: "all", label: "All Time" },
+    { value: "upcoming", label: "Upcoming" },
+    { value: "past", label: "Past" },
+    { value: "thisWeek", label: "This Week" },
+    { value: "thisMonth", label: "This Month" },
   ];
-const sortOptions = [
-    { value: 'newest', label: 'Newest First' },
-    { value: 'oldest', label: 'Oldest First' },
-    { value: 'dateAsc', label: 'Date (Earliest)' },
-    { value: 'dateDesc', label: 'Date (Latest)' },
-    { value: 'amount', label: 'Amount (Highest)' },
+
+  const sortOptions = [
+    { value: "newest", label: "Newest First" },
+    { value: "oldest", label: "Oldest First" },
+    { value: "dateAsc", label: "Date (Earliest)" },
+    { value: "dateDesc", label: "Date (Latest)" },
+    { value: "amount", label: "Amount (Highest)" },
   ];
-  // const sortOptions = [
-  //   { value: 'newest', label: 'Newest First' },
-  //   { value: 'oldest', label: 'Oldest First' },
-  //   { value: 'dateAsc', label: 'Date (Earliest)' },
-  //   { value: 'dateDesc', label: 'Date (Latest)' },
-  //   { value: 'amount', label: 'Amount (Highest)' }
-  // ];
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    return (
+      <div className="flex justify-center items-center space-x-2 mt-6">
+        <button
+          onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 rounded-xl ${
+            currentPage === 1
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+          }`}
+        >
+          Previous
+        </button>
+        {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => setCurrentPage(index + 1)}
+            className={`px-4 py-2 rounded-xl ${
+              currentPage === index + 1
+                ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+            }`}
+          >
+            {index + 1}
+          </button>
+        ))}
+        <button
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`px-4 py-2 rounded-xl ${
+            currentPage === totalPages
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+          }`}
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
 
   if (isLoading) {
     return (
@@ -277,8 +341,12 @@ const sortOptions = [
                 <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                 <div className="absolute inset-0 w-16 h-16 border-4 border-primary/20 rounded-full mx-auto"></div>
               </div>
-              <p className="text-xl font-semibold text-foreground mb-2">Loading your bookings...</p>
-              <p className="text-text-secondary">Please wait while we fetch your data</p>
+              <p className="text-xl font-semibold text-foreground mb-2">
+                Loading your bookings...
+              </p>
+              <p className="text-text-secondary">
+                Please wait while we fetch your data
+              </p>
             </div>
           </div>
         </div>
@@ -403,7 +471,10 @@ const sortOptions = [
                   type="search"
                   placeholder="Search facilities, courts, or booking IDs..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
                   className="pl-11 h-12 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
                 />
                 <Icon
@@ -421,7 +492,10 @@ const sortOptions = [
               <Select
                 options={statusOptions}
                 value={statusFilter}
-                onChange={setStatusFilter}
+                onChange={(value) => {
+                  setStatusFilter(value);
+                  setCurrentPage(1);
+                }}
                 className="h-12"
               />
             </div>
@@ -433,7 +507,10 @@ const sortOptions = [
               <Select
                 options={dateOptions}
                 value={dateFilter}
-                onChange={setDateFilter}
+                onChange={(value) => {
+                  setDateFilter(value);
+                  setCurrentPage(1);
+                }}
                 className="h-12"
               />
             </div>
@@ -445,7 +522,10 @@ const sortOptions = [
               <Select
                 options={sortOptions}
                 value={sortBy}
-                onChange={setSortBy}
+                onChange={(value) => {
+                  setSortBy(value);
+                  setCurrentPage(1);
+                }}
                 className="h-12"
               />
             </div>
@@ -461,7 +541,7 @@ const sortOptions = [
         </div>
 
         {/* Enhanced Bookings List */}
-        {filteredBookings.length === 0 ? (
+        {paginatedBookings.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-16 text-center">
             <div className="w-24 h-24 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Icon name="Calendar" size={40} className="text-blue-500" />
@@ -484,168 +564,171 @@ const sortOptions = [
             </Button>
           </div>
         ) : (
-          <div className="space-y-6">
-            {filteredBookings.map((booking, index) => (
-              <div
-                key={booking.id}
-                className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className="p-6 lg:p-8">
-                  <div className="flex flex-col lg:flex-row gap-6">
-                    {/* Enhanced Sport Icon with Gradient */}
-                    <div className="flex-shrink-0">
-                      <div
-                        className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${getSportGradient(
-                          booking.sport
-                        )} flex items-center justify-center shadow-lg`}
-                      >
-                        <Icon
-                          name={getSportIcon(booking.sport)}
-                          size={28}
-                          className="text-white"
-                        />
+          <>
+            <div className="space-y-6">
+              {paginatedBookings.map((booking, index) => (
+                <div
+                  key={booking.id}
+                  className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className="p-6 lg:p-8">
+                    <div className="flex flex-col lg:flex-row gap-6">
+                      {/* Enhanced Sport Icon with Gradient */}
+                      <div className="flex-shrink-0">
+                        <div
+                          className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${getSportGradient(
+                            booking.sport
+                          )} flex items-center justify-center shadow-lg`}
+                        >
+                          <Icon
+                            name={getSportIcon(booking.sport)}
+                            size={28}
+                            className="text-white"
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Enhanced Booking Information */}
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-xl font-bold text-gray-900">
-                              {booking.facilityName}
-                            </h3>
-                            <div
-                              className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
-                                booking.status
-                              )}`}
-                            >
-                              {booking.status}
+                      {/* Enhanced Booking Information */}
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="text-xl font-bold text-gray-900">
+                                {booking.facilityName}
+                              </h3>
+                              <div
+                                className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
+                                  booking.status
+                                )}`}
+                              >
+                                {booking.status}
+                              </div>
                             </div>
+                            <p className="text-gray-600 mb-2">
+                              {booking.courtName} •{" "}
+                              {booking.courtName ? booking.courtName : "N/A"}
+                            </p>
+                            {booking.rating && renderStars(booking?.rating)}
                           </div>
-                          <p className="text-gray-600 mb-2">
-                            {booking.courtName} •{" "}
-                            {booking.courtName ? booking.courtName : "N/A"}
-                          </p>
-                          {booking.rating && renderStars(booking?.rating)}
                         </div>
-                      </div>
 
-                      {/* Enhanced Details Grid */}
-                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                        <div className="bg-gray-50 rounded-xl p-4">
-                          <div className="flex items-center mb-2">
-                            <Icon
-                              name="Calendar"
-                              size={16}
-                              className="text-blue-500 mr-2"
-                            />
-                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                              Date
+                        {/* Enhanced Details Grid */}
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                          <div className="bg-gray-50 rounded-xl p-4">
+                            <div className="flex items-center mb-2">
+                              <Icon
+                                name="Calendar"
+                                size={16}
+                                className="text-blue-500 mr-2"
+                              />
+                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                                Date
+                              </p>
+                            </div>
+                            <p className="font-semibold text-gray-900">
+                              {formatDate(booking.date)}
                             </p>
                           </div>
-                          <p className="font-semibold text-gray-900">
-                            {formatDate(booking.date)}
-                          </p>
-                        </div>
 
-                        <div className="bg-gray-50 rounded-xl p-4">
-                          <div className="flex items-center mb-2">
-                            <Icon
-                              name="Clock"
-                              size={16}
-                              className="text-emerald-500 mr-2"
-                            />
-                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                              Time
+                          <div className="bg-gray-50 rounded-xl p-4">
+                            <div className="flex items-center mb-2">
+                              <Icon
+                                name="Clock"
+                                size={16}
+                                className="text-emerald-500 mr-2"
+                              />
+                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                                Time
+                              </p>
+                            </div>
+                            <p className="font-semibold text-gray-900">
+                              {formatTime(booking.startTime)} -{" "}
+                              {formatTime(booking.endTime)}
                             </p>
                           </div>
-                          <p className="font-semibold text-gray-900">
-                            {formatTime(booking.startTime)} -{" "}
-                            {formatTime(booking.endTime)}
-                          </p>
-                        </div>
 
-                        <div className="bg-gray-50 rounded-xl p-4">
-                          <div className="flex items-center mb-2">
-                            <Icon
-                              name="Timer"
-                              size={16}
-                              className="text-purple-500 mr-2"
-                            />
-                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                              Duration
+                          <div className="bg-gray-50 rounded-xl p-4">
+                            <div className="flex items-center mb-2">
+                              <Icon
+                                name="Timer"
+                                size={16}
+                                className="text-purple-500 mr-2"
+                              />
+                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                                Duration
+                              </p>
+                            </div>
+                            <p className="font-semibold text-gray-900">
+                              {booking.duration} hours
                             </p>
                           </div>
-                          <p className="font-semibold text-gray-900">
-                            {booking.duration} hours
-                          </p>
-                        </div>
 
-                        <div className="bg-gray-50 rounded-xl p-4">
-                          <div className="flex items-center mb-2">
-                            <Icon
-                              name="DollarSign"
-                              size={16}
-                              className="text-orange-500 mr-2"
-                            />
-                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                              Amount
+                          <div className="bg-gray-50 rounded-xl p-4">
+                            <div className="flex items-center mb-2">
+                              <Icon
+                                name="DollarSign"
+                                size={16}
+                                className="text-orange-500 mr-2"
+                              />
+                              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                                Amount
+                              </p>
+                            </div>
+                            <p className="font-semibold text-gray-900 text-lg">
+                              ₹ {booking.totalPrice.toFixed(2)}
                             </p>
                           </div>
-                          <p className="font-semibold text-gray-900 text-lg">
-                            ₹ {booking.totalPrice.toFixed(2)}
-                          </p>
                         </div>
-                      </div>
 
-                      {/* Enhanced Action Buttons */}
-                      <div className="flex flex-wrap gap-3">
-                        <Button
-                          variant="outline"
-                          onClick={() => openBookingDetails(booking)}
-                          className="border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
-                          iconName="Eye"
-                        >
-                          View Details
-                        </Button>
-
-                        {canCancelBooking(booking) && (
+                        {/* Enhanced Action Buttons */}
+                        <div className="flex flex-wrap gap-3">
                           <Button
                             variant="outline"
-                            onClick={() => handleCancelBooking(booking.id)}
-                            className="border-red-200 hover:border-red-300 hover:bg-red-50 text-red-600 hover:text-red-700"
-                            iconName="X"
+                            onClick={() => openBookingDetails(booking)}
+                            className="border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+                            iconName="Eye"
                           >
-                            Cancel Booking
+                            View Details
                           </Button>
-                        )}
 
-                        {booking.status.toLowerCase() === "completed" && (
+                          {canCancelBooking(booking) && (
+                            <Button
+                              variant="outline"
+                              onClick={() => handleCancelBooking(booking.id)}
+                              className="border-red-200 hover:border-red-300 hover:bg-red-50 text-red-600 hover:text-red-700"
+                              iconName="X"
+                            >
+                              Cancel Booking
+                            </Button>
+                          )}
+
+                          {booking.status.toLowerCase() === "completed" && (
+                            <Button
+                              variant="outline"
+                              className="border-yellow-200 hover:border-yellow-300 hover:bg-yellow-50 text-yellow-600 hover:text-yellow-700"
+                              iconName="Star"
+                            >
+                              Write Review
+                            </Button>
+                          )}
+
                           <Button
-                            variant="outline"
-                            className="border-yellow-200 hover:border-yellow-300 hover:bg-yellow-50 text-yellow-600 hover:text-yellow-700"
-                            iconName="Star"
+                            variant="ghost"
+                            className="text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                            iconName="Download"
                           >
-                            Write Review
+                            Receipt
                           </Button>
-                        )}
-
-                        <Button
-                          variant="ghost"
-                          className="text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-                          iconName="Download"
-                        >
-                          Receipt
-                        </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            {renderPagination()}
+          </>
         )}
 
         {/* Enhanced Modal */}
@@ -815,20 +898,6 @@ const sortOptions = [
                             </div>
                           </div>
                         </div>
-
-                        {/* <div className="p-4 bg-gray-50 rounded-lg">
-                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Available Amenities</p>
-                          <div className="flex flex-wrap gap-2">
-                            {selectedBooking.amenities.map((amenity, index) => (
-                              <span
-                                key={index}
-                                className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full border border-blue-200"
-                              >
-                                {amenity}
-                              </span>
-                            ))}
-                          </div>
-                        </div> */}
                       </div>
                     </div>
                   </div>
@@ -907,64 +976,6 @@ const sortOptions = [
                       </div>
                     </div>
                   </div>
-
-                  {/* Additional Information */}
-                  {/* <div className="space-y-6">
-                    <div>
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <Icon
-                          name="Info"
-                          size={20}
-                          className="mr-2 text-orange-500"
-                        />
-                        Additional Information
-                      </h4>
-
-                      <div className="space-y-4">
-                        {selectedBooking.notes && (
-                          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                            <div className="flex items-start space-x-3">
-                              <Icon
-                                name="MessageSquare"
-                                size={16}
-                                className="text-yellow-500 mt-1"
-                              />
-                              <div>
-                                <p className="text-xs font-medium text-yellow-700 uppercase tracking-wide mb-1">
-                                  Notes
-                                </p>
-                                <p className="font-medium text-yellow-900">
-                                  {selectedBooking.notes}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {canCancelBooking(selectedBooking) && (
-                          <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                            <div className="flex items-start space-x-3">
-                              <Icon
-                                name="AlertTriangle"
-                                size={16}
-                                className="text-orange-500 mt-1"
-                              />
-                              <div>
-                                <p className="text-xs font-medium text-orange-700 uppercase tracking-wide mb-1">
-                                  Cancellation Deadline
-                                </p>
-                                <p className="font-medium text-orange-900">
-                                  {new Date(
-                                    selectedBooking.cancellationDeadline
-                                  ).toLocaleString()}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div> */}
                 </div>
 
                 {/* Enhanced Action Buttons */}

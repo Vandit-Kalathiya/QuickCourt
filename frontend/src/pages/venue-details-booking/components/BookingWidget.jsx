@@ -89,7 +89,7 @@ const BookingWidget = ({ venue, onBookingComplete }) => {
     const fetchAvailableSlots = async () => {
       if (selectedDate && selectedCourtId) {
         setIsLoading(true);
-        console.log(selectedCourtId, ' ', selectedDate);
+        console.log(selectedCourtId, " ", selectedDate);
         try {
           const response = await api.get(
             `/courts/${selectedCourtId}/available-slots`,
@@ -160,7 +160,7 @@ const BookingWidget = ({ venue, onBookingComplete }) => {
             displayTime: slot.displayTime,
             startTime: slot.startTime,
             endTime: slot.endTime,
-            price: slot.price,
+            price: selectedCourt.pricePerHour,
           };
         }),
         totalPrice,
@@ -251,8 +251,10 @@ const BookingWidget = ({ venue, onBookingComplete }) => {
     );
   }
 
+  console.log(selectedCourtId);
+
   return (
-    <div className="bg-card border border-border rounded-lg p-6 sticky top-2">
+    <div className="bg-card border border-border rounded-lg p-6 sticky top-20">
       <h3 className="text-xl font-semibold text-foreground mb-6">
         Book This Venue
       </h3>
@@ -304,7 +306,9 @@ const BookingWidget = ({ venue, onBookingComplete }) => {
                   >
                     <div className="flex justify-between items-center">
                       <span>{slot.displayTime}</span>
-                      <span className="text-xs opacity-80">₹ {slot.price}</span>
+                      <span className="text-xs opacity-80">
+                        ₹ {courts.filter(court => court.id === selectedCourtId)[0]?.pricePerHour}
+                      </span>
                     </div>
                   </button>
                 ))}

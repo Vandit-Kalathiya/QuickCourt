@@ -21,32 +21,32 @@ const FilterPanel = ({
   });
 
   const sportTypes = [
-    { id: 'tennis', label: 'Tennis', count: 45 },
-    { id: 'badminton', label: 'Badminton', count: 38 },
-    { id: 'basketball', label: 'Basketball', count: 32 },
-    { id: 'football', label: 'Football', count: 28 },
-    { id: 'cricket', label: 'Cricket', count: 25 },
-    { id: 'swimming', label: 'Swimming', count: 18 },
-    { id: 'squash', label: 'Squash', count: 15 },
-    { id: 'volleyball', label: 'Volleyball', count: 12 }
+    { id: 'tennis', label: 'Tennis', count: 3 },
+    { id: 'badminton', label: 'Badminton', count: 2 },
+    { id: 'basketball', label: 'Basketball', count: 1 },
+    { id: 'football', label: 'Football', count: 0 },
+    { id: 'cricket', label: 'Cricket', count: 0 },
+    { id: 'swimming', label: 'Swimming', count: 0 },
+    { id: 'squash', label: 'Squash', count: 1 },
+    { id: 'volleyball', label: 'Volleyball', count: 2 }
   ];
 
-  const venueTypes = [
-    { id: 'indoor', label: 'Indoor Courts', count: 89 },
-    { id: 'outdoor', label: 'Outdoor Courts', count: 76 },
-    { id: 'covered', label: 'Covered Courts', count: 34 },
-    { id: 'synthetic', label: 'Synthetic Surface', count: 42 }
-  ];
+  // const venueTypes = [
+  //   { id: 'indoor', label: 'Indoor Courts', count: 89 },
+  //   { id: 'outdoor', label: 'Outdoor Courts', count: 76 },
+  //   { id: 'covered', label: 'Covered Courts', count: 34 },
+  //   { id: 'synthetic', label: 'Synthetic Surface', count: 42 }
+  // ];
 
   const amenities = [
-    { id: 'parking', label: 'Parking Available', count: 156 },
-    { id: 'locker', label: 'Locker Rooms', count: 134 },
-    { id: 'shower', label: 'Shower Facilities', count: 128 },
-    { id: 'equipment', label: 'Equipment Rental', count: 98 },
-    { id: 'cafeteria', label: 'Cafeteria', count: 87 },
-    { id: 'pro-shop', label: 'Pro Shop', count: 65 },
-    { id: 'coaching', label: 'Coaching Available', count: 54 },
-    { id: 'wifi', label: 'Free WiFi', count: 145 }
+    { id: 'parking', label: 'Parking Available', count: 3 },
+    { id: 'locker', label: 'Locker Rooms', count: 0 },
+    { id: 'shower', label: 'Shower Facilities', count: 1 },
+    { id: 'equipment', label: 'Equipment Rental', count: 3 },
+    { id: 'cafeteria', label: 'Cafeteria', count: 2 },
+    { id: 'pro-shop', label: 'Pro Shop', count: 0 },
+    { id: 'coaching', label: 'Coaching Available', count: 1 },
+    { id: 'wifi', label: 'Free WiFi', count: 2 }
   ];
 
   const toggleSection = (section) => {
@@ -164,9 +164,13 @@ const FilterPanel = ({
               <Checkbox
                 label={sport?.label}
                 checked={filters?.sports?.includes(sport?.id)}
-                onChange={(e) => handleSportChange(sport?.id, e?.target?.checked)}
+                onChange={(e) =>
+                  handleSportChange(sport?.id, e?.target?.checked)
+                }
               />
-              <span className="text-sm text-text-secondary">({sport?.count})</span>
+              <span className="text-sm text-text-secondary">
+                ({sport?.count})
+              </span>
             </div>
           ))}
         </div>
@@ -180,7 +184,9 @@ const FilterPanel = ({
               type="number"
               label="Min"
               value={filters?.priceRange?.min}
-              onChange={(e) => handlePriceChange('min', parseInt(e?.target?.value) || 0)}
+              onChange={(e) =>
+                handlePriceChange("min", parseInt(e?.target?.value) || 0)
+              }
               className="flex-1"
               min="0"
             />
@@ -188,20 +194,22 @@ const FilterPanel = ({
               type="number"
               label="Max"
               value={filters?.priceRange?.max}
-              onChange={(e) => handlePriceChange('max', parseInt(e?.target?.value) || 200)}
+              onChange={(e) =>
+                handlePriceChange("max", parseInt(e?.target?.value) || 200)
+              }
               className="flex-1"
               min="0"
             />
           </div>
           <div className="flex items-center justify-between text-sm text-text-secondary">
-            <span>${filters?.priceRange?.min}</span>
-            <span>${filters?.priceRange?.max}</span>
+            <span>₹ {filters?.priceRange?.min}</span>
+            <span>₹ {filters?.priceRange?.max}</span>
           </div>
         </div>
       </FilterSection>
 
       {/* Venue Type Filter */}
-      <FilterSection title="Venue Type" section="venueType">
+      {/* <FilterSection title="Venue Type" section="venueType">
         <div className="space-y-2">
           {venueTypes?.map((type) => (
             <div key={type?.id} className="flex items-center justify-between">
@@ -214,7 +222,7 @@ const FilterPanel = ({
             </div>
           ))}
         </div>
-      </FilterSection>
+      </FilterSection> */}
 
       {/* Location Filter */}
       <FilterSection title="Location" section="location">
@@ -223,10 +231,15 @@ const FilterPanel = ({
             type="number"
             label="Radius (miles)"
             value={filters?.location?.radius}
-            onChange={(e) => onFiltersChange({
-              ...filters,
-              location: { ...filters?.location, radius: parseInt(e?.target?.value) || 25 }
-            })}
+            onChange={(e) =>
+              onFiltersChange({
+                ...filters,
+                location: {
+                  ...filters?.location,
+                  radius: parseInt(e?.target?.value) || 25,
+                },
+              })
+            }
             min="1"
             max="100"
           />
@@ -237,7 +250,7 @@ const FilterPanel = ({
         </div>
       </FilterSection>
 
-      {/* Rating Filter */}
+      {/* Rating Filter
       <FilterSection title="Minimum Rating" section="rating">
         <div className="space-y-2">
           {[4, 3, 2, 1]?.map((rating) => (
@@ -245,7 +258,9 @@ const FilterPanel = ({
               key={rating}
               onClick={() => handleRatingChange(rating)}
               className={`flex items-center space-x-2 w-full p-2 rounded-lg transition-smooth ${
-                filters?.minRating === rating ? 'bg-primary/10 border border-primary' : 'hover:bg-muted'
+                filters?.minRating === rating
+                  ? "bg-primary/10 border border-primary"
+                  : "hover:bg-muted"
               }`}
             >
               <div className="flex items-center">
@@ -254,7 +269,9 @@ const FilterPanel = ({
                     key={i}
                     name="Star"
                     size={16}
-                    className={i < rating ? 'text-accent fill-current' : 'text-muted'}
+                    className={
+                      i < rating ? "text-accent fill-current" : "text-muted"
+                    }
                   />
                 ))}
               </div>
@@ -262,19 +279,26 @@ const FilterPanel = ({
             </button>
           ))}
         </div>
-      </FilterSection>
+      </FilterSection> */}
 
       {/* Amenities Filter */}
       <FilterSection title="Amenities" section="amenities">
         <div className="space-y-2">
           {amenities?.map((amenity) => (
-            <div key={amenity?.id} className="flex items-center justify-between">
+            <div
+              key={amenity?.id}
+              className="flex items-center justify-between"
+            >
               <Checkbox
                 label={amenity?.label}
                 checked={filters?.amenities?.includes(amenity?.id)}
-                onChange={(e) => handleAmenityChange(amenity?.id, e?.target?.checked)}
+                onChange={(e) =>
+                  handleAmenityChange(amenity?.id, e?.target?.checked)
+                }
               />
-              <span className="text-sm text-text-secondary">({amenity?.count})</span>
+              <span className="text-sm text-text-secondary">
+                ({amenity?.count})
+              </span>
             </div>
           ))}
         </div>

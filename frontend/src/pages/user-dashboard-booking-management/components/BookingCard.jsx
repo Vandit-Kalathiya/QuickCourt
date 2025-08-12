@@ -5,7 +5,6 @@ import Button from '../../../components/ui/Button';
 
 const BookingCard = ({ booking, onCancel, onViewDetails, onRebook, onReview, type = 'upcoming' }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  console.log(booking);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -107,9 +106,9 @@ const BookingCard = ({ booking, onCancel, onViewDetails, onRebook, onReview, typ
               </div> */}
               <div className="flex items-center space-x-2.5">
                 <div className="w-6 h-6 bg-success/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Icon name="DollarSign" size={14} className="text-success" />
+                  {/* <Icon name="DollarSign" size={14} className="text-success" /> */}
                 </div>
-                <span className="text-sm font-semibold text-foreground">
+                <span className="text-lg font-semibold text-foreground">
                   ₹ {booking?.totalPrice}
                 </span>
               </div>

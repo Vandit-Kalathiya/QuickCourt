@@ -101,7 +101,7 @@ const VenueInfo = ({ venue }) => {
               loading="lazy"
               title={venue?.name}
               referrerPolicy="no-referrer-when-downgrade"
-              src={`https://www.google.com/maps?q=${venue?.location?.lat},${venue?.location?.lng}&z=14&output=embed`}
+              src={`https://www.google.com/maps?q=${venue?.latitude},${venue?.longitude}&z=14&output=embed`}
               className="border-0"
             />
           </div>
@@ -112,7 +112,7 @@ const VenueInfo = ({ venue }) => {
                 <p className="text-sm text-text-secondary">{venue?.location?.city}, {venue?.location?.state} {venue?.location?.zipCode}</p>
               </div>
               <a
-                href={`https://maps.google.com?q=${venue?.location?.lat},${venue?.location?.lng}`}
+                href={`https://maps.google.com?q=${venue?.latitude},${venue?.longitude}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-1 text-primary hover:text-primary/80 transition-colors"

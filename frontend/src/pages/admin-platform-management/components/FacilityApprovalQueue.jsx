@@ -4,13 +4,16 @@ import Button from "../../../components/ui/Button";
 import Image from "../../../components/AppImage";
 import { useAdmin } from "context/AdminContext";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const FacilityApprovalQueue = () => {
   const { getFacilityRequests } = useAdmin();
   const [selectedFacility, setSelectedFacility] = useState(null);
   const [approvalComment, setApprovalComment] = useState("");
   const [pendingFacilities, setPendingFacilities] = useState([]);
-  
+  const [currentPage, setCurrentPage] = useState(1);
+  const facilitiesPerPage = 5;
+
   // New state for rejection popup
   const [showRejectionPopup, setShowRejectionPopup] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
@@ -22,6 +25,7 @@ const FacilityApprovalQueue = () => {
     try {
       const response = await getFacilityRequests();
       setPendingFacilities(response?.content || []);
+      setCurrentPage(1); // Reset to first page when facilities are fetched
     } catch (error) {
       console.error("Error fetching facilities:", error);
       setPendingFacilities([]);
@@ -31,6 +35,16 @@ const FacilityApprovalQueue = () => {
   useEffect(() => {
     fetchPendingFacilities();
   }, [fetchPendingFacilities]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(pendingFacilities.length / facilitiesPerPage);
+  const getPaginatedFacilities = () => {
+    const startIndex = (currentPage - 1) * facilitiesPerPage;
+    const endIndex = startIndex + facilitiesPerPage;
+    return pendingFacilities.slice(startIndex, endIndex);
+  };
+
+  const paginatedFacilities = getPaginatedFacilities();
 
   const handleApprove = async (facilityId) => {
     try {
@@ -53,10 +67,16 @@ const FacilityApprovalQueue = () => {
         }
       );
       console.log(response.data);
+      toast.success("Facility approved successfully");
       await fetchPendingFacilities();
       resetSelection();
+      // Adjust page if necessary
+      if (paginatedFacilities.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
     } catch (err) {
       console.error("Approval failed:", err);
+      toast.error("Facility approval failed");
     }
   };
 
@@ -76,8 +96,10 @@ const FacilityApprovalQueue = () => {
 
     try {
       setIsRejecting(true);
-      console.log(`Rejecting ${facilityToReject?.id} with reason: ${rejectionReason}`);
-      
+      console.log(
+        `Rejecting ${facilityToReject?.id} with reason: ${rejectionReason}`
+      );
+
       const token = localStorage.getItem("jwtToken");
       if (!token) {
         throw new Error("No authentication token found. Please log in.");
@@ -95,13 +117,19 @@ const FacilityApprovalQueue = () => {
           },
         }
       );
-      
+
       console.log("Rejection response:", response.data);
       await fetchPendingFacilities();
+      toast.success("Facility rejected successfully");
       closeRejectionPopup();
       resetSelection();
+      // Adjust page if necessary
+      if (paginatedFacilities.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
     } catch (err) {
       console.error("Rejection failed:", err);
+      toast.error("Facility rejection failed");
       alert("Failed to reject facility. Please try again.");
     } finally {
       setIsRejecting(false);
@@ -133,6 +161,50 @@ const FacilityApprovalQueue = () => {
     }
   };
 
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    return (
+      <div className="flex justify-center items-center space-x-2 p-6">
+        <button
+          onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 rounded-xl ${
+            currentPage === 1
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+          }`}
+        >
+          Previous
+        </button>
+        {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => setCurrentPage(index + 1)}
+            className={`px-4 py-2 rounded-xl ${
+              currentPage === index + 1
+                ? "bg-gradient-to-r from-primary to-primary text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+            }`}
+          >
+            {index + 1}
+          </button>
+        ))}
+        <button
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`px-4 py-2 rounded-xl ${
+            currentPage === totalPages
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+          }`}
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="bg-card border border-border rounded-lg shadow-subtle">
       {/* Header */}
@@ -157,77 +229,92 @@ const FacilityApprovalQueue = () => {
 
       {/* Facility list */}
       <div className="divide-y divide-border">
-        {pendingFacilities.map((facility) => (
-          <div key={facility?.id} className="p-6">
-            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
-              <div className="flex-1 flex gap-4">
-                <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
-                  {facility?.photos?.[0] ? (
-                    <Image
-                      src={`http://localhost:7000/uploads${facility.photos[0]}`}
-                      alt={facility?.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-muted" />
-                  )}
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold">{facility?.name}</h4>
-                  <p className="text-sm text-text-secondary">
-                    {facility?.location}
-                  </p>
-                  <div className="flex flex-wrap gap-2 mt-2 text-sm text-text-secondary">
-                    <span>Owner: {facility?.owner}</span>
-                    <span>•</span>
-                    <span>Submitted: {facility?.submittedDate}</span>
-                    <span>•</span>
-                    <span>{facility?.courts} courts</span>
+        {paginatedFacilities.length === 0 ? (
+          <div className="p-6 text-center">
+            <Icon name="Inbox" size={40} className="text-muted mx-auto mb-4" />
+            <p className="text-lg font-medium text-foreground">
+              No facilities pending approval
+            </p>
+            <p className="text-sm text-text-secondary mt-2">
+              All facility requests have been processed
+            </p>
+          </div>
+        ) : (
+          paginatedFacilities.map((facility) => (
+            <div key={facility?.id} className="p-6">
+              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                <div className="flex-1 flex gap-4">
+                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                    {facility?.photos?.[0] ? (
+                      <Image
+                        src={`http://localhost:7000/uploads${facility.photos[0]}`}
+                        alt={facility?.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-muted" />
+                    )}
                   </div>
-                  <div className="flex flex-wrap gap-2 mt-3">
-                    {facility?.sports?.map((sport) => (
-                      <span
-                        key={sport}
-                        className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full"
-                      >
-                        {sport}
-                      </span>
-                    ))}
+                  <div className="flex-1">
+                    <h4 className="font-semibold">{facility?.name}</h4>
+                    <p className="text-sm text-text-secondary">
+                      {facility?.location}
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-2 text-sm text-text-secondary">
+                      <span>Owner: {facility?.owner}</span>
+                      <span>•</span>
+                      <span>Submitted: {facility?.submittedDate}</span>
+                      <span>•</span>
+                      <span>{facility?.courts} courts</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {facility?.sports?.map((sport) => (
+                        <span
+                          key={sport}
+                          className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full"
+                        >
+                          {sport}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Actions */}
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  iconName="Eye"
-                  onClick={() => setSelectedFacility(facility)}
-                >
-                  Review
-                </Button>
-                <Button
-                  variant="success"
-                  size="sm"
-                  iconName="Check"
-                  onClick={() => handleApprove(facility?.id)}
-                >
-                  Approve
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  iconName="X"
-                  onClick={() => handleReject(facility)}
-                >
-                  Reject
-                </Button>
+                {/* Actions */}
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    iconName="Eye"
+                    onClick={() => setSelectedFacility(facility)}
+                  >
+                    Review
+                  </Button>
+                  <Button
+                    variant="success"
+                    size="sm"
+                    iconName="Check"
+                    onClick={() => handleApprove(facility?.id)}
+                  >
+                    Approve
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    iconName="X"
+                    onClick={() => handleReject(facility)}
+                  >
+                    Reject
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
+
+      {/* Pagination */}
+      {renderPagination()}
 
       {/* Review Modal */}
       {selectedFacility && (
@@ -387,7 +474,8 @@ const FacilityApprovalQueue = () => {
             <div className="p-6">
               <div className="mb-4">
                 <p className="text-text-secondary mb-2">
-                  You are about to reject "{facilityToReject?.name}". This action cannot be undone.
+                  You are about to reject "{facilityToReject?.name}". This
+                  action cannot be undone.
                 </p>
                 <p className="text-sm text-text-secondary">
                   Please provide a reason for rejection:
@@ -410,8 +498,8 @@ const FacilityApprovalQueue = () => {
               </div>
 
               <div className="flex justify-end gap-3">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={closeRejectionPopup}
                   disabled={isRejecting}
                 >

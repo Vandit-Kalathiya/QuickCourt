@@ -19,15 +19,8 @@ const CourtManagementTab = ({
   const [filterStatus, setFilterStatus] = useState("all");
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    facilityId: "",
-    sportType: "",
-    pricePerHour: "",
-    openingTime: "06:00",
-    closingTime: "22:00",
-    active: true,
-  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const courtsPerPage = 3;
 
   const { createCourt, fetchCourts } = useCourt();
 
@@ -48,12 +41,32 @@ const CourtManagementTab = ({
 
   const uniqueSports = [...new Set(courts?.map((court) => court?.sportType))];
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredCourts?.length / courtsPerPage);
+  const getPaginatedCourts = () => {
+    const startIndex = (currentPage - 1) * courtsPerPage;
+    const endIndex = startIndex + courtsPerPage;
+    return filteredCourts?.slice(startIndex, endIndex);
+  };
+
+  const paginatedCourts = getPaginatedCourts();
+
   const handleFormChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
+
+  const [formData, setFormData] = useState({
+    name: "",
+    facilityId: "",
+    sportType: "",
+    pricePerHour: "",
+    openingTime: "06:00",
+    closingTime: "22:00",
+    active: true,
+  });
 
   const handleAddCourt = async (e) => {
     e.preventDefault();
@@ -73,7 +86,7 @@ const CourtManagementTab = ({
 
       const response = await createCourt(courtData);
       console.log(response);
-      
+
       // Reset form data
       setFormData({
         name: "",
@@ -84,9 +97,9 @@ const CourtManagementTab = ({
         closingTime: "22:00",
         active: true,
       });
-      
+
       setShowAddModal(false);
-      
+
       // Show success toast
       setShowSuccessToast(true);
       setTimeout(() => setShowSuccessToast(false), 3000);
@@ -97,10 +110,12 @@ const CourtManagementTab = ({
       } else if (fetchCourts) {
         await fetchCourts(); // Fallback to context refresh
       }
-      
+
+      // Reset to first page after adding a court
+      setCurrentPage(1);
+
       // Force a small delay to ensure smooth UI update
       setTimeout(() => setIsLoading(false), 500);
-      
     } catch (error) {
       console.error("Error adding court:", error);
       setIsLoading(false);
@@ -118,11 +133,14 @@ const CourtManagementTab = ({
     try {
       await onCourtUpdate(editingCourt);
       setEditingCourt(null);
-      
+
       // Show success toast
       setShowSuccessToast(true);
       setTimeout(() => setShowSuccessToast(false), 3000);
-      
+
+      // Reset to first page after editing
+      setCurrentPage(1);
+
       // Small delay for smooth UI update
       setTimeout(() => setIsLoading(false), 300);
     } catch (error) {
@@ -140,11 +158,16 @@ const CourtManagementTab = ({
       setIsLoading(true);
       try {
         await onCourtDelete(courtId);
-        
+
         // Show success toast
         setShowSuccessToast(true);
         setTimeout(() => setShowSuccessToast(false), 3000);
-        
+
+        // Adjust page if necessary
+        if (paginatedCourts.length === 1 && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
+
         setTimeout(() => setIsLoading(false), 300);
       } catch (error) {
         console.error("Error deleting court:", error);
@@ -176,13 +199,60 @@ const CourtManagementTab = ({
       football: "bg-emerald-500/10 text-emerald-600 border-emerald-200",
       cricket: "bg-yellow-500/10 text-yellow-600 border-yellow-200",
     };
-    return colors?.[sportType] || "bg-primary/10 text-primary border-primary/20";
+    return (
+      colors?.[sportType] || "bg-primary/10 text-primary border-primary/20"
+    );
   };
 
   const clearFilters = () => {
     setSearchTerm("");
     setFilterSport("all");
     setFilterStatus("all");
+    setCurrentPage(1);
+  };
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    return (
+      <div className="flex justify-center items-center space-x-2 mt-6">
+        <button
+          onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 rounded-xl ${
+            currentPage === 1
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+          }`}
+        >
+          Previous
+        </button>
+        {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => setCurrentPage(index + 1)}
+            className={`px-4 py-2 rounded-xl ${
+              currentPage === index + 1
+                  ? "bg-gradient-to-r from-primary to-primary text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+            }`}
+          >
+            {index + 1}
+          </button>
+        ))}
+        <button
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`px-4 py-2 rounded-xl ${
+            currentPage === totalPages
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+          }`}
+        >
+          Next
+        </button>
+      </div>
+    );
   };
 
   return (
@@ -193,7 +263,9 @@ const CourtManagementTab = ({
           <div className="bg-card rounded-xl p-6 shadow-2xl border border-border">
             <div className="flex items-center gap-3">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-              <span className="text-foreground font-medium">Updating courts...</span>
+              <span className="text-foreground font-medium">
+                Updating courts...
+              </span>
             </div>
           </div>
         </div>
@@ -287,12 +359,18 @@ const CourtManagementTab = ({
               type="text"
               placeholder="Search courts by name or sport..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
               className="w-full pl-10 pr-4 py-3 border border-border rounded-xl bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 hover:border-primary/30"
             />
             {searchTerm && (
               <button
-                onClick={() => setSearchTerm("")}
+                onClick={() => {
+                  setSearchTerm("");
+                  setCurrentPage(1);
+                }}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-secondary hover:text-foreground"
               >
                 <Icon name="X" size={16} />
@@ -304,7 +382,10 @@ const CourtManagementTab = ({
           <div className="flex gap-3">
             <select
               value={filterSport}
-              onChange={(e) => setFilterSport(e.target.value)}
+              onChange={(e) => {
+                setFilterSport(e.target.value);
+                setCurrentPage(1);
+              }}
               className="px-4 py-3 border border-border rounded-xl bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 hover:border-primary/30 min-w-[140px]"
             >
               <option value="all">All Sports</option>
@@ -317,7 +398,10 @@ const CourtManagementTab = ({
 
             <select
               value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
+              onChange={(e) => {
+                setFilterStatus(e.target.value);
+                setCurrentPage(1);
+              }}
               className="px-4 py-3 border border-border rounded-xl bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 hover:border-primary/30 min-w-[120px]"
             >
               <option value="all">All Status</option>
@@ -325,7 +409,9 @@ const CourtManagementTab = ({
               <option value="inactive">Inactive</option>
             </select>
 
-            {(searchTerm || filterSport !== "all" || filterStatus !== "all") && (
+            {(searchTerm ||
+              filterSport !== "all" ||
+              filterStatus !== "all") && (
               <Button
                 variant="outline"
                 onClick={clearFilters}
@@ -341,7 +427,7 @@ const CourtManagementTab = ({
       </div>
 
       {/* Enhanced Courts Grid */}
-      {filteredCourts?.length === 0 ? (
+      {paginatedCourts?.length === 0 ? (
         <div className="text-center py-20 bg-card rounded-2xl border border-border">
           <div className="w-20 h-20 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full flex items-center justify-center mx-auto mb-6">
             <Icon name="Calendar" size={32} className="text-primary" />
@@ -379,119 +465,138 @@ const CourtManagementTab = ({
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredCourts?.map((court, index) => (
-            <div
-              key={court?.id}
-              className="bg-card rounded-2xl border border-border p-6 hover:shadow-xl hover:border-primary/30 transition-all duration-300 group transform hover:-translate-y-1"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              {/* Court Header */}
-              <div className="flex items-start justify-between mb-6">
-                <div className="flex items-center space-x-4">
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {paginatedCourts?.map((court, index) => (
+              <div
+                key={court?.id}
+                className="bg-card rounded-2xl border border-border p-6 hover:shadow-xl hover:border-primary/30 transition-all duration-300 group transform hover:-translate-y-1"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                {/* Court Header */}
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex items-center space-x-4">
+                    <div
+                      className={`w-14 h-14 rounded-2xl flex items-center justify-center border-2 ${getSportColor(
+                        court?.sportType
+                      )} group-hover:scale-110 transition-transform duration-200`}
+                    >
+                      <Icon name={getSportIcon(court?.sportType)} size={24} />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-foreground text-xl group-hover:text-primary transition-colors mb-1">
+                        {court?.name}
+                      </h3>
+                      <p className="text-sm text-text-secondary capitalize flex items-center gap-2">
+                        <Icon name="Zap" size={14} />
+                        {court?.sportType}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Enhanced Status Badge */}
                   <div
-                    className={`w-14 h-14 rounded-2xl flex items-center justify-center border-2 ${getSportColor(
-                      court?.sportType
-                    )} group-hover:scale-110 transition-transform duration-200`}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm ${
+                      court?.active
+                        ? "bg-success/15 text-success border border-success/20"
+                        : "bg-error/15 text-error border border-error/20"
+                    }`}
                   >
-                    <Icon name={getSportIcon(court?.sportType)} size={24} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-foreground text-xl group-hover:text-primary transition-colors mb-1">
-                      {court?.name}
-                    </h3>
-                    <p className="text-sm text-text-secondary capitalize flex items-center gap-2">
-                      <Icon name="Zap" size={14} />
-                      {court?.sportType}
-                    </p>
+                    {court?.active ? "Active" : "Inactive"}
                   </div>
                 </div>
 
-                {/* Enhanced Status Badge */}
-                <div
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm ${
-                    court?.active
-                      ? "bg-success/15 text-success border border-success/20"
-                      : "bg-error/15 text-error border border-error/20"
-                  }`}
-                >
-                  {court?.active ? "Active" : "Inactive"}
-                </div>
-              </div>
-
-              {/* Enhanced Court Details */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-background/50 to-background/30 rounded-xl border border-border/50">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                      <Icon name="DollarSign" size={16} className="text-primary" />
+                {/* Enhanced Court Details */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-background/50 to-background/30 rounded-xl border border-border/50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <Icon
+                          name="DollarSign"
+                          size={16}
+                          className="text-primary"
+                        />
+                      </div>
+                      <span className="text-sm font-medium text-text-secondary">
+                        Hourly Rate
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-text-secondary">
-                      Hourly Rate
+                    <span className="font-bold text-foreground text-xl">
+                      ₹{court?.pricePerHour}
                     </span>
                   </div>
-                  <span className="font-bold text-foreground text-xl">
-                    ₹{court?.pricePerHour}
-                  </span>
-                </div>
 
-                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-background/50 to-background/30 rounded-xl border border-border/50">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                      <Icon name="Clock" size={16} className="text-primary" />
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-background/50 to-background/30 rounded-xl border border-border/50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <Icon name="Clock" size={16} className="text-primary" />
+                      </div>
+                      <span className="text-sm font-medium text-text-secondary">
+                        Operating Hours
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-text-secondary">
-                      Operating Hours
+                    <span className="text-sm text-foreground font-semibold">
+                      {court?.openingTime} - {court?.closingTime}
                     </span>
                   </div>
-                  <span className="text-sm text-foreground font-semibold">
-                    {court?.openingTime} - {court?.closingTime}
-                  </span>
-                </div>
 
-                {court?.description && (
-                  <div className="p-4 bg-gradient-to-r from-background/50 to-background/30 rounded-xl border border-border/50">
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mt-0.5">
-                        <Icon name="FileText" size={16} className="text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <span className="text-sm font-medium text-text-secondary block mb-2">
-                          Description
-                        </span>
-                        <p className="text-sm text-foreground leading-relaxed">
-                          {court?.description}
-                        </p>
+                  {court?.description && (
+                    <div className="p-4 bg-gradient-to-r from-background/50 to-background/30 rounded-xl border border-border/50">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center mt-0.5">
+                          <Icon
+                            name="FileText"
+                            size={16}
+                            className="text-primary"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <span className="text-sm font-medium text-text-secondary block mb-2">
+                            Description
+                          </span>
+                          <p className="text-sm text-foreground leading-relaxed">
+                            {court?.description}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
 
-              {/* Enhanced Action Buttons */}
-              <div className="flex items-center gap-3 mt-6 pt-4 border-t border-border">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleEditCourt(court)}
-                  className="flex-1 hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 group/btn"
-                >
-                  <Icon name="Edit" size={14} className="mr-2 group-hover/btn:rotate-12 transition-transform" />
-                  Edit
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDeleteCourt(court?.id)}
-                  className="flex-1 hover:bg-error hover:text-white hover:border-error transition-all duration-200 text-error border-error/30 group/btn"
-                >
-                  <Icon name="Trash2" size={14} className="mr-2 group-hover/btn:animate-pulse" />
-                  Delete
-                </Button>
+                {/* Enhanced Action Buttons */}
+                <div className="flex items-center gap-3 mt-6 pt-4 border-t border-border">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEditCourt(court)}
+                    className="flex-1 hover:bg-primary hover:text-white hover:border-primary transition-all duration-200 group/btn"
+                  >
+                    <Icon
+                      name="Edit"
+                      size={14}
+                      className="mr-2 group-hover/btn:rotate-12 transition-transform"
+                    />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDeleteCourt(court?.id)}
+                    className="flex-1 hover:bg-error hover:text-white hover:border-error transition-all duration-200 text-error border-error/30 group/btn"
+                  >
+                    <Icon
+                      name="Trash2"
+                      size={14}
+                      className="mr-2 group-hover/btn:animate-pulse"
+                    />
+                    Delete
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          {renderPagination()}
+        </>
       )}
 
       {/* Add Court Modal */}
@@ -511,7 +616,9 @@ const CourtManagementTab = ({
           <div className="bg-card rounded-2xl border border-border p-8 w-full max-w-lg shadow-2xl transform animate-scale-in">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h3 className="text-2xl font-bold text-foreground mb-1">Edit Court</h3>
+                <h3 className="text-2xl font-bold text-foreground mb-1">
+                  Edit Court
+                </h3>
                 <p className="text-text-secondary">Update court information</p>
               </div>
               <Button
@@ -567,10 +674,7 @@ const CourtManagementTab = ({
               >
                 Cancel
               </Button>
-              <Button
-                onClick={handleSaveEdit}
-                className="flex-1"
-              >
+              <Button onClick={handleSaveEdit} className="flex-1">
                 Save Changes
               </Button>
             </div>
@@ -590,7 +694,7 @@ const CourtManagementTab = ({
             opacity: 1;
           }
         }
-        
+
         @keyframes scale-in {
           from {
             transform: scale(0.9);
@@ -601,11 +705,11 @@ const CourtManagementTab = ({
             opacity: 1;
           }
         }
-        
+
         .animate-slide-in {
           animation: slide-in 0.3s ease-out;
         }
-        
+
         .animate-scale-in {
           animation: scale-in 0.2s ease-out;
         }

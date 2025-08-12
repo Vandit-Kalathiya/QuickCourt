@@ -289,8 +289,6 @@ const VenueDetailsBooking = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header Spacing */}
-      <div className="h-16"></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <Breadcrumb venueName={venue?.name} />

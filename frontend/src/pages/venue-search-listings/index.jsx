@@ -18,6 +18,8 @@ const VenueSearchListings = () => {
   const [viewMode, setViewMode] = useState("list");
   const [sortBy, setSortBy] = useState("relevance");
   const [selectedVenue, setSelectedVenue] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const venuesPerPage = 9;
 
   const {
     venues,
@@ -52,12 +54,12 @@ const VenueSearchListings = () => {
         sports: venue.sports || [],
         rating: venue.averageRating || 0,
         reviewCount: venue.totalReviews || 0,
-        startingPrice: venue.basePrice || 50, // You might need to add this field to your API
-        distance: "0.0 mi", // You'll need to calculate this based on user location
+        startingPrice: venue.basePrice || 50,
+        distance: "0.0 mi",
         availability: venue.status === "APPROVED" ? "available" : "unavailable",
         isVerified: venue.status === "APPROVED",
-        isPopular: venue.totalReviews > 50, // Define your own logic
-        isFavorited: false, // This would come from user favorites
+        isPopular: venue.totalReviews > 50,
+        isFavorited: false,
         openingHours: {
           start: venue.openingTime || "6:00 AM",
           end: venue.closingTime || "10:00 PM",
@@ -99,7 +101,7 @@ const VenueSearchListings = () => {
   useEffect(() => {
     const fetchInitialVenues = async () => {
       try {
-        await getFacilities([], "", 0, 12);
+        await getFacilities([], "", 0, venuesPerPage);
       } catch (error) {
         console.error("Error fetching venues:", error);
       }
@@ -184,7 +186,18 @@ const VenueSearchListings = () => {
     });
 
     setFilteredVenues(filtered);
+    setCurrentPage(1); // Reset to first page when filters or sort change
   }, [venues, filters, searchQuery, sortBy]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredVenues.length / venuesPerPage);
+  const getPaginatedVenues = () => {
+    const startIndex = (currentPage - 1) * venuesPerPage;
+    const endIndex = startIndex + venuesPerPage;
+    return filteredVenues.slice(startIndex, endIndex);
+  };
+
+  const paginatedVenues = getPaginatedVenues();
 
   // Get active filters for display
   const getActiveFilters = () => {
@@ -215,17 +228,18 @@ const VenueSearchListings = () => {
 
   const handleSearchSubmit = async (query) => {
     setSearchQuery(query);
+    setCurrentPage(1); // Reset to first page on new search
     if (query) {
       setSearchParams({ q: query });
       try {
-        await searchVenues(filters.sports, query);
+        await searchVenues(filters.sports, query, 0, venuesPerPage);
       } catch (error) {
         console.error("Search error:", error);
       }
     } else {
       setSearchParams({});
       try {
-        await getFacilities(filters.sports);
+        await getFacilities(filters.sports, "", 0, venuesPerPage);
       } catch (error) {
         console.error("Fetch error:", error);
       }
@@ -260,6 +274,7 @@ const VenueSearchListings = () => {
     }
 
     setFilters(newFilters);
+    setCurrentPage(1); // Reset to first page when filters are removed
   };
 
   const handleClearAllFilters = () => {
@@ -271,6 +286,7 @@ const VenueSearchListings = () => {
       minRating: 0,
       amenities: [],
     });
+    setCurrentPage(1); // Reset to first page when clearing filters
   };
 
   const handleLoadMoreVenues = async () => {
@@ -281,6 +297,50 @@ const VenueSearchListings = () => {
         console.error("Load more error:", error);
       }
     }
+  };
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    return (
+      <div className="flex justify-center items-center space-x-2 mt-6">
+        <button
+          onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 rounded-xl ${
+            currentPage === 1
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+          }`}
+        >
+          Previous
+        </button>
+        {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => setCurrentPage(index + 1)}
+            className={`px-4 py-2 rounded-xl ${
+              currentPage === index + 1
+                ? "bg-gradient-to-r from-primary to-primary/80 text-white"
+                : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+            }`}
+          >
+            {index + 1}
+          </button>
+        ))}
+        <button
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`px-4 py-2 rounded-xl ${
+            currentPage === totalPages
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
+          }`}
+        >
+          Next
+        </button>
+      </div>
+    );
   };
 
   const activeFilterCount = getActiveFilters()?.length;
@@ -375,13 +435,16 @@ const VenueSearchListings = () => {
               <>
                 {/* Venue Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {filteredVenues?.map((venue) => (
+                  {paginatedVenues?.map((venue) => (
                     <VenueCard key={venue?.id} venue={venue} />
                   ))}
 
                   {/* Loading Skeletons */}
-                  {loading && <LoadingSkeleton count={6} />}
+                  {loading && <LoadingSkeleton count={venuesPerPage} />}
                 </div>
+
+                {/* Pagination */}
+                {renderPagination()}
 
                 {/* Load More Button */}
                 {pagination.hasNext &&
@@ -399,7 +462,7 @@ const VenueSearchListings = () => {
                   )}
 
                 {/* No Results */}
-                {filteredVenues?.length === 0 && !loading && (
+                {paginatedVenues?.length === 0 && !loading && (
                   <div className="text-center py-12">
                     <Icon
                       name="Search"

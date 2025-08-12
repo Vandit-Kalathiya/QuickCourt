@@ -41,7 +41,7 @@ const VenueCard = ({ venue }) => {
   };
 
   return (
-    <div 
+    <div
       onClick={handleCardClick}
       className="bg-surface border border-border rounded-lg overflow-hidden hover:shadow-medium transition-smooth cursor-pointer group"
     >
@@ -52,7 +52,7 @@ const VenueCard = ({ venue }) => {
           alt={venue?.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        
+
         {/* Favorite Button */}
         <button
           onClick={handleFavoriteToggle}
@@ -61,7 +61,9 @@ const VenueCard = ({ venue }) => {
           <Icon
             name="Heart"
             size={16}
-            className={isFavorited ? 'text-error fill-current' : 'text-text-secondary'}
+            className={
+              isFavorited ? "text-error fill-current" : "text-text-secondary"
+            }
           />
         </button>
 
@@ -100,7 +102,9 @@ const VenueCard = ({ venue }) => {
           </h3>
           <div className="flex items-center space-x-1 ml-2">
             <Icon name="MapPin" size={14} className="text-text-secondary" />
-            <span className="text-sm text-text-secondary">{venue?.distance}</span>
+            <span className="text-sm text-text-secondary">
+              {venue?.distance}
+            </span>
           </div>
         </div>
 
@@ -117,16 +121,26 @@ const VenueCard = ({ venue }) => {
           <div className="flex items-center space-x-1">
             {renderStars(venue?.rating)}
           </div>
-          <span className="text-sm font-medium text-foreground">{venue?.rating}</span>
-          <span className="text-sm text-text-secondary">({venue?.reviewCount} reviews)</span>
+          <span className="text-sm font-medium text-foreground">
+            {venue?.rating}
+          </span>
+          <span className="text-sm text-text-secondary">
+            ({venue?.reviewCount} reviews)
+          </span>
         </div>
 
         {/* Amenities */}
         <div className="flex items-center space-x-3 mb-4">
           {venue?.amenities?.slice(0, 3)?.map((amenity) => (
             <div key={amenity?.id} className="flex items-center space-x-1">
-              <Icon name={amenity?.icon} size={14} className="text-text-secondary" />
-              <span className="text-xs text-text-secondary">{amenity?.name}</span>
+              <Icon
+                name={amenity?.icon}
+                size={14}
+                className="text-text-secondary"
+              />
+              <span className="text-xs text-text-secondary">
+                {amenity?.name}
+              </span>
             </div>
           ))}
           {venue?.amenities?.length > 3 && (
@@ -139,20 +153,35 @@ const VenueCard = ({ venue }) => {
         {/* Price and Availability */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <span className="text-lg font-bold text-primary">${venue?.startingPrice}</span>
+            <span className="text-lg font-bold text-primary">
+              ₹ {venue?.startingPrice}
+            </span>
             <span className="text-sm text-text-secondary">/hour</span>
           </div>
           <div className="flex items-center space-x-1">
-            <div className={`w-2 h-2 rounded-full ${
-              venue?.availability === 'available' ? 'bg-success' : 
-              venue?.availability === 'limited' ? 'bg-warning' : 'bg-error'
-            }`} />
-            <span className={`text-xs font-medium ${
-              venue?.availability === 'available' ? 'text-success' : 
-              venue?.availability === 'limited' ? 'text-warning' : 'text-error'
-            }`}>
-              {venue?.availability === 'available' ? 'Available' : 
-               venue?.availability === 'limited' ? 'Limited' : 'Busy'}
+            <div
+              className={`w-2 h-2 rounded-full ${
+                venue?.availability === "available"
+                  ? "bg-success"
+                  : venue?.availability === "limited"
+                  ? "bg-warning"
+                  : "bg-error"
+              }`}
+            />
+            <span
+              className={`text-xs font-medium ${
+                venue?.availability === "available"
+                  ? "text-success"
+                  : venue?.availability === "limited"
+                  ? "text-warning"
+                  : "text-error"
+              }`}
+            >
+              {venue?.availability === "available"
+                ? "Available"
+                : venue?.availability === "limited"
+                ? "Limited"
+                : "Busy"}
             </span>
           </div>
         </div>
