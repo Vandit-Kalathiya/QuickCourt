@@ -1,7 +1,7 @@
 // src/contexts/OwnerContext.jsx
 import React, { createContext, useContext, useReducer } from "react";
 import { useAuth } from "./AuthContext";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import axios from "axios";
 
 const OwnerContext = createContext();
@@ -86,7 +86,7 @@ const initialState = {
 
 export const OwnerProvider = ({ children }) => {
   const [state, dispatch] = useReducer(ownerReducer, initialState);
-  const { user, isOwner } = useAuth();
+  const { user, isOwner, isAuthenticated } = useAuth();
 
   // Create facility - corresponds to OwnerController.createFacility()
   const createFacility = async (facilityData, photos) => {
@@ -97,14 +97,34 @@ export const OwnerProvider = ({ children }) => {
     try {
       dispatch({ type: "SET_LOADING", payload: true });
 
-      const newFacility = await ownerService.createFacility(facilityData);
+      const formData = new FormData();
+      Object.keys(facilityData).forEach(key => {
+        if (facilityData[key] !== null && facilityData[key] !== undefined) {
+          formData.append(key, facilityData[key]);
+        }
+      });
+      
+      if (photos) {
+        formData.append('photo', photos);
+      }
 
-      dispatch({ type: "ADD_FACILITY", payload: newFacility });
+      const response = await axios.post(
+        `http://localhost:7000/owner/facilities`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      dispatch({ type: "ADD_FACILITY", payload: response.data });
       toast.success(
         "Facility created successfully! Waiting for admin approval."
       );
 
-      return newFacility;
+      return response.data;
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Failed to create facility";
@@ -118,23 +138,39 @@ export const OwnerProvider = ({ children }) => {
 
   // Update facility - corresponds to OwnerController.updateFacility()
   const updateFacility = async (facilityId, facilityData, photos) => {
-    if (!isAuthenticated || !isOwner()) {
+    if (!user || !isOwner()) {
       throw new Error("Unauthorized");
     }
 
     try {
       dispatch({ type: "SET_LOADING", payload: true });
 
-      const updatedFacility = await ownerService.updateFacility(
-        facilityId,
-        facilityData,
-        photos
+      const formData = new FormData();
+      Object.keys(facilityData).forEach(key => {
+        if (facilityData[key] !== null && facilityData[key] !== undefined) {
+          formData.append(key, facilityData[key]);
+        }
+      });
+      
+      if (photos) {
+        formData.append('photo', photos);
+      }
+
+      const response = await axios.put(
+        `http://localhost:7000/owner/facilities/${facilityId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
 
-      dispatch({ type: "UPDATE_FACILITY", payload: updatedFacility });
+      dispatch({ type: "UPDATE_FACILITY", payload: response.data });
       toast.success("Facility updated successfully!");
 
-      return updatedFacility;
+      return response.data;
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Failed to update facility";
@@ -160,19 +196,28 @@ export const OwnerProvider = ({ children }) => {
 
   // Create court - corresponds to OwnerController.createCourt()
   const createCourt = async (facilityId, courtData) => {
-    if (!isAuthenticated || !isOwner()) {
+    if (!user || !isOwner()) {
       throw new Error("Unauthorized");
     }
 
     try {
       dispatch({ type: "SET_LOADING", payload: true });
 
-      const newCourt = await ownerService.createCourt(facilityId, courtData);
+      const response = await axios.post(
+        `http://localhost:7000/owner/facilities/${facilityId}/courts`,
+        courtData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      dispatch({ type: "ADD_COURT", payload: newCourt });
+      dispatch({ type: "ADD_COURT", payload: response.data });
       toast.success("Court added successfully!");
 
-      return newCourt;
+      return response.data;
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Failed to create court";
@@ -186,19 +231,28 @@ export const OwnerProvider = ({ children }) => {
 
   // Update court - corresponds to OwnerController.updateCourt()
   const updateCourt = async (courtId, courtData) => {
-    if (!isAuthenticated || !isOwner()) {
+    if (!user || !isOwner()) {
       throw new Error("Unauthorized");
     }
 
     try {
       dispatch({ type: "SET_LOADING", payload: true });
 
-      const updatedCourt = await ownerService.updateCourt(courtId, courtData);
+      const response = await axios.put(
+        `http://localhost:7000/owner/courts/${courtId}`,
+        courtData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      dispatch({ type: "UPDATE_COURT", payload: updatedCourt });
+      dispatch({ type: "UPDATE_COURT", payload: response.data });
       toast.success("Court updated successfully!");
 
-      return updatedCourt;
+      return response.data;
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Failed to update court";
@@ -224,51 +278,74 @@ export const OwnerProvider = ({ children }) => {
 
   // Block time slot - corresponds to OwnerController.blockTimeSlot()
   const blockTimeSlot = async (courtId, date, startTime, endTime) => {
-    if (!isAuthenticated || !isOwner()) {
+    if (!user || !isOwner()) {
       throw new Error("Unauthorized");
     }
 
     try {
-      await ownerService.blockTimeSlot(courtId, date, startTime, endTime);
-      toast.success("Time slot blocked successfully!");
-      return true;
+      const response = await axios.post(
+        `http://localhost:7000/owner/courts/${courtId}/block`,
+        null,
+        {
+          params: { date, startTime, endTime },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
+        }
+      );
+      return response.data;
     } catch (error) {
+      console.error('Block error:', error.response?.data || error.message);
       const errorMessage =
-        error.response?.data?.message || "Failed to block time slot";
-      toast.error(errorMessage);
-      throw error;
+        error.response?.data?.message || error.response?.data || "Failed to block time slot";
+      throw new Error(errorMessage);
     }
   };
 
   // Unblock time slot - corresponds to OwnerController.unblockTimeSlot()
-  const unblockTimeSlot = async (courtId, date) => {
-    if (!isAuthenticated || !isOwner()) {
+  const unblockTimeSlot = async (courtId, date, startTime, endTime) => {
+    if (!user || !isOwner()) {
       throw new Error("Unauthorized");
     }
 
     try {
-      await ownerService.unblockTimeSlot(courtId, date);
-      toast.success("Time slot unblocked successfully!");
-      return true;
+      const response = await axios.post(
+        `http://localhost:7000/owner/courts/${courtId}/unblock`,
+        null,
+        {
+          params: { date, startTime, endTime },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
+        }
+      );
+      return response.data;
     } catch (error) {
+      console.error('Unblock error:', error.response?.data || error.message);
       const errorMessage =
-        error.response?.data?.message || "Failed to unblock time slot";
-      toast.error(errorMessage);
-      throw error;
+        error.response?.data?.message || error.response?.data || "Failed to unblock time slot";
+      throw new Error(errorMessage);
     }
   };
 
   // Get owner dashboard - corresponds to OwnerController.getOwnerDashboard()
   const getOwnerDashboard = async () => {
-    if (!isAuthenticated || !isOwner()) return;
+    if (!user || !isOwner()) return;
 
     try {
       dispatch({ type: "SET_LOADING", payload: true });
 
-      const dashboardData = await ownerService.getOwnerDashboard();
+      const response = await axios.get(
+        `http://localhost:7000/owner/dashboard`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
+        }
+      );
 
-      dispatch({ type: "SET_DASHBOARD_DATA", payload: dashboardData });
-      return dashboardData;
+      dispatch({ type: "SET_DASHBOARD_DATA", payload: response.data });
+      return response.data;
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Failed to fetch dashboard data";
@@ -291,6 +368,63 @@ export const OwnerProvider = ({ children }) => {
     return res.data;
   };
 
+  // Get available slots for a court on a specific date
+  const getAvailableSlots = async (courtId, date) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:7000/api/courts/${courtId}/available-slots`,
+        {
+          params: { date },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching available slots:", error);
+      throw error;
+    }
+  };
+
+  // Get blocked slots for a court on a specific date
+  const getBlockedSlots = async (courtId, date) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:7000/api/courts/${courtId}/blocked-slots`,
+        {
+          params: { date },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching blocked slots:", error);
+      return []; // Return empty array if endpoint doesn't exist yet
+    }
+  };
+
+  // Get all slots (available + blocked) for a court on a specific date
+  const getAllSlots = async (courtId, date) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:7000/api/courts/${courtId}/all-slots`,
+        {
+          params: { date },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching all slots:", error.response?.data || error.message);
+      return { available: [], blocked: [] };
+    }
+  };
+
   // Clear error
   const clearError = () => {
     dispatch({ type: "CLEAR_ERROR" });
@@ -306,6 +440,9 @@ export const OwnerProvider = ({ children }) => {
     getFacilityCourts,
     blockTimeSlot,
     unblockTimeSlot,
+    getAvailableSlots,
+    getBlockedSlots,
+    getAllSlots,
     getApprovedFacilities,
     getOwnerDashboard,
     clearError,

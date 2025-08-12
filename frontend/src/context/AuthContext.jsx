@@ -288,6 +288,21 @@ export const AuthProvider = ({ children }) => {
   //   }
   // };
 
+  // Helper function to check if user is owner
+  const isOwner = () => {
+    return userProfile?.role === 'OWNER' || userProfile?.roles?.includes('OWNER');
+  };
+
+  // Helper function to check if user is admin
+  const isAdmin = () => {
+    return userProfile?.role === 'ADMIN' || userProfile?.roles?.includes('ADMIN');
+  };
+
+  // Helper function to check if user is authenticated
+  const isAuthenticated = () => {
+    return !!user && !!userProfile;
+  };
+
   const value = {
     user,
     userProfile,
@@ -299,6 +314,9 @@ export const AuthProvider = ({ children }) => {
     sendEmailOTP,
     verifyOtp,
     getCurrentUser,
+    isOwner,
+    isAdmin,
+    isAuthenticated,
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

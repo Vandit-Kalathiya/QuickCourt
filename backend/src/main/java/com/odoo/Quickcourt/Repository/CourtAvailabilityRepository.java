@@ -30,4 +30,6 @@ public interface CourtAvailabilityRepository extends JpaRepository<CourtAvailabi
     );
 
     void deleteByCourtIdAndDate(UUID courtId, LocalDate date);
+    
+    void deleteByCourtIdAndDateAndStartTimeAndEndTime(UUID courtId, LocalDate date, LocalTime startTime, LocalTime endTime);
 }
