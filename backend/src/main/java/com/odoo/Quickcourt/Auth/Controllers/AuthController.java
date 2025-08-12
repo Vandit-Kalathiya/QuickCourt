@@ -112,6 +112,12 @@ public class AuthController {
         return ResponseEntity.ok(user);
     }
 
+//    get all users
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return ResponseEntity.ok(users);
+    }
 }
 
 //

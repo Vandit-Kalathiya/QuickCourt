@@ -89,6 +89,8 @@ const UserManagementPanel = () => {
     }
   ];
 
+  
+
   const userTypeOptions = [
     { value: 'all', label: 'All Users' },
     { value: 'user', label: 'Sports Enthusiasts' },
