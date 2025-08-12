@@ -2,7 +2,9 @@ package com.odoo.Quickcourt.Services;
 // service/BookingService.java
 
 
+import com.odoo.Quickcourt.Auth.Entities.User;
 import com.odoo.Quickcourt.Auth.Entities.UserPrincipal;
+import com.odoo.Quickcourt.Auth.Repository.UserRepository;
 import com.odoo.Quickcourt.Dto.Booking.BookingRequest;
 import com.odoo.Quickcourt.Dto.Booking.BookingResponse;
 import com.odoo.Quickcourt.Dto.Payment.CreateOrderRequest;
@@ -26,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -38,6 +41,7 @@ public class BookingService {
     private final FacilityRepository facilityRepository;
     private final CourtAvailabilityRepository availabilityRepository;
     private final PaymentService paymentService;
+    private final UserRepository userRepository;
 
     public CreateOrderResponse createBooking(BookingRequest request) throws BadRequestException {
         UserPrincipal userPrincipal = getCurrentUser();
@@ -185,6 +189,7 @@ public class BookingService {
                 .startTime(booking.getStartTime())
                 .endTime(booking.getEndTime())
                 .totalPrice(booking.getTotalPrice())
+                .razorpayOrderId(booking.getRazorpayOrderId())
                 .status(booking.getStatus())
                 .createdAt(booking.getCreatedAt())
                 .facilityAddress(facility.getAddress() != null ? facility.getAddress() : null)
@@ -193,5 +198,12 @@ public class BookingService {
                 .duration((int) Duration.between(booking.getStartTime(), booking.getEndTime()).toHours())
                 .sportType(court.getSportType().toString())
                 .build();
+    }
+
+    public Page<BookingResponse> getBookingsByOwner(UUID ownerId, Pageable pageable) {
+        List<Booking> bookings = bookingRepository.findAllByUserId(ownerId);
+
+        return bookingRepository.findByOwnerIdOrderByCreatedAtDesc(ownerId, pageable)
+                .map(this::mapToResponse);
     }
 }

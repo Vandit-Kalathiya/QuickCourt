@@ -164,4 +164,16 @@ public class BookingController {
         bookingService.cancelBooking(id);
         return ResponseEntity.ok("Booking cancelled successfully");
     }
+
+    @GetMapping("/{ownerId}")
+    @PreAuthorize("hasRole('OWNER')")
+    @Operation(summary = "Get bookings for a specific owner")
+    public ResponseEntity<Page<BookingResponse>> getBookingsByOwner(
+            @PathVariable UUID ownerId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) throws BadRequestException {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<BookingResponse> bookings = bookingService.getBookingsByOwner(ownerId, pageable);
+        return ResponseEntity.ok(bookings);
+    }
 }

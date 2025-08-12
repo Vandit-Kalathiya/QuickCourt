@@ -60,11 +60,7 @@ export const AuthProvider = ({ children }) => {
 
       console.log("Current User : ", data);
 
-      return {
-        email: data.email,
-        name: data.name,
-        role: data.role,
-      };
+      return data;
     } catch (err) {
       throw new Error("Failed to fetch user profile");
     }

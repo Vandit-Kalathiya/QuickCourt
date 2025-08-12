@@ -6,7 +6,7 @@ import Button from '../../../components/ui/Button';
 const BookingFilters = ({ filters, onFilterChange, onClearFilters }) => {
   const statusOptions = [
     { value: '', label: 'All Status' },
-    { value: 'CONFIRMED', label: 'Confirmed' },
+    { value: 'CREATED', label: 'Created' },
     { value: 'CANCELLED', label: 'Cancelled' },
     { value: 'COMPLETED', label: 'Completed' }
   ];

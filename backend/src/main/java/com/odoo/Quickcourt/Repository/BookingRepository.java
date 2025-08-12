@@ -67,4 +67,6 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
 
     @Query("SELECT COUNT(b) FROM Booking b WHERE DATE(b.createdAt) = CURRENT_DATE")
     Long countTodayBookings();
+
+    List<Booking> findAllByUserId(UUID userId);
 }

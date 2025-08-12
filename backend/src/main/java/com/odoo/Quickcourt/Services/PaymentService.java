@@ -146,7 +146,7 @@ public class PaymentService {
                 JSONObject captureRequest = new JSONObject();
                 Object amountObj = razorpayPayment.get("amount");
                 if (amountObj instanceof Number) {
-                    captureRequest.put("amount", ((Number) amountObj).longValue());
+                    captureRequest.put("amount", amountObj);
                 } else {
                     throw new IllegalArgumentException("Amount is not a valid number");
                 }

@@ -24,4 +24,6 @@ public interface CourtRepository extends JpaRepository<Court, UUID> {
 
     @Query("SELECT COUNT(c) FROM Court c WHERE c.active = true")
     Long countAllActiveCourts();
+
+
 }
