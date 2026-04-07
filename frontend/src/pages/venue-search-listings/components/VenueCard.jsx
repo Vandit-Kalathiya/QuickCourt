@@ -119,7 +119,7 @@ const VenueCard = ({ venue }) => {
         {/* Rating and Reviews */}
         <div className="flex items-center space-x-2 mb-3">
           <div className="flex items-center space-x-1">
-            {renderStars(venue?.rating)}
+            {renderStars(venue?.rating || 4)}
           </div>
           <span className="text-sm font-medium text-foreground">
             {venue?.rating}

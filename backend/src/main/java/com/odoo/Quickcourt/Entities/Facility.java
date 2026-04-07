@@ -64,6 +64,9 @@ public class Facility extends BaseEntity {
     private List<Review> reviews;
 
     @Builder.Default
+    private String rating = "0";
+
+    @Builder.Default
     private Boolean active = true;
 
     public enum Sport {

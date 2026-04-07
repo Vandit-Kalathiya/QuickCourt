@@ -30,6 +30,7 @@ public class FacilityResponse {
     private String latitude;
     private String ownerName;
     private String ownerEmail;
+    private String rating;
     private String phone;
     private List<String> photos;
     private LocalDateTime createdAt;

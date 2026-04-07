@@ -52,6 +52,8 @@ public class FacilityService {
                 .sports(request.getSports())
                 .amenities(request.getAmenities())
                 .active(request.isActive())
+                .longitude(request.getLongitude())
+                .latitude(request.getLatitude())
                 .status(Facility.FacilityStatus.PENDING)
                 .build();
 
@@ -169,6 +171,7 @@ public class FacilityService {
                 .status(facility.getStatus())
                 .latitude(facility.getLatitude())
                 .longitude(facility.getLongitude())
+                .rating(facility.getRating())
                 .phone(facility.getPhone())
                 .ownerName(owner.getName())
                 .ownerEmail(facility.getEmail())

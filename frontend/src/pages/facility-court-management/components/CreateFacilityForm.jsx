@@ -1,8 +1,9 @@
 // components/CreateFacilityForm.jsx
 import toast from "react-hot-toast";
-import React, { useState } from 'react';
-import Icon from '../../../components/AppIcon';
-import Button from '../../../components/ui/Button';
+import React, { useState } from "react";
+import Icon from "../../../components/AppIcon";
+import Button from "../../../components/ui/Button";
+import LocationSelector from "./LocationSelector";
 
 const CreateFacilityForm = ({
   isOpen,
@@ -19,11 +20,30 @@ const CreateFacilityForm = ({
     sports: [],
     amenities: [],
     active: true,
+    latitude: null,
+    longitude: null,
   });
 
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Add this handler function
+  const handleLocationChange = (location) => {
+    setFormData((prev) => ({
+      ...prev,
+      latitude: location.lat,
+      longitude: location.lng,
+    }));
+
+    // Clear location error if it exists
+    if (errors.location) {
+      setErrors((prev) => ({
+        ...prev,
+        location: "",
+      }));
+    }
+  };
 
   const availableAmenities = [
     "Parking",
@@ -165,6 +185,10 @@ const CreateFacilityForm = ({
       newErrors.sports = "Please select at least one sport";
     }
 
+    if (!formData.latitude || !formData.longitude) {
+      newErrors.location = "Please select a location on the map";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -180,6 +204,8 @@ const CreateFacilityForm = ({
       sports: [],
       amenities: [],
       active: true,
+      latitude: null,
+      longitude: null,
     });
     setSelectedPhoto(null);
     setErrors({});
@@ -203,6 +229,8 @@ const CreateFacilityForm = ({
       formDataToSend.append("ownerEmail", formData.ownerEmail); // Add ownerEmail to form data
       formDataToSend.append("ownerPhone", formData.ownerPhone); // Add phone number to form data
       formDataToSend.append("active", formData.active);
+      formDataToSend.append("latitude", formData.latitude.toString());
+      formDataToSend.append("longitude", formData.longitude.toString());
 
       formData.sports.forEach((sport) => {
         formDataToSend.append("sports", sport);
@@ -238,7 +266,6 @@ const CreateFacilityForm = ({
       setShowCreateForm(false);
       // Clear form and close modal
       clearForm();
-      
     } catch (error) {
       console.error("Error creating facility:", error);
       setErrors((prev) => ({
@@ -349,7 +376,7 @@ const CreateFacilityForm = ({
                 {/* ownerEmail */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    ownerEmail Address *
+                    Email Address *
                   </label>
                   <div className="relative">
                     <input
@@ -463,6 +490,27 @@ const CreateFacilityForm = ({
                   )}
                 </div>
               </div>
+            </div>
+
+            {/* Location Selection */}
+            <div className="bg-muted/20 rounded-lg border border-border/50 p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center">
+                <Icon name="MapPin" size={18} className="mr-2 text-primary" />
+                Location *
+              </h2>
+
+              <LocationSelector
+                onLocationChange={handleLocationChange}
+                initialLocation={
+                  formData.latitude && formData.longitude
+                    ? [formData.latitude, formData.longitude]
+                    : null
+                }
+              />
+
+              {errors.location && (
+                <p className="text-red-500 text-sm mt-2">{errors.location}</p>
+              )}
             </div>
 
             {/* Sports Selection */}

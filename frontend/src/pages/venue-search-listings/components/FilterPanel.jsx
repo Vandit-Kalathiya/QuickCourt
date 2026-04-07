@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
-import Icon from '../../../components/AppIcon';
-import Button from '../../../components/ui/Button';
-import Input from '../../../components/ui/Input';
-import { Checkbox } from '../../../components/ui/Checkbox';
+import React, { useState } from "react";
+import Icon from "../../../components/AppIcon";
+import Button from "../../../components/ui/Button";
+import Input from "../../../components/ui/Input";
+import { Checkbox } from "../../../components/ui/Checkbox";
 
-const FilterPanel = ({ 
-  filters, 
-  onFiltersChange, 
-  isOpen, 
-  onClose, 
-  isMobile 
+const FilterPanel = ({
+  filters,
+  onFiltersChange,
+  isOpen,
+  onClose,
+  isMobile,
+  sportCounts = {}, // Add this prop
+  amenityCounts = {},
+  priceRange = { min: 0, max: 200 },
 }) => {
   const [expandedSections, setExpandedSections] = useState({
     sport: true,
@@ -17,18 +20,26 @@ const FilterPanel = ({
     venueType: true,
     location: true,
     rating: true,
-    amenities: true
+    amenities: true,
   });
 
   const sportTypes = [
-    { id: 'tennis', label: 'Tennis', count: 3 },
-    { id: 'badminton', label: 'Badminton', count: 2 },
-    { id: 'basketball', label: 'Basketball', count: 1 },
-    { id: 'football', label: 'Football', count: 0 },
-    { id: 'cricket', label: 'Cricket', count: 0 },
-    { id: 'swimming', label: 'Swimming', count: 0 },
-    { id: 'squash', label: 'Squash', count: 1 },
-    { id: 'volleyball', label: 'Volleyball', count: 2 }
+    { id: "tennis", label: "Tennis", count: sportCounts.tennis || 0 },
+    { id: "badminton", label: "Badminton", count: sportCounts.badminton || 0 },
+    {
+      id: "basketball",
+      label: "Basketball",
+      count: sportCounts.basketball || 0,
+    },
+    { id: "football", label: "Football", count: sportCounts.football || 0 },
+    { id: "cricket", label: "Cricket", count: sportCounts.cricket || 0 },
+    { id: "swimming", label: "Swimming", count: sportCounts.swimming || 0 },
+    { id: "squash", label: "Squash", count: sportCounts.squash || 0 },
+    {
+      id: "volleyball",
+      label: "Volleyball",
+      count: sportCounts.volleyball || 0,
+    },
   ];
 
   // const venueTypes = [
@@ -39,51 +50,75 @@ const FilterPanel = ({
   // ];
 
   const amenities = [
-    { id: 'parking', label: 'Parking Available', count: 3 },
-    { id: 'locker', label: 'Locker Rooms', count: 0 },
-    { id: 'shower', label: 'Shower Facilities', count: 1 },
-    { id: 'equipment', label: 'Equipment Rental', count: 3 },
-    { id: 'cafeteria', label: 'Cafeteria', count: 2 },
-    { id: 'pro-shop', label: 'Pro Shop', count: 0 },
-    { id: 'coaching', label: 'Coaching Available', count: 1 },
-    { id: 'wifi', label: 'Free WiFi', count: 2 }
+    {
+      id: "parking",
+      label: "Parking Available",
+      count: amenityCounts.parking || 0,
+    },
+    { id: "locker", label: "Locker Rooms", count: amenityCounts.locker || 0 },
+    {
+      id: "shower",
+      label: "Shower Facilities",
+      count: amenityCounts.shower || 0,
+    },
+    {
+      id: "equipment",
+      label: "Equipment Rental",
+      count: amenityCounts.equipment || 0,
+    },
+    {
+      id: "cafeteria",
+      label: "Cafeteria",
+      count: amenityCounts.cafeteria || 0,
+    },
+    {
+      id: "pro-shop",
+      label: "Pro Shop",
+      count: amenityCounts["pro-shop"] || 0,
+    },
+    {
+      id: "coaching",
+      label: "Coaching Available",
+      count: amenityCounts.coaching || 0,
+    },
+    { id: "wifi", label: "Free WiFi", count: amenityCounts.wifi || 0 },
   ];
 
   const toggleSection = (section) => {
-    setExpandedSections(prev => ({
+    setExpandedSections((prev) => ({
       ...prev,
-      [section]: !prev?.[section]
+      [section]: !prev?.[section],
     }));
   };
 
   const handleSportChange = (sportId, checked) => {
-    const updatedSports = checked 
+    const updatedSports = checked
       ? [...filters?.sports, sportId]
-      : filters?.sports?.filter(s => s !== sportId);
-    
+      : filters?.sports?.filter((s) => s !== sportId);
+
     onFiltersChange({ ...filters, sports: updatedSports });
   };
 
   const handleVenueTypeChange = (typeId, checked) => {
-    const updatedTypes = checked 
+    const updatedTypes = checked
       ? [...filters?.venueTypes, typeId]
-      : filters?.venueTypes?.filter(t => t !== typeId);
-    
+      : filters?.venueTypes?.filter((t) => t !== typeId);
+
     onFiltersChange({ ...filters, venueTypes: updatedTypes });
   };
 
   const handleAmenityChange = (amenityId, checked) => {
-    const updatedAmenities = checked 
+    const updatedAmenities = checked
       ? [...filters?.amenities, amenityId]
-      : filters?.amenities?.filter(a => a !== amenityId);
-    
+      : filters?.amenities?.filter((a) => a !== amenityId);
+
     onFiltersChange({ ...filters, amenities: updatedAmenities });
   };
 
   const handlePriceChange = (field, value) => {
     onFiltersChange({
       ...filters,
-      priceRange: { ...filters?.priceRange, [field]: value }
+      priceRange: { ...filters?.priceRange, [field]: value },
     });
   };
 
@@ -98,16 +133,18 @@ const FilterPanel = ({
       venueTypes: [],
       location: { radius: 25, coordinates: null },
       minRating: 0,
-      amenities: []
+      amenities: [],
     });
   };
 
   const getActiveFilterCount = () => {
-    return filters?.sports?.length + 
-           filters?.venueTypes?.length + 
-           filters?.amenities?.length + 
-           (filters?.minRating > 0 ? 1 : 0) +
-           (filters?.priceRange?.min > 0 || filters?.priceRange?.max < 200 ? 1 : 0);
+    return (
+      filters?.sports?.length +
+      filters?.venueTypes?.length +
+      filters?.amenities?.length +
+      (filters?.minRating > 0 ? 1 : 0) +
+      (filters?.priceRange?.min > 0 || filters?.priceRange?.max < 200 ? 1 : 0)
+    );
   };
 
   const FilterSection = ({ title, section, children }) => (
@@ -117,9 +154,9 @@ const FilterPanel = ({
         className="flex items-center justify-between w-full text-left mb-3"
       >
         <h3 className="font-semibold text-foreground">{title}</h3>
-        <Icon 
-          name={expandedSections?.[section] ? "ChevronUp" : "ChevronDown"} 
-          size={16} 
+        <Icon
+          name={expandedSections?.[section] ? "ChevronUp" : "ChevronDown"}
+          size={16}
           className="text-text-secondary"
         />
       </button>
@@ -185,25 +222,40 @@ const FilterPanel = ({
               label="Min"
               value={filters?.priceRange?.min}
               onChange={(e) =>
-                handlePriceChange("min", parseInt(e?.target?.value) || 0)
+                handlePriceChange(
+                  "min",
+                  parseInt(e?.target?.value) || priceRange.min
+                )
               }
               className="flex-1"
-              min="0"
+              min={priceRange.min}
+              max={priceRange.max}
+              placeholder={`Min ₹${priceRange.min}`}
             />
             <Input
               type="number"
               label="Max"
               value={filters?.priceRange?.max}
               onChange={(e) =>
-                handlePriceChange("max", parseInt(e?.target?.value) || 200)
+                handlePriceChange(
+                  "max",
+                  parseInt(e?.target?.value) || priceRange.max
+                )
               }
               className="flex-1"
-              min="0"
+              min={priceRange.min}
+              max={priceRange.max}
+              placeholder={`Max ₹${priceRange.max}`}
             />
           </div>
           <div className="flex items-center justify-between text-sm text-text-secondary">
-            <span>₹ {filters?.priceRange?.min}</span>
-            <span>₹ {filters?.priceRange?.max}</span>
+            <span>₹ {filters?.priceRange?.min || priceRange.min}</span>
+            <span>₹ {filters?.priceRange?.max || priceRange.max}</span>
+          </div>
+
+          {/* Optional: Show the actual range from venues */}
+          <div className="text-xs text-text-secondary text-center">
+            Available range: ₹{priceRange.min} - ₹{priceRange.max}
           </div>
         </div>
       </FilterSection>
@@ -322,14 +374,14 @@ const FilterPanel = ({
         {isOpen && (
           <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
         )}
-        
+
         {/* Mobile Filter Panel */}
-        <div className={`fixed inset-y-0 right-0 w-full max-w-sm bg-surface z-50 transform transition-transform duration-300 ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}>
-          <div className="h-full overflow-y-auto p-6">
-            {content}
-          </div>
+        <div
+          className={`fixed inset-y-0 right-0 w-full max-w-sm bg-surface z-50 transform transition-transform duration-300 ${
+            isOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          <div className="h-full overflow-y-auto p-6">{content}</div>
         </div>
       </>
     );

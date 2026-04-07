@@ -54,7 +54,7 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             "AND b.createdAt >= :startDate " +
             "GROUP BY DATE(b.createdAt) ORDER BY DATE(b.createdAt)")
     List<Object[]> findBookingTrendsByOwnerId(
-            @Param("ownerId") UUID ownerId,
+             UUID ownerId,
             @Param("startDate") LocalDateTime startDate
     );
 

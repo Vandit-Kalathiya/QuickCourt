@@ -21,7 +21,8 @@ public class FacilityRequest {
 
     private String address;
 
-
+    private String longitude;
+    private String latitude;
     private List<String> sports;
 
     private List<String> amenities;
