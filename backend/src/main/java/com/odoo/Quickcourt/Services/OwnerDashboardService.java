@@ -34,7 +34,13 @@ public class OwnerDashboardService {
         Long totalBookings = bookingRepository.countByOwnerId(ownerId);
         Long activeCourts = courtRepository.countActiveCourtsByOwnerId(ownerId);
         BigDecimal totalEarnings = bookingRepository.sumEarningsByOwnerId(ownerId).orElse(BigDecimal.ZERO);
-        Long todayBookings = bookingRepository.countTodayBookings();
+
+        LocalDate today = LocalDate.now();
+
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end = today.plusDays(1).atStartOfDay();
+
+        Long todayBookings = bookingRepository.countTodayBookings(start, end);
 
         // Booking trends (last 30 days)
         LocalDateTime startDate = LocalDateTime.now().minusDays(30);
