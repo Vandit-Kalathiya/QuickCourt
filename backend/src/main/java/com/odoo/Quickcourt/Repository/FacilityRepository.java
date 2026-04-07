@@ -20,9 +20,12 @@ public interface FacilityRepository extends JpaRepository<Facility, UUID> {
 
     List<Facility> findByOwnerId(UUID ownerId);
 
-    @Query("SELECT f FROM Facility f WHERE f.status = 'APPROVED' " +
-            "AND (:sports IS NULL OR EXISTS (SELECT s FROM f.sports s WHERE s IN :sports)) " +
-            "AND (:name IS NULL OR LOWER(f.name) LIKE LOWER(CONCAT('%', :name, '%')))")
+    @Query("""
+SELECT f FROM Facility f 
+WHERE f.status = 'APPROVED'
+AND (:sports IS NULL OR EXISTS (SELECT s FROM f.sports s WHERE s IN :sports))
+AND (:name IS NULL OR f.name LIKE CONCAT('%', :name, '%'))
+""")
     Page<Facility> findApprovedFacilities(
             @Param("sports") List<Facility.Sport> sports,
             @Param("name") String name,
