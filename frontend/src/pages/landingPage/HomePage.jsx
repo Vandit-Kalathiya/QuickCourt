@@ -187,23 +187,23 @@ const Homepage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 overflow-x-hidden">
       {/* Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div
-          className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-purple-300/30 to-pink-300/30 rounded-full blur-3xl animate-pulse"
+          className="absolute -top-40 -right-40 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl"
           style={{
             transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`,
           }}
         />
         <div
-          className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-blue-300/30 to-cyan-300/30 rounded-full blur-3xl animate-pulse"
+          className="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl"
           style={{
             transform: `translate(${-mousePosition.x}px, ${-mousePosition.y}px)`,
           }}
         />
         <div
-          className="absolute top-1/2 left-1/2 w-96 h-96 bg-gradient-to-br from-emerald-300/20 to-teal-300/20 rounded-full blur-3xl animate-pulse"
+          className="absolute top-1/2 left-1/2 w-96 h-96 bg-emerald-200/15 rounded-full blur-3xl"
           style={{
             transform: `translate(${mousePosition.x * 0.5}px, ${
               mousePosition.y * 0.5
@@ -218,13 +218,12 @@ const Homepage = () => {
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center">
               <div className="relative group">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/25 group-hover:shadow-purple-500/40 transition-all duration-300">
+                <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
                   <span className="text-2xl">⚡</span>
                 </div>
-                <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
               </div>
-              <span className="ml-3 text-2xl font-black bg-gradient-to-r from-gray-900 via-purple-600 to-cyan-600 bg-clip-text text-transparent">
-                SportArena
+              <span className="ml-3 text-2xl font-black text-gray-900">
+                quickCourt
               </span>
             </div>
 
@@ -235,11 +234,11 @@ const Homepage = () => {
                   <a
                     key={item}
                     href="#"
-                    className="text-gray-700 hover:text-purple-600 px-4 py-2 text-sm font-semibold transition-all duration-300 relative group"
+                    className="text-gray-700 hover:text-blue-600 px-4 py-2 text-sm font-semibold transition-all duration-300 relative group"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     {item}
-                    <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-500 to-cyan-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+                    <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
                   </a>
                 )
               )}
@@ -253,15 +252,14 @@ const Homepage = () => {
                 <div className="hidden md:flex items-center space-x-4">
                   <button
                     onClick={() => navigate("/auth")}
-                    className="text-gray-700 hover:text-purple-600 px-6 py-3 text-sm font-semibold transition-colors duration-300 hover:bg-purple-50 rounded-xl"
+                    className="text-gray-700 hover:text-blue-600 px-6 py-3 text-sm font-semibold transition-colors duration-300 hover:bg-blue-50 rounded-xl"
                   >
                     Sign In
                   </button>
                   <button
                     onClick={() => navigate("/auth")}
-                    className="relative bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-8 py-3 rounded-2xl font-bold overflow-hidden group shadow-xl shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300"
+                    className="relative bg-blue-600 text-white px-8 py-3 rounded-2xl font-bold overflow-hidden group shadow-xl hover:bg-blue-700 transition-all duration-300"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-purple-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                     <span className="relative">Get Started</span>
                   </button>
                 </div>
@@ -270,9 +268,8 @@ const Homepage = () => {
                 <>
                  <button
                     onClick={() => navigate("/dashboard")}
-                    className="relative bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-8 py-3 rounded-2xl font-bold overflow-hidden group shadow-xl shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300"
+                    className="relative bg-blue-600 text-white px-8 py-3 rounded-2xl font-bold overflow-hidden group shadow-xl hover:bg-blue-700 transition-all duration-300"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-purple-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                     <span className="relative">Get Started</span>
                   </button>
                 </>
@@ -312,17 +309,17 @@ const Homepage = () => {
                   <a
                     key={item}
                     href="#"
-                    className="block text-gray-700 hover:text-purple-600 py-3 px-4 rounded-xl hover:bg-purple-50 transition-all duration-300 font-semibold"
+                    className="block text-gray-700 hover:text-blue-600 py-3 px-4 rounded-xl hover:bg-blue-50 transition-all duration-300 font-semibold"
                   >
                     {item}
                   </a>
                 )
               )}
               <div className="border-t border-gray-200 pt-4 space-y-4">
-                <button className="block w-full text-left text-gray-700 hover:text-purple-600 py-3 px-4 rounded-xl hover:bg-purple-50 transition-all duration-300 font-semibold">
+                <button className="block w-full text-left text-gray-700 hover:text-blue-600 py-3 px-4 rounded-xl hover:bg-blue-50 transition-all duration-300 font-semibold">
                   Sign In
                 </button>
-                <button className="w-full bg-gradient-to-r from-purple-600 to-cyan-600 text-white py-4 rounded-2xl font-bold shadow-xl">
+                <button className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-xl hover:bg-blue-700 transition-all duration-300">
                   Get Started
                 </button>
               </div>
@@ -351,7 +348,7 @@ const Homepage = () => {
                   transform: `translateY(${scrollY * 0.5}px)`,
                 }}
               /> */}
-              <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-white/10 to-white/30"></div>
+              <div className="absolute inset-0 bg-white/20"></div>
             </div>
           ))}
         </div>
@@ -366,7 +363,7 @@ const Homepage = () => {
             </div>
 
             <h1 className="text-6xl md:text-8xl font-black text-gray-900 mb-8 leading-tight">
-              <span className="bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-500 bg-clip-text text-transparent animate-gradient">
+              <span className="text-blue-600">
                 {heroSlides[currentSlide].title}
               </span>
             </h1>
@@ -386,7 +383,7 @@ const Homepage = () => {
                   <input
                     type="text"
                     placeholder="Find your perfect sports venue..."
-                    className="w-full pl-14 pr-6 py-4 bg-gray-50 rounded-2xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 font-medium border border-gray-200 focus:bg-white transition-all duration-300"
+                    className="w-full pl-14 pr-6 py-4 bg-gray-50 rounded-2xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium border border-gray-200 focus:bg-white transition-all duration-300"
                   />
                 </div>
                 <div className="relative">
@@ -397,10 +394,10 @@ const Homepage = () => {
                   <input
                     type="text"
                     placeholder="Location"
-                    className="w-full lg:w-64 pl-14 pr-6 py-4 bg-gray-50 rounded-2xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 font-medium border border-gray-200 focus:bg-white transition-all duration-300"
+                    className="w-full lg:w-64 pl-14 pr-6 py-4 bg-gray-50 rounded-2xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium border border-gray-200 focus:bg-white transition-all duration-300"
                   />
                 </div>
-                <button className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-10 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center group shadow-xl shadow-purple-500/25">
+                <button className="bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold text-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center group shadow-xl hover:bg-blue-700">
                   <span>Search</span>
                   <ArrowRight
                     size={20}
@@ -417,7 +414,7 @@ const Homepage = () => {
                   onClick={() => setCurrentSlide(index)}
                   className={`transition-all duration-500 ${
                     index === currentSlide
-                      ? "w-12 h-3 bg-gradient-to-r from-purple-500 to-cyan-500 shadow-lg"
+                      ? "w-12 h-3 bg-blue-600 shadow-lg"
                       : "w-3 h-3 bg-gray-300 hover:bg-gray-400"
                   } rounded-full`}
                 />
@@ -438,7 +435,7 @@ const Homepage = () => {
                 style={{ animationDelay: `${index * 150}ms` }}
               >
                 <div
-                  className={`w-16 h-16 bg-gradient-to-r ${stat.gradient} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
+                  className={`w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
                 >
                   <stat.icon className="text-white" size={28} />
                 </div>
@@ -454,19 +451,19 @@ const Homepage = () => {
 
       {/* Popular Sports - Reimagined */}
       <section className="py-32 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-50/50 via-pink-50/30 to-cyan-50/50"></div>
+        <div className="absolute inset-0 bg-blue-50/30"></div>
 
         <div className="max-w-7xl mx-auto px-6 relative">
           <div className="text-center mb-20">
-            <div className="inline-flex items-center bg-purple-100/80 backdrop-blur-sm rounded-full px-6 py-3 mb-8 border border-purple-200/50 shadow-lg">
-              <Trophy className="text-purple-600 mr-2" size={16} />
-              <span className="text-purple-700 font-semibold">
+            <div className="inline-flex items-center bg-blue-100/80 backdrop-blur-sm rounded-full px-6 py-3 mb-8 border border-blue-200/50 shadow-lg">
+              <Trophy className="text-blue-600 mr-2" size={16} />
+              <span className="text-blue-700 font-semibold">
                 Popular Sports
               </span>
             </div>
             <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6">
               Choose Your{" "}
-              <span className="bg-gradient-to-r from-purple-600 to-cyan-500 bg-clip-text text-transparent">
+              <span className="text-blue-600">
                 Game
               </span>
             </h2>
@@ -483,17 +480,17 @@ const Homepage = () => {
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div
-                  className={`relative bg-white/80 backdrop-blur-xl rounded-3xl p-8 border border-white/50 hover:border-purple-200 transition-all duration-500 overflow-hidden group-hover:scale-105 group-hover:-translate-y-2 shadow-xl shadow-gray-900/5 hover:shadow-2xl hover:shadow-gray-900/10`}
+                  className={`relative bg-white/80 backdrop-blur-xl rounded-3xl p-8 border border-white/50 hover:border-blue-200 transition-all duration-500 overflow-hidden group-hover:scale-105 group-hover:-translate-y-2 shadow-xl shadow-gray-900/5 hover:shadow-2xl hover:shadow-gray-900/10`}
                 >
                   <div
-                    className={`absolute inset-0 bg-gradient-to-br ${sport.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                    className={`absolute inset-0 bg-blue-100 opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
                   ></div>
 
                   <div className="relative z-10 text-center">
                     <div className="text-5xl mb-4 group-hover:scale-125 transition-transform duration-500">
                       {sport.icon}
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors duration-300">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-300">
                       {sport.name}
                     </h3>
                     <p className="text-sm text-gray-500 font-medium">
@@ -508,7 +505,7 @@ const Homepage = () => {
       </section>
 
       {/* Popular Venues - Enhanced */}
-      <section className="py-32 relative bg-gradient-to-br from-gray-50 via-white to-blue-50">
+      <section className="py-32 relative bg-gray-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
             <div className="inline-flex items-center bg-cyan-100/80 backdrop-blur-sm rounded-full px-6 py-3 mb-8 border border-cyan-200/50 shadow-lg">
@@ -517,7 +514,7 @@ const Homepage = () => {
             </div>
             <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6">
               Premium{" "}
-              <span className="bg-gradient-to-r from-cyan-600 to-purple-500 bg-clip-text text-transparent">
+              <span className="text-blue-600">
                 Venues
               </span>
             </h2>
@@ -536,7 +533,7 @@ const Homepage = () => {
                 }`}
                 style={{ animationDelay: `${index * 200}ms` }}
               >
-                <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/50 hover:border-purple-200 transition-all duration-700 group-hover:scale-105 group-hover:-translate-y-4 shadow-xl shadow-gray-900/5 hover:shadow-2xl hover:shadow-purple-500/10">
+                <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/50 hover:border-blue-200 transition-all duration-700 group-hover:scale-105 group-hover:-translate-y-4 shadow-xl shadow-gray-900/5 hover:shadow-2xl hover:shadow-blue-500/10">
                   <div className="relative overflow-hidden">
                     <img
                       src={venue.image}
@@ -545,7 +542,7 @@ const Homepage = () => {
                         venue.featured ? "h-96" : "h-64"
                       }`}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                    <div className="absolute inset-0 bg-black/60"></div>
 
                     {/* Floating Price Tag */}
                     <div className="absolute top-6 left-6">
@@ -560,7 +557,7 @@ const Homepage = () => {
                     {/* Featured Badge */}
                     {venue.featured && (
                       <div className="absolute top-6 right-6">
-                        <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full px-4 py-2 text-xs font-bold text-white shadow-lg">
+                        <div className="bg-yellow-500 rounded-full px-4 py-2 text-xs font-bold text-white shadow-lg">
                           FEATURED
                         </div>
                       </div>
@@ -569,7 +566,7 @@ const Homepage = () => {
 
                   <div className="p-8">
                     <div className="flex items-start justify-between mb-4">
-                      <h3 className="text-2xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors duration-300">
+                      <h3 className="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
                         {venue.name}
                       </h3>
                       <div className="flex items-center bg-yellow-100/80 backdrop-blur-sm rounded-full px-3 py-1 border border-yellow-200/50 shadow-sm">
@@ -594,7 +591,7 @@ const Homepage = () => {
                       {venue.sports.map((sport, sportIndex) => (
                         <span
                           key={sportIndex}
-                          className="bg-purple-100/80 text-purple-700 text-xs px-3 py-1 rounded-full font-semibold border border-purple-200/50"
+                          className="bg-blue-100/80 text-blue-700 text-xs px-3 py-1 rounded-full font-semibold border border-blue-200/50"
                         >
                           {sport}
                         </span>
@@ -605,7 +602,7 @@ const Homepage = () => {
                       <span className="text-sm text-gray-500 font-medium">
                         {venue.reviews} reviews
                       </span>
-                      <button className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-6 py-3 rounded-xl font-bold hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center group shadow-lg shadow-purple-500/25">
+                      <button className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center group shadow-lg hover:bg-blue-700">
                         Book Now
                         <ArrowRight
                           size={16}
@@ -622,13 +619,13 @@ const Homepage = () => {
       </section>
 
       {/* Features Section - Redesigned */}
-      <section className="py-32 relative bg-gradient-to-br from-purple-50/50 via-pink-50/30 to-cyan-50/50">
+      <section className="py-32 relative bg-blue-50/30">
         <div className="max-w-7xl mx-auto px-6 relative">
           <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl font-black text-gray-900 mb-6">
               Why Athletes Choose{" "}
-              <span className="bg-gradient-to-r from-purple-600 to-cyan-500 bg-clip-text text-transparent">
-                SportArena
+              <span className="text-gray-900">
+                quickCourt
               </span>
             </h2>
           </div>
@@ -663,11 +660,11 @@ const Homepage = () => {
                 style={{ animationDelay: `${index * 200}ms` }}
               >
                 <div
-                  className={`w-24 h-24 bg-gradient-to-r ${feature.gradient} rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-2xl shadow-gray-900/10`}
+                  className={`w-24 h-24 bg-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-2xl shadow-gray-900/10`}
                 >
                   <feature.icon className="text-white" size={40} />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-6 group-hover:text-purple-600 transition-colors duration-300">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6 group-hover:text-blue-600 transition-colors duration-300">
                   {feature.title}
                 </h3>
                 <p className="text-gray-600 text-lg leading-relaxed font-medium">
@@ -680,7 +677,7 @@ const Homepage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 relative overflow-hidden bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600">
+      <section className="py-32 relative overflow-hidden bg-blue-600">
         <div
           className="absolute inset-0"
           style={{
@@ -694,18 +691,18 @@ const Homepage = () => {
             Ready to <span className="text-yellow-300">Dominate</span>?
           </h2>
           <p className="text-xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed font-medium">
-            Join SportArena today and unlock access to premium sports facilities
+            Join quickCourt today and unlock access to premium sports facilities
             that will elevate your game to the next level.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <button className="bg-white text-purple-600 px-12 py-4 rounded-2xl font-black text-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center group shadow-xl">
+            <button className="bg-white text-blue-600 px-12 py-4 rounded-2xl font-black text-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center group shadow-xl">
               Start Your Journey
               <ArrowRight
                 size={20}
                 className="ml-2 group-hover:translate-x-1 transition-transform duration-300"
               />
             </button>
-            <button className="border-2 border-white/80 text-white px-12 py-4 rounded-2xl font-bold text-lg hover:bg-white hover:text-purple-600 transition-all duration-300 backdrop-blur-sm shadow-xl">
+            <button className="border-2 border-white/80 text-white px-12 py-4 rounded-2xl font-bold text-lg hover:bg-white hover:text-blue-600 transition-all duration-300 backdrop-blur-sm shadow-xl">
               Watch Demo
             </button>
           </div>
@@ -713,18 +710,18 @@ const Homepage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-cyan-900/20"></div>
+      <footer className="bg-gray-900 text-white py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-blue-900/10"></div>
 
         <div className="max-w-7xl mx-auto px-6 relative">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div className="md:col-span-2">
               <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center mr-3 shadow-lg">
+                <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center mr-3 shadow-lg">
                   <span className="text-2xl">⚡</span>
                 </div>
-                <span className="text-2xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                  SportArena
+                <span className="text-2xl font-black text-white">
+                  quickCourt
                 </span>
               </div>
               <p className="text-gray-400 mb-8 max-w-md leading-relaxed font-medium">
@@ -735,7 +732,7 @@ const Homepage = () => {
                 {["f", "t", "i", "y"].map((social, index) => (
                   <div
                     key={index}
-                    className="w-12 h-12 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-xl flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-300 shadow-lg"
+                    className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center cursor-pointer hover:scale-110 transition-transform duration-300 shadow-lg hover:bg-blue-700"
                   >
                     <span className="text-white font-bold">{social}</span>
                   </div>
@@ -754,7 +751,7 @@ const Homepage = () => {
                         className="hover:text-white transition-colors duration-300 relative group font-medium"
                       >
                         {link}
-                        <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-cyan-500 group-hover:w-full transition-all duration-300"></div>
+                        <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300"></div>
                       </a>
                     </li>
                   )
@@ -777,7 +774,7 @@ const Homepage = () => {
                       className="hover:text-white transition-colors duration-300 relative group font-medium"
                     >
                       {link}
-                      <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-cyan-500 group-hover:w-full transition-all duration-300"></div>
+                      <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-purple-600 group-hover:w-full transition-all duration-300"></div>
                     </a>
                   </li>
                 ))}
@@ -787,7 +784,7 @@ const Homepage = () => {
 
           <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 mb-4 md:mb-0 font-medium">
-              &copy; 2025 SportArena. All rights reserved. Crafted with ❤️ for
+              &copy; 2025 quickCourt. All rights reserved. Crafted with ❤️ for
               athletes.
             </p>
             <div className="flex space-x-6 text-sm text-gray-400">

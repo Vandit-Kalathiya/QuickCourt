@@ -317,7 +317,7 @@ const UserDashboardBookingManagement = () => {
             onClick={() => handlePageChange(tab, index + 1)}
             className={`px-4 py-2 rounded-xl ${
               currentPage === index + 1
-                ? "bg-gradient-to-r from-purple-600 to-cyan-600 text-white"
+                ? "bg-blue-600 text-white"
                 : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200"
             }`}
           >
@@ -340,11 +340,11 @@ const UserDashboardBookingManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Subtle Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-blue-200/20 to-cyan-200/20 rounded-full blur-3xl"></div>
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-blue-200/15 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-200/15 rounded-full blur-3xl"></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
@@ -360,7 +360,7 @@ const UserDashboardBookingManagement = () => {
               </div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2">
                 My{" "}
-                <span className="bg-gradient-to-r from-purple-600 to-cyan-500 bg-clip-text text-transparent">
+                <span className="text-blue-600">
                   Dashboard
                 </span>
               </h1>
@@ -381,7 +381,7 @@ const UserDashboardBookingManagement = () => {
                 onClick={() =>
                   (window.location.href = "/listings")
                 }
-                className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-8 py-3 rounded-2xl font-bold shadow-xl shadow-purple-500/25 hover:shadow-purple-500/40 transition-all duration-300 flex items-center space-x-2"
+                className="bg-blue-600 text-white px-8 py-3 rounded-2xl font-bold shadow-xl hover:bg-blue-700 transition-all duration-300 flex items-center space-x-2"
               >
                 <Icon name="Plus" size={18} />
                 <span>New Booking</span>
@@ -396,7 +396,7 @@ const UserDashboardBookingManagement = () => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center space-x-3 mb-2">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                     <Icon name="Calendar" size={24} className="text-white" />
                   </div>
                   <div>
@@ -416,7 +416,7 @@ const UserDashboardBookingManagement = () => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center space-x-3 mb-2">
-                  <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
                     <Icon name="Clock" size={24} className="text-white" />
                   </div>
                   <div>
@@ -440,7 +440,7 @@ const UserDashboardBookingManagement = () => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center space-x-3 mb-2">
-                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                     <Icon name="Heart" size={24} className="text-white" />
                   </div>
                   <div>
@@ -460,7 +460,7 @@ const UserDashboardBookingManagement = () => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center space-x-3 mb-2">
-                  <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 bg-yellow-600 rounded-xl flex items-center justify-center shadow-lg">
                     <Icon name="DollarSign" size={24} className="text-white" />
                   </div>
                   <div>
@@ -489,7 +489,7 @@ const UserDashboardBookingManagement = () => {
                     onClick={() => setActiveTab(tab?.id)}
                     className={`w-full flex items-center justify-between p-4 rounded-xl text-left transition-all duration-300 group ${
                       activeTab === tab?.id
-                        ? `bg-gradient-to-r ${tab.gradient} text-white shadow-lg`
+                        ? `bg-blue-600 text-white shadow-lg`
                         : "text-gray-700 hover:bg-gray-50 hover:shadow-md"
                     }`}
                   >
@@ -582,7 +582,7 @@ const UserDashboardBookingManagement = () => {
                           onClick={() =>
                             (window.location.href = "/venue-search-listings")
                           }
-                          className="bg-gradient-to-r from-purple-600 to-cyan-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center space-x-2 mx-auto"
+                          className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:bg-blue-700 transition-all duration-300 flex items-center space-x-2 mx-auto"
                         >
                           <Icon name="Plus" size={18} />
                           <span>Find Venues</span>

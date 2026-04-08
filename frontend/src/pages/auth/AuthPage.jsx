@@ -312,7 +312,7 @@ const AuthPage = () => {
             }}
           ></div>
           <div className="relative z-10 bg-gray-600/80 backdrop-blur-sm p-8 rounded-xl text-center text-white max-w-sm">
-            <h2 className="text-3xl font-bold mb-3">Welcome to SportHub</h2>
+            <h2 className="text-3xl font-bold mb-3">Welcome to quickCourt</h2>
             <p className="text-lg opacity-90">
               {isLogin
                 ? "Sign in to continue your journey"
@@ -646,7 +646,7 @@ const AuthPage = () => {
               <button
                 type="submit"
                 disabled={isFormLoading}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center min-h-[42px] text-sm mt-4"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center min-h-[42px] text-sm mt-4"
               >
                 {isFormLoading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
@@ -666,7 +666,7 @@ const AuthPage = () => {
                   : "Already have an account?"}
                 <button
                   type="button"
-                  className="ml-1 text-blue-600 font-semibold hover:text-purple-600 transition-colors duration-200 underline text-sm"
+                  className="ml-1 text-blue-600 font-semibold hover:text-blue-700 transition-colors duration-200 underline text-sm"
                   onClick={toggleMode}
                 >
                   {isLogin ? "Sign Up" : "Sign In"}
@@ -706,7 +706,7 @@ const AuthPage = () => {
 
             <div className="space-y-2">
               <button
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center min-h-[40px] text-sm"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center min-h-[40px] text-sm"
                 onClick={handleOtpVerification}
                 disabled={isLoading}
               >
