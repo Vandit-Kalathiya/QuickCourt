@@ -11,6 +11,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const VenueDetailsBooking = () => {
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7000";
   const [venue, setVenue] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [searchParams] = useSearchParams();
@@ -22,7 +23,7 @@ const VenueDetailsBooking = () => {
     const fetchVenueDetails = async () => {
       try {
         console.log(id);
-        const response = await fetch(`http://localhost:7000/venues/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/venues/${id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -185,7 +186,7 @@ const VenueDetailsBooking = () => {
 
     // Create booking and initialize payment
     const response = await axios.post(
-      "http://localhost:7000/bookings",
+      `${API_BASE_URL}/bookings`,
       bookingRequest,
       {
         headers: {
@@ -210,7 +211,7 @@ const VenueDetailsBooking = () => {
         try {
           // Step 1: Verify payment with Razorpay's callback API
           const verifyResponse = await axios.post(
-            "http://localhost:7000/bookings/payment-callback",
+            `${API_BASE_URL}/bookings/payment-callback`,
             {}, // No request body since params are in the URL
             {
               headers: {
@@ -232,7 +233,7 @@ const VenueDetailsBooking = () => {
             const orderId = razorpayResponse.razorpay_order_id;
             // ✅ Step 2: Call your verify-payment API to release funds
             const deliveryVerifyResponse = await axios.post(
-              `http://localhost:7000/bookings/verify-payment/${orderId}`,
+              `${API_BASE_URL}/bookings/verify-payment/${orderId}`,
               {},
               {
                 headers: {

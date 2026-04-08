@@ -7,6 +7,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const FacilityApprovalQueue = () => {
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7000";
   const { getFacilityRequests } = useAdmin();
   const [selectedFacility, setSelectedFacility] = useState(null);
   const [approvalComment, setApprovalComment] = useState("");
@@ -57,7 +58,7 @@ const FacilityApprovalQueue = () => {
       }
       console.log(token);
       const response = await axios.post(
-        `http://localhost:7000/admin/facility-requests/${facilityId}/approve`,
+        `${API_BASE_URL}/admin/facility-requests/${facilityId}/approve`,
         {},
         {
           headers: {
@@ -108,7 +109,7 @@ const FacilityApprovalQueue = () => {
       const reason = rejectionReason.trim();
 
       const response = await axios.post(
-        `http://localhost:7000/admin/facility-requests/${facilityToReject?.id}/reject`,
+        `${API_BASE_URL}/admin/facility-requests/${facilityToReject?.id}/reject`,
         reason,
         {
           headers: {
@@ -247,7 +248,7 @@ const FacilityApprovalQueue = () => {
                   <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                     {facility?.photos?.[0] ? (
                       <Image
-                        src={`http://localhost:7000/uploads${facility.photos[0]}`}
+                        src={`${API_BASE_URL}/uploads${facility.photos[0]}`}
                         alt={facility?.name}
                         className="w-full h-full object-cover"
                       />

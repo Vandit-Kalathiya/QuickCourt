@@ -9,8 +9,11 @@ const CreateFacilityForm = ({
   isOpen,
   setShowCreateForm,
   onCancel,
-  apiEndpoint = "http://localhost:7000/owner/facilities",
+  apiEndpoint,
 }) => {
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7000";
+  const defaultApiEndpoint = `${API_BASE_URL}/owner/facilities`;
+  const finalApiEndpoint = apiEndpoint || defaultApiEndpoint;
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -244,7 +247,7 @@ const CreateFacilityForm = ({
         formDataToSend.append("photo", selectedPhoto);
       }
 
-      const response = await fetch(apiEndpoint, {
+      const response = await fetch(finalApiEndpoint, {
         method: "POST",
         body: formDataToSend,
         headers: {

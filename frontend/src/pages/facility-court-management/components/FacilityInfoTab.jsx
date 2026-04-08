@@ -7,6 +7,7 @@ import { Checkbox } from "../../../components/ui/Checkbox";
 import { useAuth } from "context/AuthContext";
 
 const FacilityInfoTab = ({ facility, onUpdate }) => {
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7000";
   const { userProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -496,7 +497,7 @@ const FacilityInfoTab = ({ facility, onUpdate }) => {
                 onDrop={(e) => handleDrop(e, index)}
               >
                 <Image
-                  src={"http://localhost:7000" + photo}
+                  src={API_BASE_URL + photo}
                   alt={`Facility photo ${index + 1}`}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />

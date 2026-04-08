@@ -16,10 +16,12 @@ export const useAdmin = () => {
 export const AdminProvider = ({ children }) => {
   // const { user, userProfile } = useAuth();
 
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7000";
+
   // Get facility requests - corresponds to AdminController.getFacilityRequests()
   const getFacilityRequests = async () => {
     const res = await axios.get(
-      `http://localhost:7000/admin/facility-requests`,
+      `${API_BASE_URL}/admin/facility-requests`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,

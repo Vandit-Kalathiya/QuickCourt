@@ -13,6 +13,7 @@ import { useBooking } from "context/BookingContext";
 import axios from "axios";
 
 const FacilityOwnerDashboard = () => {
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7000";
   const { userProfile } = useAuth();
   const [bookings, setBookings] = useState([]);
 
@@ -20,7 +21,7 @@ const FacilityOwnerDashboard = () => {
     const fetchBookings = async () => {
       try {
         console.log(userProfile);
-        const res = await axios.get(`http://localhost:7000/bookings/${userProfile.id}`, {
+        const res = await axios.get(`${API_BASE_URL}/bookings/${userProfile.id}`, {
           headers: {
             "Authorization": `Bearer ${localStorage.getItem("jwtToken")}`
           }

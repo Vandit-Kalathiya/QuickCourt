@@ -18,8 +18,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const API_BASE_URL =
-    import.meta.env.REACT_APP_API_URL || "http://localhost:7000";
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7000";
 
   // Helper function to handle API errors
   const handleApiError = async (response) => {

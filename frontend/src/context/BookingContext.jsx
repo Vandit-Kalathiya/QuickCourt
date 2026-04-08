@@ -21,7 +21,7 @@ export const BookingProvider = ({ children }) => {
   const [currentPage, setCurrentPage] = useState(0);
 
   // Base API URL
-  const API_BASE_URL = 'http://localhost:7000';
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:7000';
 
   // Create axios instance with default config
   const api = axios.create({

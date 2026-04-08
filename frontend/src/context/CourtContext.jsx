@@ -13,8 +13,7 @@ export const useCourt = () => {
 };
 
 export const CourtProvider = ({ children }) => {
-  const API_BASE_URL =
-    import.meta.env.REACT_APP_API_URL || "http://localhost:7000";
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7000";
 
   // Helper function to handle API errors
   const handleApiError = async (response) => {
@@ -40,7 +39,7 @@ export const CourtProvider = ({ children }) => {
 
   const createCourt = async (courtData) => {
     try {
-      const response = await axios.post(`http://localhost:7000/owner/facilities/${courtData.facilityId}/courts`, courtData, {
+      const response = await axios.post(`${API_BASE_URL}/owner/facilities/${courtData.facilityId}/courts`, courtData, {
         headers: getHeaders(),
       });
       toast.success("Court Created Successfully")

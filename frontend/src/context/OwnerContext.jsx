@@ -88,6 +88,8 @@ export const OwnerProvider = ({ children }) => {
   const [state, dispatch] = useReducer(ownerReducer, initialState);
   const { user, isOwner, isAuthenticated } = useAuth();
 
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7000";
+
   // Create facility - corresponds to OwnerController.createFacility()
   const createFacility = async (facilityData, photos) => {
     if (!user || !isOwner()) {
@@ -109,7 +111,7 @@ export const OwnerProvider = ({ children }) => {
       }
 
       const response = await axios.post(
-        `http://localhost:7000/owner/facilities`,
+        `${API_BASE_URL}/owner/facilities`,
         formData,
         {
           headers: {
@@ -157,7 +159,7 @@ export const OwnerProvider = ({ children }) => {
       }
 
       const response = await axios.put(
-        `http://localhost:7000/owner/facilities/${facilityId}`,
+        `${API_BASE_URL}/owner/facilities/${facilityId}`,
         formData,
         {
           headers: {
@@ -184,7 +186,7 @@ export const OwnerProvider = ({ children }) => {
 
   // Get owner facilities - corresponds to OwnerController.getOwnerFacilities()
   const getOwnerFacilities = async () => {
-    const res = await axios.get(`http://localhost:7000/owner/facilities`, {
+    const res = await axios.get(`${API_BASE_URL}/owner/facilities`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
       },
@@ -204,7 +206,7 @@ export const OwnerProvider = ({ children }) => {
       dispatch({ type: "SET_LOADING", payload: true });
 
       const response = await axios.post(
-        `http://localhost:7000/owner/facilities/${facilityId}/courts`,
+        `${API_BASE_URL}/owner/facilities/${facilityId}/courts`,
         courtData,
         {
           headers: {
@@ -239,7 +241,7 @@ export const OwnerProvider = ({ children }) => {
       dispatch({ type: "SET_LOADING", payload: true });
 
       const response = await axios.put(
-        `http://localhost:7000/owner/courts/${courtId}`,
+        `${API_BASE_URL}/owner/courts/${courtId}`,
         courtData,
         {
           headers: {
@@ -266,7 +268,7 @@ export const OwnerProvider = ({ children }) => {
 
   // Get facility courts - corresponds to OwnerController.getFacilityCourts()
   const getFacilityCourts = async (facilityId) => {
-    const res = await axios.get(`http://localhost:7000/owner/facilities/${facilityId}/courts`, {
+    const res = await axios.get(`${API_BASE_URL}/owner/facilities/${facilityId}/courts`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
       },
@@ -284,7 +286,7 @@ export const OwnerProvider = ({ children }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:7000/owner/courts/${courtId}/block`,
+        `${API_BASE_URL}/owner/courts/${courtId}/block`,
         null,
         {
           params: { date, startTime, endTime },
@@ -310,7 +312,7 @@ export const OwnerProvider = ({ children }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:7000/owner/courts/${courtId}/unblock`,
+        `${API_BASE_URL}/owner/courts/${courtId}/unblock`,
         null,
         {
           params: { date, startTime, endTime },
@@ -336,7 +338,7 @@ export const OwnerProvider = ({ children }) => {
       dispatch({ type: "SET_LOADING", payload: true });
 
       const response = await axios.get(
-        `http://localhost:7000/owner/dashboard`,
+        `${API_BASE_URL}/owner/dashboard`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
@@ -356,7 +358,7 @@ export const OwnerProvider = ({ children }) => {
 
   const getApprovedFacilities = async () => {
     const res = await axios.get(
-      `http://localhost:7000/owner/approved-facilities`,
+      `${API_BASE_URL}/owner/approved-facilities`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
@@ -372,7 +374,7 @@ export const OwnerProvider = ({ children }) => {
   const getAvailableSlots = async (courtId, date) => {
     try {
       const response = await axios.get(
-        `http://localhost:7000/api/courts/${courtId}/available-slots`,
+        `${API_BASE_URL}/api/courts/${courtId}/available-slots`,
         {
           params: { date },
           headers: {
@@ -391,7 +393,7 @@ export const OwnerProvider = ({ children }) => {
   const getBlockedSlots = async (courtId, date) => {
     try {
       const response = await axios.get(
-        `http://localhost:7000/api/courts/${courtId}/blocked-slots`,
+        `${API_BASE_URL}/api/courts/${courtId}/blocked-slots`,
         {
           params: { date },
           headers: {
@@ -410,7 +412,7 @@ export const OwnerProvider = ({ children }) => {
   const getAllSlots = async (courtId, date) => {
     try {
       const response = await axios.get(
-        `http://localhost:7000/api/courts/${courtId}/all-slots`,
+        `${API_BASE_URL}/api/courts/${courtId}/all-slots`,
         {
           params: { date },
           headers: {
@@ -438,7 +440,7 @@ export const OwnerProvider = ({ children }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:7000/owner/pricing-rules`,
+        `${API_BASE_URL}/owner/pricing-rules`,
         ruleData,
         {
           headers: {
@@ -465,7 +467,7 @@ export const OwnerProvider = ({ children }) => {
 
     try {
       const response = await axios.put(
-        `http://localhost:7000/owner/pricing-rules/${ruleId}`,
+        `${API_BASE_URL}/owner/pricing-rules/${ruleId}`,
         ruleData,
         {
           headers: {
@@ -492,7 +494,7 @@ export const OwnerProvider = ({ children }) => {
 
     try {
       const response = await axios.delete(
-        `http://localhost:7000/owner/pricing-rules/${ruleId}`,
+        `${API_BASE_URL}/owner/pricing-rules/${ruleId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
@@ -517,7 +519,7 @@ export const OwnerProvider = ({ children }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:7000/owner/pricing-rules/${ruleId}/toggle`,
+        `${API_BASE_URL}/owner/pricing-rules/${ruleId}/toggle`,
         null,
         {
           headers: {
@@ -543,7 +545,7 @@ export const OwnerProvider = ({ children }) => {
 
     try {
       const response = await axios.get(
-        `http://localhost:7000/owner/pricing-rules/facility/${facilityId}`,
+        `${API_BASE_URL}/owner/pricing-rules/facility/${facilityId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
@@ -564,7 +566,7 @@ export const OwnerProvider = ({ children }) => {
 
     try {
       const response = await axios.get(
-        `http://localhost:7000/owner/pricing-rules/court/${courtId}`,
+        `${API_BASE_URL}/owner/pricing-rules/court/${courtId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
@@ -581,7 +583,7 @@ export const OwnerProvider = ({ children }) => {
   const calculatePrice = async (courtId, date, time, durationHours) => {
     try {
       const response = await axios.get(
-        `http://localhost:7000/owner/pricing-rules/calculate-price`,
+        `${API_BASE_URL}/owner/pricing-rules/calculate-price`,
         {
           params: { courtId, date, time, durationHours },
           headers: {

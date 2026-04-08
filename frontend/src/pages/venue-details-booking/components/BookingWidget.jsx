@@ -23,9 +23,11 @@ const BookingWidget = ({ venue, onBookingComplete }) => {
   // Base price per slot (you can make this dynamic based on court or time)
   const BASE_PRICE_PER_SLOT = 35;
 
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7000";
+
   // Create axios instance
   const api = axios.create({
-    baseURL: "http://localhost:7000/api",
+    baseURL: `${API_BASE_URL}/api`,
     timeout: 10000,
   });
 

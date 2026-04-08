@@ -42,6 +42,8 @@ const VenueSearchListings = () => {
 
   const [filteredVenues, setFilteredVenues] = useState([]);
 
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7000";
+
   // Transform API data to match component expectations
   const transformVenueData = (apiVenues) => {
     return (
@@ -49,7 +51,7 @@ const VenueSearchListings = () => {
         id: venue.id,
         name: venue.name,
         image: venue.photos?.[0]
-          ? `http://localhost:7000${venue.photos[0]}`
+          ? `${API_BASE_URL}${venue.photos[0]}`
           : "/placeholder-venue.jpg",
         sports: venue.sports || [],
         rating: venue.averageRating || 0,

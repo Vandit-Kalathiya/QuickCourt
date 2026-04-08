@@ -4,6 +4,7 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
 const ImageGallery = ({ images, venueName }) => {
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:7000";
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
@@ -31,7 +32,7 @@ const ImageGallery = ({ images, venueName }) => {
         {/* Main Image */}
         <div className="relative h-64 md:h-80 lg:h-96">
           <Image
-            src={`http://localhost:7000${images?.[0]}`}
+            src={`${API_BASE_URL}${images?.[0]}`}
             alt={`${venueName} - Image ${currentImageIndex + 1}`}
             className="w-full h-full object-cover cursor-pointer"
             onClick={() => openLightbox(currentImageIndex)}
